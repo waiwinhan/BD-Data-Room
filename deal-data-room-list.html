@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRDB Deal Data Room</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #F4F2EE;
+    --surface:   #FFFFFF;
+    --surface2:  #F9F7F4;
+    --border:    rgba(0,0,0,0.08);
+    --border2:   rgba(0,0,0,0.14);
+    --text:      #1A1916;
+    --muted:     #7A7770;
+    --faint:     #B0ADA8;
+    --green:     #1D9E75;
+    --green-bg:  #E1F5EE;
+    --green-txt: #0F6E56;
+    --blue:      #185FA5;
+    --blue-bg:   #E6F1FB;
+    --amber:     #854F0B;
+    --amber-bg:  #FEF3E2;
+    --red:       #A32D2D;
+    --red-bg:    #FCEBEB;
+    --purple:    #534AB7;
+    --purple-bg: #EEEDFE;
+    --font:      'DM Sans', sans-serif;
+    --mono:      'DM Mono', monospace;
+    --radius:    10px;
+    --radius-sm: 6px;
+    --shadow:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+  }
+
+  html { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+
+  /* ── TOPBAR ── */
+  .topbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 52px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .logo-mark {
+    width: 30px; height: 30px;
+    background: var(--text); border-radius: 7px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: #fff; letter-spacing: 0.04em;
+  }
+  .topbar-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .topbar-divider { width: 1px; height: 16px; background: var(--border2); }
+  .topbar-sub { font-size: 12px; color: var(--muted); }
+  .topbar-right { display: flex; align-items: center; gap: 8px; }
+  .btn-sm {
+    height: 30px; padding: 0 12px;
+    border: 1px solid var(--border2); border-radius: var(--radius-sm);
+    background: transparent; font-family: var(--font); font-size: 12px; font-weight: 500; color: var(--muted);
+    cursor: pointer; transition: all 0.15s;
+  }
+  .btn-sm:hover { background: var(--surface2); color: var(--text); }
+  .btn-primary {
+    height: 30px; padding: 0 14px;
+    border: none; border-radius: var(--radius-sm);
+    background: var(--text); color: #fff;
+    font-family: var(--font); font-size: 12px; font-weight: 500;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  .btn-primary:hover { opacity: 0.82; }
+
+  /* ── NDA STRIP ── */
+  .nda-strip {
+    background: var(--amber-bg);
+    border-bottom: 1px solid rgba(133,79,11,0.15);
+    padding: 8px 28px;
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11.5px; color: var(--amber); font-weight: 500;
+  }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    padding: 32px 28px 0;
+    max-width: 1280px; margin: 0 auto; width: 100%;
+  }
+  .page-header-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
+  .page-title { font-size: 22px; font-weight: 600; color: var(--text); letter-spacing: -0.4px; }
+  .page-subtitle { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 28px 20px;
+    max-width: 1280px; margin: 0 auto; width: 100%;
+  }
+  .filter-pill {
+    height: 30px; padding: 0 14px;
+    border: 1px solid var(--border2); border-radius: 20px;
+    background: transparent; font-family: var(--font); font-size: 12px; font-weight: 500; color: var(--muted);
+    cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  }
+  .filter-pill:hover { background: var(--surface); color: var(--text); }
+  .filter-pill.active { background: var(--text); color: #fff; border-color: var(--text); }
+  .filter-count {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: rgba(255,255,255,0.25); font-size: 10px; font-weight: 600;
+    margin-left: 4px;
+  }
+  .filter-count.dark { background: rgba(0,0,0,0.12); color: var(--text); }
+  .filter-sep { flex: 1; }
+  .search-wrap { position: relative; }
+  .search-input {
+    height: 30px; padding: 0 12px 0 30px; width: 200px;
+    border: 1px solid var(--border2); border-radius: var(--radius-sm);
+    background: var(--surface); font-family: var(--font); font-size: 12px; color: var(--text);
+    outline: none; transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--text); }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--faint); pointer-events: none; }
+
+  /* ── SUMMARY STRIP ── */
+  .summary-strip {
+    display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px;
+    padding: 0 28px 24px;
+    max-width: 1280px; margin: 0 auto; width: 100%;
+  }
+  .sum-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px 16px;
+    box-shadow: var(--shadow);
+  }
+  .sum-label { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; font-weight: 500; }
+  .sum-value { font-size: 18px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+  .sum-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* ── DEAL GRID ── */
+  .deal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 14px;
+    padding: 0 28px 40px;
+    max-width: 1280px; margin: 0 auto; width: 100%;
+  }
+
+  /* ── DEAL CARD ── */
+  .deal-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    text-decoration: none; color: inherit;
+  }
+  .deal-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    border-color: var(--border2);
+  }
+
+  /* card colour bar */
+  .card-bar { height: 3px; width: 100%; }
+
+  .card-body { padding: 16px 18px 14px; flex: 1; }
+
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+  .card-name { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; line-height: 1.3; }
+  .card-ref { font-size: 10.5px; font-family: var(--mono); color: var(--faint); margin-top: 2px; }
+
+  .card-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 1px; }
+  .badge {
+    font-size: 10.5px; font-weight: 500; padding: 2px 8px;
+    border-radius: 20px; letter-spacing: 0.02em; white-space: nowrap;
+  }
+  .badge-green  { background: var(--green-bg);  color: var(--green-txt); }
+  .badge-blue   { background: var(--blue-bg);   color: var(--blue); }
+  .badge-amber  { background: var(--amber-bg);  color: var(--amber); }
+  .badge-red    { background: var(--red-bg);     color: var(--red); }
+  .badge-purple { background: var(--purple-bg); color: var(--purple); }
+  .badge-grey   { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+
+  .card-location { font-size: 12px; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 5px; }
+  .loc-pin { font-size: 11px; }
+
+  /* KPI mini grid */
+  .card-kpis { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+  .card-kpi { padding: 10px 12px; }
+  .card-kpi:not(:last-child) { border-right: 1px solid var(--border); }
+  .ck-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; font-weight: 500; }
+  .ck-value { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
+  .ck-sub { font-size: 10px; color: var(--faint); margin-top: 1px; font-family: var(--mono); }
+
+  /* card footer */
+  .card-footer {
+    padding: 10px 18px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--surface2);
+  }
+  .card-footer-left { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--muted); }
+  .footer-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .footer-dot.active { background: var(--green); }
+  .footer-dot.review { background: #378ADD; }
+  .footer-dot.signed { background: var(--purple); }
+  .footer-dot.hold   { background: var(--faint); }
+  .card-footer-right { font-size: 11px; color: var(--faint); font-family: var(--mono); }
+
+  /* ── PROGRESS BAR (DD progress) ── */
+  .dd-progress { margin-top: 12px; }
+  .dd-label-row { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--muted); margin-bottom: 5px; }
+  .dd-bar-track { height: 4px; background: var(--surface2); border-radius: 2px; border: 1px solid var(--border); overflow: hidden; }
+  .dd-bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center; padding: 60px 20px;
+    color: var(--muted); font-size: 13px;
+  }
+  .empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }
+
+  /* ── ADD DEAL CARD ── */
+  .add-card {
+    background: transparent;
+    border: 1.5px dashed var(--border2);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    min-height: 200px; gap: 8px;
+    color: var(--muted); font-size: 13px; font-weight: 500;
+  }
+  .add-card:hover { background: var(--surface); border-color: var(--text); color: var(--text); box-shadow: var(--shadow); }
+  .add-icon { font-size: 24px; opacity: 0.5; }
+
+  /* ── ANIMATIONS ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .deal-card { animation: fadeUp 0.3s ease both; }
+  .deal-card:nth-child(1) { animation-delay: 0.05s; }
+  .deal-card:nth-child(2) { animation-delay: 0.10s; }
+  .deal-card:nth-child(3) { animation-delay: 0.15s; }
+  .deal-card:nth-child(4) { animation-delay: 0.20s; }
+  .deal-card:nth-child(5) { animation-delay: 0.25s; }
+  .deal-card:nth-child(6) { animation-delay: 0.30s; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <div class="logo-mark">BR</div>
+    <span class="topbar-title">Deal Data Room</span>
+    <div class="topbar-divider"></div>
+    <span class="topbar-sub">BRDB Berhad · Business Development</span>
+  </div>
+  <div class="topbar-right">
+    <button class="btn-sm">Settings</button>
+    <button class="btn-sm">Logout</button>
+    <button class="btn-primary" onclick="alert('Add new deal — coming in Phase 4')">+ New Deal</button>
+  </div>
+</header>
+
+<!-- NDA STRIP -->
+<div class="nda-strip">
+  <span>⚠</span>
+  Confidential — under NDA. Access restricted to authorised BRDB personnel only.
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-header-row">
+    <div>
+      <div class="page-title">Active Deals</div>
+      <div class="page-subtitle">Property acquisitions &amp; joint ventures under due diligence or negotiation</div>
+    </div>
+  </div>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <button class="filter-pill active" onclick="filterDeals('all', this)">All <span class="filter-count">5</span></button>
+  <button class="filter-pill" onclick="filterDeals('dd', this)">Active DD <span class="filter-count dark">2</span></button>
+  <button class="filter-pill" onclick="filterDeals('review', this)">Under Review <span class="filter-count dark">1</span></button>
+  <button class="filter-pill" onclick="filterDeals('signed', this)">Signed <span class="filter-count dark">1</span></button>
+  <button class="filter-pill" onclick="filterDeals('hold', this)">On Hold <span class="filter-count dark">1</span></button>
+  <div class="filter-sep"></div>
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input class="search-input" type="text" placeholder="Search deals…" oninput="searchDeals(this.value)">
+  </div>
+</div>
+
+<!-- SUMMARY STRIP -->
+<div class="summary-strip">
+  <div class="sum-card">
+    <div class="sum-label">Total Pipeline GDV</div>
+    <div class="sum-value">RM 1.24B</div>
+    <div class="sum-sub">Across 5 active deals</div>
+  </div>
+  <div class="sum-card">
+    <div class="sum-label">Avg. Projected IRR</div>
+    <div class="sum-value">17.8%</div>
+    <div class="sum-sub">Above 16% hurdle</div>
+  </div>
+  <div class="sum-card">
+    <div class="sum-label">Total Land Area</div>
+    <div class="sum-value">48.3 ac</div>
+    <div class="sum-sub">Freehold &amp; leasehold mix</div>
+  </div>
+  <div class="sum-card">
+    <div class="sum-label">Pending Board Sign-off</div>
+    <div class="sum-value">2 deals</div>
+    <div class="sum-sub">Est. May – Jun 2026</div>
+  </div>
+</div>
+
+<!-- DEAL GRID -->
+<div class="deal-grid" id="dealGrid">
+
+  <!-- Deal 1 — Active DD -->
+  <a class="deal-card" href="deal-data-room-prototype.html" data-stage="dd">
+    <div class="card-bar" style="background: linear-gradient(90deg, #5DCAA5, #1D9E75)"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <div>
+          <div class="card-name">Permas Jaya Land Acquisition</div>
+          <div class="card-ref">JB-2026-04</div>
+        </div>
+        <div class="card-badges">
+          <span class="badge badge-red">Restricted</span>
+          <span class="badge badge-green">Active DD</span>
+        </div>
+      </div>
+      <div class="card-location"><span class="loc-pin">📍</span>PTD 220475, Mukim Plentong, Johor Bahru</div>
+      <div class="card-kpis">
+        <div class="card-kpi">
+          <div class="ck-label">GDV</div>
+          <div class="ck-value">RM 280M</div>
+          <div class="ck-sub">RM 680 psf</div>
+        </div>
+        <div class="card-kpi">
+          <div class="ck-label">IRR</div>
+          <div class="ck-value">18.4%</div>
+          <div class="ck-sub">+2.4% vs hurdle</div>
+        </div>
+        <div class="card-kpi">
+          <div class="ck-label">Land</div>
+          <div class="ck-value">5.55 ac</div>
+          <div class="ck-sub">Freehold</div>
+        </div>
+      </div>
+      <div class="dd-progress">
+        <div class="dd-label-row"><span>DD Progress</span><span>40%</span></div>
+        <div class="dd-bar-track"><div class="dd-bar-fill" style="width:40%; background:#5DCAA5"></div></div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="card-footer-left"><div class="footer-dot active"></div>Active due diligence · 4 docs pending</div>
+      <div class="card-footer-right">Updated Apr 6</div>
+    </div>
+  </a>
+
+  <!-- Deal 2 — Active DD -->
+  <a class="deal-card" href="#" data-stage="dd" onclick="alert('Dashboard for this deal — add data to unlock')">
+    <div class="card-bar" style="background: linear-gradient(90deg, #85B7EB, #185FA5)"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <div>
+          <div class="card-name">Iskandar Waterfront Parcel C</div>
+          <div class="card-ref">JB-2026-07</div>
+        </div>
+        <div class="card-badges">
+          <span class="badge badge-red">Restricted</span>
+          <span class="badge badge-green">Active DD</span>
+        </div>
+      </div>
+      <div class="card-location"><span class="loc-pin">📍</span>Lot 4821, Persiaran Danga, Johor Bahru</div>
+      <div class="card-kpis">
+        <div class="card-kpi">
+          <div class="ck-label">GDV</div>
+          <div class="ck-value">RM 420M</div>
+          <div class="ck-sub">RM 820 psf</div>
+        </div>
+        <div class="card-kpi">
+          <div class="ck-label">IRR</div>
+          <div class="ck-value">19.1%</div>
+          <div class="ck-sub">+3.1% vs hurdle</div>
+        </div>
+        <div class="card-kpi">
+          <div class="ck-label">Land</div>
+          <div class="ck-value">8.20 ac</div>
+          <div class="ck-sub">Leasehold 99yr</div>
+        </div>
+      </div>
+      <div class="dd-progress">
+        <div class="dd-label-row"><span>DD Progress</span><span>25%</span></div>
+        <div class="dd-bar-track"><div class="dd-bar-fill" style="width:25%; background:#85B7EB"></div></div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="card-footer-left"><div class="footer-dot active"></div>Active due diligence · LOI executed</div>
+      <div class="card-footer-right">Updated Apr 3</div>
+    </div>
+  </a>
+
+  <!-- Deal 3 — Under Review -->
+  <a class="deal-card" href="#" data-stage="review" onclick="alert('Dashboard for this deal — add data to unlock')">
+    <div class="card-bar" style="background: linear-gradient(90deg, #FAC775, #EF9F27)"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <div>
+          <div class="card-name">Bukit Jalil Mixed Dev JV</div>
+          <div class="card-ref">KL-2026-02</div>
+        </div>
+        <div class="card-badges">
+          <span class="badge badge-amber">Under Review</span>
+        </div>
+      </div>
+      <div class="card-location"><span class="loc-pin">📍</span>Lot 78, Jalan Jalil Perkasa, Bukit Jalil, KL</div>
+      <div class="card-kpis">
+        <div class="card-kpi">
+          <div class="ck-label">GDV</div>
+          <div class="ck-value">RM 310M</div>
+          <div class="ck-sub">RM 750 psf</div>
+        </div>
+        <div class="card-kpi">
+          <div class="ck-label">IRR</div>
+          <div class="ck-value">16.9%</div>
+          <div class="ck-sub">+0.9% vs hurdle</div>
+        </div>
+        <div class="card-kpi">
+          <div class="ck-label">Land</div>
+          <div class="ck-value">12.4 ac</div>
+          <div class="ck-sub">Freehold</div>
+        </div>
+      </div>
+      <div class="dd-progress">
+        <div class="dd-label-row"><span>DD Progress</span><span>75%</span></div>
+        <div class="dd-bar-track"><div class="dd-bar-fill" style="width:75%; background:#FAC775"></div></div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="card-footer-left"><div class="footer-dot review"></div>Pending board presentation · May 2026</div>
+      <div class="card-footer-right">Updated Mar 28</div>
+    </div>
+  </a>
+
+  <!-- Deal 4 — Signed -->
+  <a class="deal-card" href="#" data-stage="signed" onclick="alert('Dashboard for this deal — add data to unlock')">
+    <div class="card-bar" style="background: linear-gradient(90deg, #AFA9EC, #534AB7)"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <div>
+          <div class="card-name">Damansara Damai Residences</div>
+          <div class="card-ref">KL-2025-11</div>
+        </div>
+        <div class="card-badges">
+          <span class="badge badge-purple">Signed</span>
+        </div>
+      </div>
+      <div class="card-location"><span class="loc-pin">📍</span>GM 4192, Mukim Batu, Petaling Jaya, Selangor</div>
+      <div class="card-kpis">
+        <div class="card-kpi">
+          <div class="ck-label">GDV</div>
+          <div class="ck-value">RM 148M</div>
+          <div class="ck-sub">RM 620 psf</div>
+        </div>
+        <div class="card-kpi">
+          <div class="ck-label">IRR</div>
+          <div class="ck-value">17.2%</div>
+          <div class="ck-sub">+1.2% vs hurdle</div>
+        </div>
+        <div class="card-kpi">
+          <div class="ck-label">Land</div>
+          <div class="ck-value">14.8 ac</div>
+          <div class="ck-sub">Freehold</div>
+        </div>
+      </div>
+      <div class="dd-progress">
+        <div class="dd-label-row"><span>DD Progress</span><span>100%</span></div>
+        <div class="dd-bar-track"><div class="dd-bar-fill" style="width:100%; background:#534AB7"></div></div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="card-footer-left"><div class="footer-dot signed"></div>SPA executed · Dec 2025 · Launching Q3 2026</div>
+      <div class="card-footer-right">Updated Jan 15</div>
+    </div>
+  </a>
+
+  <!-- Deal 5 — On Hold -->
+  <a class="deal-card" href="#" data-stage="hold" onclick="alert('Dashboard for this deal — add data to unlock')">
+    <div class="card-bar" style="background: linear-gradient(90deg, #D3D1C7, #888780)"></div>
+    <div class="card-body">
+      <div class="card-top">
+        <div>
+          <div class="card-name">Rawang Township Phase 3</div>
+          <div class="card-ref">SL-2026-01</div>
+        </div>
+        <div class="card-badges">
+          <span class="badge badge-grey">On Hold</span>
+        </div>
+      </div>
+      <div class="card-location"><span class="loc-pin">📍</span>Lot 990, Mukim Rawang, Selangor</div>
+      <div class="card-kpis">
+        <div class="card-kpi">
+          <div class="ck-label">GDV</div>
+          <div class="ck-value">RM 82M</div>
+          <div class="ck-sub">RM 380 psf</div>
+        </div>
+        <div class="card-kpi">
+          <div class="ck-label">IRR</div>
+          <div class="ck-value">14.3%</div>
+          <div class="ck-sub" style="color:#A32D2D">−1.7% vs hurdle</div>
+        </div>
+        <div class="card-kpi">
+          <div class="ck-label">Land</div>
+          <div class="ck-value">7.35 ac</div>
+          <div class="ck-sub">Freehold</div>
+        </div>
+      </div>
+      <div class="dd-progress">
+        <div class="dd-label-row"><span>DD Progress</span><span>55%</span></div>
+        <div class="dd-bar-track"><div class="dd-bar-fill" style="width:55%; background:#B4B2A9"></div></div>
+      </div>
+    </div>
+    <div class="card-footer">
+      <div class="card-footer-left"><div class="footer-dot hold"></div>On hold — IRR below threshold</div>
+      <div class="card-footer-right">Updated Feb 10</div>
+    </div>
+  </a>
+
+  <!-- Add new deal card -->
+  <div class="add-card" onclick="alert('+ New Deal — available in Phase 4')">
+    <div class="add-icon">+</div>
+    <span>Add new deal</span>
+  </div>
+
+</div>
+
+<script>
+// ── FILTER ──
+function filterDeals(stage, btn) {
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.deal-card[data-stage]').forEach(card => {
+    const show = stage === 'all' || card.dataset.stage === stage;
+    card.style.display = show ? '' : 'none';
+  });
+  document.querySelector('.add-card').style.display = stage === 'all' ? '' : 'none';
+}
+
+// ── SEARCH ──
+function searchDeals(query) {
+  const q = query.toLowerCase().trim();
+  document.querySelectorAll('.deal-card[data-stage]').forEach(card => {
+    const text = card.textContent.toLowerCase();
+    card.style.display = (!q || text.includes(q)) ? '' : 'none';
+  });
+}
+</script>
+
+</body>
+</html>

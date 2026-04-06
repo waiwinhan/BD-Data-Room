@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRDB Deal Data Room — Permas Jaya</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F4F2EE;--surface:#FFF;--surface2:#F9F7F4;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1A1916;--muted:#7A7770;--faint:#B0ADA8;
+  --green:#1D9E75;--green-bg:#E1F5EE;--green-txt:#0F6E56;
+  --blue:#185FA5;--blue-bg:#E6F1FB;
+  --amber:#854F0B;--amber-bg:#FEF3E2;
+  --red:#A32D2D;--red-bg:#FCEBEB;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --r:10px;--rs:6px;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shm:0 4px 16px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.05);
+}
+html{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.tl{display:flex;align-items:center;gap:12px}
+.logo{width:30px;height:30px;background:var(--text);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;letter-spacing:.04em}
+.t-title{font-size:13px;font-weight:600;color:var(--text)}
+.t-div{width:1px;height:16px;background:var(--border2)}
+.t-sub{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.tr{display:flex;align-items:center;gap:8px}
+.btn{height:30px;padding:0 12px;border:1px solid var(--border2);border-radius:var(--rs);background:transparent;font-family:var(--font);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center}
+.btn:hover{background:var(--surface2);color:var(--text)}
+.btn-p{height:30px;padding:0 14px;border:none;border-radius:var(--rs);background:var(--text);color:#fff;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:opacity .15s}
+.btn-p:hover{opacity:.82}
+
+/* NDA */
+.nda{background:var(--amber-bg);border-bottom:1px solid rgba(133,79,11,.15);padding:8px 24px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--amber);font-weight:500}
+
+/* DEAL HEADER */
+.dh{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px 0}
+.dh-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.d-name{font-size:18px;font-weight:600;color:var(--text);letter-spacing:-.3px;margin-bottom:3px}
+.d-meta{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sep-dot{color:var(--faint)}
+.bdgs{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.b{font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px;letter-spacing:.02em}
+.b-red{background:var(--red-bg);color:var(--red)}
+.b-grn{background:var(--green-bg);color:var(--green-txt)}
+.b-grey{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+
+/* TABS */
+.tabs{display:flex}
+.tab{font-size:13px;font-weight:400;color:var(--muted);padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:color .15s;white-space:nowrap;user-select:none}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--text);font-weight:500;border-bottom-color:var(--text)}
+
+/* MAIN */
+.main{padding:24px;max-width:1280px;width:100%;margin:0 auto}
+.panel{display:none}
+.panel.active{display:block;animation:fu .2s ease}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);transition:box-shadow .2s,transform .2s}
+.kpi:hover{box-shadow:var(--shm);transform:translateY(-1px)}
+.kpi-l{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;font-weight:500}
+.kpi-v{font-size:22px;font-weight:600;color:var(--text);line-height:1;letter-spacing:-.5px}
+.kpi-s{font-size:11px;margin-top:5px;color:var(--green)}
+.kpi-s.warn{color:var(--red)}
+.kpi-s.n{color:var(--muted)}
+
+/* GRIDS */
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mb20{margin-bottom:20px}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh)}
+.cl{font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.sep{height:1px;background:var(--border);margin:14px 0}
+
+/* MAP */
+.map-w{border-radius:8px;overflow:hidden;border:1px solid var(--border);height:200px;position:relative;background:#E8E4DC}
+.map-w iframe{width:100%;height:100%;border:none;display:block}
+.map-ov{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.55));padding:10px 12px;pointer-events:none}
+.map-ov .mp{font-size:12px;color:#fff;font-weight:500}
+.map-ov .ms{font-size:10.5px;color:rgba(255,255,255,.8)}
+.map-open{position:absolute;top:8px;right:8px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:500;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:3px;box-shadow:var(--sh)}
+.cpills{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.cp{font-size:10.5px;font-family:var(--mono);background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:2px 9px;color:var(--muted)}
+
+/* PROXIMITY */
+.px-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
+.px-row:last-child{border-bottom:none}
+.px-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.px-lbl{color:var(--muted);flex:1}
+.px-dist{color:var(--text);font-weight:500;font-family:var(--mono);font-size:11.5px}
+
+/* MILESTONES */
+.ms-row{display:flex;align-items:flex-start;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.ms-row:last-child{border-bottom:none}
+.ms-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.ms-dot.done{background:var(--green)}
+.ms-dot.act{background:#378ADD}
+.ms-dot.pend{background:var(--faint)}
+.ms-b{flex:1}
+.ms-lbl{font-size:12.5px;color:var(--text)}
+.ms-dt{font-size:11px;color:var(--muted);margin-top:1px}
+.ms-badge{font-size:10.5px;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.ms-badge.done{background:var(--green-bg);color:var(--green-txt)}
+.ms-badge.act{background:var(--blue-bg);color:var(--blue)}
+.ms-badge.pend{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+
+/* DEV MIX */
+.mx-row{margin-bottom:12px}
+.mx-hdr{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.mx-n{color:var(--text)}
+.mx-p{color:var(--muted);font-family:var(--mono)}
+.bar-t{height:5px;background:var(--surface2);border-radius:3px;border:1px solid var(--border)}
+.bar-f{height:100%;border-radius:3px}
+.asm-g{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)}
+.asm-l{font-size:10.5px;color:var(--muted);margin-bottom:2px}
+.asm-v{font-size:13px;font-weight:600;color:var(--text);font-family:var(--mono)}
+
+/* DOCS */
+.doc-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:all .12s}
+.doc-row:last-of-type{border-bottom:none}
+.doc-row:hover{background:var(--surface2);margin:0 -6px;padding:8px 6px;border-radius:6px}
+.di{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;font-family:var(--mono)}
+.di.pdf{background:#FAECE7;color:#993C1D}
+.di.xls{background:#EAF3DE;color:#3B6D11}
+.di.doc{background:#E6F1FB;color:#185FA5}
+.di.img{background:#FAEEDA;color:#854F0B}
+.db{flex:1;min-width:0}
+.dn{font-size:12.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dm{font-size:11px;color:var(--muted);margin-top:1px}
+.ds{font-size:10.5px;padding:2px 8px;border-radius:20px;flex-shrink:0}
+.ds.new{background:var(--green-bg);color:var(--green-txt)}
+.ds.rev{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.ds.pend{background:var(--amber-bg);color:var(--amber)}
+.up-btn{margin-top:10px;width:100%;height:34px;border:1px dashed var(--border2);border-radius:var(--rs);background:transparent;font-family:var(--font);font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s}
+.up-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--text)}
+
+/* CHARTS */
+.cw{position:relative;height:180px}
+.cl-leg{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px;font-size:11.5px;color:var(--muted)}
+.li{display:flex;align-items:center;gap:5px}
+.ls{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+
+/* SENSITIVITY */
+.sens-w{overflow-x:auto;margin-top:4px}
+.st{width:100%;border-collapse:collapse;font-size:12px}
+.st th,.st td{padding:7px 12px;text-align:center}
+.st th{font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border2)}
+.st td:first-child{text-align:left;color:var(--muted);font-family:var(--mono);font-size:11px}
+.c-base{background:var(--green-bg);color:var(--green-txt);font-weight:600;border-radius:4px}
+.c-good{color:var(--green)}
+.c-bad{color:var(--red)}
+
+/* RISK */
+.ri{padding:10px 0;border-bottom:1px solid var(--border)}
+.ri:last-child{border-bottom:none}
+.ri-t{font-size:12.5px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.ri-d{font-size:11.5px;color:var(--muted);line-height:1.5}
+.rdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.rdot.hi{background:#E24B4A}
+.rdot.med{background:#EF9F27}
+.rdot.lo{background:var(--green)}
+
+/* LEGAL */
+.lr{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px}
+.lr:last-child{border-bottom:none}
+.lk{color:var(--muted)}
+.lv{font-weight:500;color:var(--text);text-align:right}
+.lv.good{color:var(--green)}
+.lv.warn{color:var(--amber)}
+
+/* TEAM */
+.tr-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.tr-row:last-child{border-bottom:none}
+.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;flex-shrink:0}
+.ti{flex:1}
+.tn{font-size:12.5px;font-weight:500;color:var(--text)}
+.tro{font-size:11px;color:var(--muted)}
+.tl-txt{font-size:11px;color:var(--muted)}
+
+/* LOG */
+.log{font-size:12px;color:var(--muted);line-height:2.1}
+.log strong{color:var(--text);font-weight:500}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="tl">
+    <div class="logo">BR</div>
+    <span class="t-title">Deal Data Room</span>
+    <div class="t-div"></div>
+    <span class="t-sub">BRDB · Apr 2026</span>
+  </div>
+  <div class="tr">
+    <a href="deal-data-room-list.html" class="btn">← All Deals</a>
+    <button class="btn">↑ Upload</button>
+    <button class="btn-p">Export PDF</button>
+  </div>
+</header>
+
+<div class="nda">⚠ Confidential — under NDA. Intended solely for authorised investors and partners of BRDB.</div>
+
+<div class="dh">
+  <div class="dh-top">
+    <div>
+      <div class="d-name">Permas Jaya Land Acquisition</div>
+      <div class="d-meta">
+        PTD 220475, Mukim Plentong, Johor Bahru
+        <span class="sep-dot">·</span> 5.55 acres freehold
+        <span class="sep-dot">·</span> Ref: JB-2026-04
+      </div>
+    </div>
+    <div class="bdgs">
+      <span class="b b-red">Restricted</span>
+      <span class="b b-grn">Active DD</span>
+      <span class="b b-grey">Updated Apr 6</span>
+    </div>
+  </div>
+  <nav class="tabs">
+    <div class="tab active" onclick="sw('overview')">Overview</div>
+    <div class="tab" onclick="sw('documents')">Documents</div>
+    <div class="tab" onclick="sw('financials')">Financials</div>
+    <div class="tab" onclick="sw('risk')">Risk &amp; Legal</div>
+    <div class="tab" onclick="sw('team')">Deal Team</div>
+  </nav>
+</div>
+
+<main class="main">
+
+  <!-- OVERVIEW -->
+  <div id="p-overview" class="panel active">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-l">Land Area</div><div class="kpi-v">5.55 ac</div><div class="kpi-s n">Freehold title</div></div>
+      <div class="kpi"><div class="kpi-l">Est. GDV</div><div class="kpi-v">RM 280M</div><div class="kpi-s">Blended RM 680 psf</div></div>
+      <div class="kpi"><div class="kpi-l">Land Cost</div><div class="kpi-v">RM 38M</div><div class="kpi-s n">RM 157 psf</div></div>
+      <div class="kpi"><div class="kpi-l">Projected IRR</div><div class="kpi-v">18.4%</div><div class="kpi-s warn">Threshold 16.0%</div></div>
+    </div>
+    <div class="g3">
+      <!-- Map -->
+      <div class="card">
+        <div class="cl">Site Location</div>
+        <div class="map-w">
+          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.5!2d103.8223!3d1.5023!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31da6c9b79a73b39%3A0xc3249283065a329d!2sPermas%20Jaya%2C%2081750%20Masai%2C%20Johor!5e0!3m2!1sen!2smy!4v1712300000000" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          <div class="map-ov"><div class="mp">PTD 220475 — Permas Jaya</div><div class="ms">Mukim Plentong, Johor Bahru</div></div>
+          <a class="map-open" href="https://maps.google.com/?q=1.5023,103.8223" target="_blank">↗ Open</a>
+        </div>
+        <div class="cpills">
+          <span class="cp">1.5023° N</span><span class="cp">103.8223° E</span><span class="cp">Johor Bahru</span>
+        </div>
+        <div style="margin-top:12px">
+          <div class="cl">Key Proximities</div>
+          <div class="px-row"><div class="px-dot" style="background:#378ADD"></div><span class="px-lbl">CIQ / Customs checkpoint</span><span class="px-dist">~8 km</span></div>
+          <div class="px-row"><div class="px-dot" style="background:#5DCAA5"></div><span class="px-lbl">Iskandar Puteri (Medini)</span><span class="px-dist">~18 km</span></div>
+          <div class="px-row"><div class="px-dot" style="background:#EF9F27"></div><span class="px-lbl">JS-SEZ core zone</span><span class="px-dist">~12 km</span></div>
+          <div class="px-row"><div class="px-dot" style="background:#7F77DD"></div><span class="px-lbl">Nearest LRT (planned)</span><span class="px-dist">~2.1 km</span></div>
+        </div>
+      </div>
+      <!-- Milestones -->
+      <div class="card">
+        <div class="cl">DD Milestones</div>
+        <div class="ms-row"><div class="ms-dot done"></div><div class="ms-b"><div class="ms-lbl">LOI executed</div><div class="ms-dt">10 Mar 2026</div></div><span class="ms-badge done">Done</span></div>
+        <div class="ms-row"><div class="ms-dot done"></div><div class="ms-b"><div class="ms-lbl">Title search &amp; encumbrance check</div><div class="ms-dt">18 Mar 2026</div></div><span class="ms-badge done">Done</span></div>
+        <div class="ms-row"><div class="ms-dot act"></div><div class="ms-b"><div class="ms-lbl">Legal due diligence</div><div class="ms-dt">Target 15 Apr 2026</div></div><span class="ms-badge act">In progress</span></div>
+        <div class="ms-row"><div class="ms-dot act"></div><div class="ms-b"><div class="ms-lbl">Financial feasibility sign-off</div><div class="ms-dt">Target 20 Apr 2026</div></div><span class="ms-badge act">In progress</span></div>
+        <div class="ms-row"><div class="ms-dot pend"></div><div class="ms-b"><div class="ms-lbl">Board approval</div><div class="ms-dt">Est. May 2026</div></div><span class="ms-badge pend">Pending</span></div>
+        <div class="ms-row"><div class="ms-dot pend"></div><div class="ms-b"><div class="ms-lbl">SPA execution</div><div class="ms-dt">Est. Jun 2026</div></div><span class="ms-badge pend">Pending</span></div>
+      </div>
+      <!-- Dev Mix -->
+      <div class="card">
+        <div class="cl">Development Mix (Proposed)</div>
+        <div class="mx-row"><div class="mx-hdr"><span class="mx-n">Serviced apartments (600–900 sf)</span><span class="mx-p">55%</span></div><div class="bar-t"><div class="bar-f" style="width:55%;background:#5DCAA5"></div></div></div>
+        <div class="mx-row"><div class="mx-hdr"><span class="mx-n">SoHo / SOFO units</span><span class="mx-p">25%</span></div><div class="bar-t"><div class="bar-f" style="width:25%;background:#85B7EB"></div></div></div>
+        <div class="mx-row"><div class="mx-hdr"><span class="mx-n">Retail podium</span><span class="mx-p">12%</span></div><div class="bar-t"><div class="bar-f" style="width:12%;background:#FAC775"></div></div></div>
+        <div class="mx-row"><div class="mx-hdr"><span class="mx-n">Car park / facilities</span><span class="mx-p">8%</span></div><div class="bar-t"><div class="bar-f" style="width:8%;background:#B4B2A9"></div></div></div>
+        <div class="asm-g">
+          <div><div class="asm-l">Plot ratio</div><div class="asm-v">1:6.0</div></div>
+          <div><div class="asm-l">Build cost psf</div><div class="asm-v">RM 280</div></div>
+          <div><div class="asm-l">Absorption rate</div><div class="asm-v">80% / yr</div></div>
+          <div><div class="asm-l">Dev. period</div><div class="asm-v">4 years</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DOCUMENTS -->
+  <div id="p-documents" class="panel">
+    <div class="g2">
+      <div class="card">
+        <div class="cl">Legal Documents</div>
+        <div class="doc-row"><div class="di pdf">PDF</div><div class="db"><div class="dn">LOI — Compadu Sdn Bhd</div><div class="dm">Wai Win Han · 10 Mar 2026 · 2.1 MB</div></div><span class="ds rev">Reviewed</span></div>
+        <div class="doc-row"><div class="di pdf">PDF</div><div class="db"><div class="dn">Draft term sheet v3</div><div class="dm">Ahmad Kamil · 22 Mar 2026 · 890 KB</div></div><span class="ds new">New</span></div>
+        <div class="doc-row"><div class="di pdf">PDF</div><div class="db"><div class="dn">Title search — PTD 220475</div><div class="dm">Ahmad Kamil · 18 Mar 2026 · 1.4 MB</div></div><span class="ds rev">Reviewed</span></div>
+        <div class="doc-row"><div class="di doc">DOC</div><div class="db"><div class="dn">Land condition report</div><div class="dm">Siti Tan · 25 Mar 2026 · 3.2 MB</div></div><span class="ds pend">Pending</span></div>
+        <div class="doc-row"><div class="di pdf">PDF</div><div class="db"><div class="dn">Caveat status (Registry)</div><div class="dm">Ahmad Kamil · 19 Mar 2026 · 410 KB</div></div><span class="ds rev">Reviewed</span></div>
+        <button class="up-btn">+ Upload legal document</button>
+      </div>
+      <div class="card">
+        <div class="cl">Financial &amp; Technical</div>
+        <div class="doc-row"><div class="di xls">XLS</div><div class="db"><div class="dn">Feasibility model v4</div><div class="dm">Rebecca Lim · 28 Mar 2026 · 1.8 MB</div></div><span class="ds new">New</span></div>
+        <div class="doc-row"><div class="di pdf">PDF</div><div class="db"><div class="dn">Valuation report (JPPH)</div><div class="dm">Knight Frank MY · 21 Mar 2026 · 5.6 MB</div></div><span class="ds rev">Reviewed</span></div>
+        <div class="doc-row"><div class="di img">IMG</div><div class="db"><div class="dn">Survey plan &amp; lot boundaries</div><div class="dm">Siti Tan · 17 Mar 2026 · 8.1 MB</div></div><span class="ds rev">Reviewed</span></div>
+        <div class="doc-row"><div class="di xls">XLS</div><div class="db"><div class="dn">Comparable transactions (EdgeProp)</div><div class="dm">Rebecca Lim · 30 Mar 2026 · 640 KB</div></div><span class="ds new">New</span></div>
+        <div class="doc-row"><div class="di pdf">PDF</div><div class="db"><div class="dn">Geotechnical preliminary report</div><div class="dm">Requested — pending vendor</div></div><span class="ds pend">Pending</span></div>
+        <button class="up-btn">+ Upload financial / technical</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div id="p-financials" class="panel">
+    <div class="kpi-row">
+      <div class="kpi"><div class="kpi-l">Total Dev Cost</div><div class="kpi-v">RM 198M</div><div class="kpi-s n">Land + build + SGA</div></div>
+      <div class="kpi"><div class="kpi-l">GDV</div><div class="kpi-v">RM 280M</div><div class="kpi-s n">Blended RM 680 psf</div></div>
+      <div class="kpi"><div class="kpi-l">Dev. Margin</div><div class="kpi-v">29.3%</div><div class="kpi-s">On GDV</div></div>
+      <div class="kpi"><div class="kpi-l">Equity Required</div><div class="kpi-v">RM 52M</div><div class="kpi-s warn">Inc. land &amp; prelim</div></div>
+    </div>
+    <div class="g2 mb20">
+      <div class="card">
+        <div class="cl">Cost Breakdown</div>
+        <div class="cw"><canvas id="cc"></canvas></div>
+        <div class="cl-leg">
+          <div class="li"><div class="ls" style="background:#5DCAA5"></div>Land RM 38M</div>
+          <div class="li"><div class="ls" style="background:#85B7EB"></div>Construction RM 118M</div>
+          <div class="li"><div class="ls" style="background:#FAC775"></div>SGA RM 22M</div>
+          <div class="li"><div class="ls" style="background:#B4B2A9"></div>Finance RM 20M</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="cl">Projected Cashflow (RM M)</div>
+        <div class="cw"><canvas id="cfc"></canvas></div>
+        <div class="cl-leg">
+          <div class="li"><div class="ls" style="background:#5DCAA5"></div>Inflows</div>
+          <div class="li"><div class="ls" style="background:#F0997B"></div>Outflows</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="cl">Sensitivity — IRR vs ASP psf &amp; Absorption Rate</div>
+      <div class="sens-w">
+        <table class="st">
+          <thead><tr>
+            <th style="text-align:left">Absorption \ ASP</th>
+            <th>RM 620</th><th>RM 650</th><th>RM 680 ★</th><th>RM 710</th><th>RM 740</th>
+          </tr></thead>
+          <tbody id="sb"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RISK -->
+  <div id="p-risk" class="panel">
+    <div class="g2">
+      <div class="card">
+        <div class="cl">Risk Register</div>
+        <div class="ri"><div class="ri-t"><div class="rdot hi"></div>Zoning conversion approval delay</div><div class="ri-d">Current zoning permits commercial; residential conversion requires MBJB approval — typical 6–18 month timeline adds interest cost exposure.</div></div>
+        <div class="ri"><div class="ri-t"><div class="rdot hi"></div>Bumiputera quota compliance</div><div class="ri-d">Johor requirement may reduce effective sellable GDV by 8–12% if discounting applies. Mitigation: seek negotiated release clause in SPA.</div></div>
+        <div class="ri"><div class="ri-t"><div class="rdot med"></div>Construction cost escalation</div><div class="ri-d">Base build cost assumed RM 280 psf. Steel &amp; labour inflation risk ±10% — built into sensitivity model.</div></div>
+        <div class="ri"><div class="ri-t"><div class="rdot med"></div>JS-SEZ absorption uncertainty</div><div class="ri-d">Demand thesis partly anchored to Johor-Singapore SEZ spillover. Policy delays could soften near-term take-up.</div></div>
+        <div class="ri"><div class="ri-t"><div class="rdot lo"></div>Title caveat (resolved)</div><div class="ri-d">Caveat by financier noted — confirmed discharged 18 Mar 2026 per Registry search.</div></div>
+      </div>
+      <div class="card">
+        <div class="cl">Legal Status</div>
+        <div class="lr"><span class="lk">Title type</span><span class="lv">Freehold (Hakmilik Kekal)</span></div>
+        <div class="lr"><span class="lk">Encumbrance</span><span class="lv good">Clear (post Mar 18)</span></div>
+        <div class="lr"><span class="lk">Current zoning</span><span class="lv">Commercial</span></div>
+        <div class="lr"><span class="lk">Required rezoning</span><span class="lv warn">Residential — pending</span></div>
+        <div class="lr"><span class="lk">Bumi quota (est.)</span><span class="lv">30% (negotiable)</span></div>
+        <div class="lr"><span class="lk">Legal counsel</span><span class="lv">Messrs. Zaid Ibrahim &amp; Co.</span></div>
+        <div class="sep"></div>
+        <div class="cl">Key Dates</div>
+        <div class="lr"><span class="lk">LOI signed</span><span class="lv">10 Mar 2026</span></div>
+        <div class="lr"><span class="lk">DD deadline</span><span class="lv warn">20 Apr 2026</span></div>
+        <div class="lr"><span class="lk">Board approval</span><span class="lv">Est. May 2026</span></div>
+        <div class="lr"><span class="lk">SPA target</span><span class="lv">Jun 2026</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEAM -->
+  <div id="p-team" class="panel">
+    <div class="g2 mb20">
+      <div class="card">
+        <div class="cl">BRDB Deal Team</div>
+        <div class="tr-row"><div class="av" style="background:#C0DD97;color:#3B6D11">WH</div><div class="ti"><div class="tn">Wai Win Han</div><div class="tro">Business Development</div></div><span class="tl-txt">Deal lead</span></div>
+        <div class="tr-row"><div class="av" style="background:#B5D4F4;color:#185FA5">RL</div><div class="ti"><div class="tn">Rebecca Lim</div><div class="tro">Corporate Finance</div></div><span class="tl-txt">Financial modelling</span></div>
+        <div class="tr-row"><div class="av" style="background:#F4C0D1;color:#993556">AK</div><div class="ti"><div class="tn">Ahmad Kamil</div><div class="tro">Legal &amp; Compliance</div></div><span class="tl-txt">Legal review</span></div>
+        <div class="tr-row"><div class="av" style="background:#FAEEDA;color:#854F0B">ST</div><div class="ti"><div class="tn">Siti Tan</div><div class="tro">Project Development</div></div><span class="tl-txt">Technical DD</span></div>
+      </div>
+      <div class="card">
+        <div class="cl">External Advisors</div>
+        <div class="tr-row"><div class="av" style="background:#CED8F6;color:#534AB7">ZI</div><div class="ti"><div class="tn">Messrs. Zaid Ibrahim</div><div class="tro">Legal counsel</div></div><span class="tl-txt">Vendor side</span></div>
+        <div class="tr-row"><div class="av" style="background:#9FE1CB;color:#0F6E56">KW</div><div class="ti"><div class="tn">Knight Frank MY</div><div class="tro">Valuation</div></div><span class="tl-txt">Independent valuer</span></div>
+        <div class="tr-row"><div class="av" style="background:#F7C1C1;color:#A32D2D">EP</div><div class="ti"><div class="tn">EdgeProp Analytics</div><div class="tro">Market data</div></div><span class="tl-txt">Comparables</span></div>
+        <div class="tr-row"><div class="av" style="background:#D3D1C7;color:#5F5E5A">GE</div><div class="ti"><div class="tn">Geotech Env. Sdn Bhd</div><div class="tro">Soil investigation</div></div><span class="tl-txt">Engaged — pending</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="cl">Document Access Log</div>
+      <div class="log">
+        <strong>Wai Win Han</strong> viewed Feasibility model v4 &nbsp;·&nbsp; Today 09:14<br>
+        <strong>Rebecca Lim</strong> uploaded Feasibility model v4 &nbsp;·&nbsp; Yesterday 17:42<br>
+        <strong>Ahmad Kamil</strong> uploaded Draft term sheet v3 &nbsp;·&nbsp; 22 Mar 2026 · 16:20<br>
+        <strong>Knight Frank MY</strong> uploaded Valuation report (JPPH) &nbsp;·&nbsp; 21 Mar 2026 · 11:05<br>
+        <strong>Siti Tan</strong> viewed Survey plan &amp; lot boundaries &nbsp;·&nbsp; 20 Mar 2026 · 14:38
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+function sw(name) {
+  const names = ['overview','documents','financials','risk','team'];
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', names[i] === name));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('p-' + name).classList.add('active');
+  if (name === 'financials') initCharts();
+}
+
+let ready = false;
+function initCharts() {
+  if (ready) return;
+  ready = true;
+  new Chart(document.getElementById('cc'), {
+    type: 'doughnut',
+    data: { labels:['Land','Construction','SGA','Finance'], datasets:[{ data:[38,118,22,20], backgroundColor:['#5DCAA5','#85B7EB','#FAC775','#B4B2A9'], borderWidth:0 }] },
+    options: { responsive:true, maintainAspectRatio:false, cutout:'64%', plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>' RM '+c.parsed+'M'}} } }
+  });
+  new Chart(document.getElementById('cfc'), {
+    type: 'bar',
+    data: { labels:['Y1','Y2','Y3','Y4','Y5'], datasets:[
+      { label:'Inflows',  data:[0,42,88,96,54],        backgroundColor:'#5DCAA5' },
+      { label:'Outflows', data:[-58,-72,-55,-28,-10], backgroundColor:'#F0997B' }
+    ]},
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>' RM '+Math.abs(c.parsed)+'M'}} },
+      scales:{
+        x:{ grid:{display:false}, ticks:{color:'#7A7770',font:{size:11}} },
+        y:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{color:'#7A7770',font:{size:11},callback:v=>'RM '+Math.abs(v)+'M'} }
+      }
+    }
+  });
+  const abs=[60,70,80,90,100], asps=[620,650,680,710,740], hurdle=16;
+  const tb=document.getElementById('sb');
+  abs.forEach(a=>{
+    const tr=document.createElement('tr');
+    const td0=document.createElement('td'); td0.textContent=a+'% abs.'; tr.appendChild(td0);
+    asps.forEach(asp=>{
+      const td=document.createElement('td');
+      const irr=Math.round((14+(asp-620)/30*1.8+(a-60)/40*2.2)*10)/10;
+      const base=asp===680&&a===80;
+      td.textContent=irr.toFixed(1)+(base?'% ★':'%');
+      td.className=base?'c-base':irr>=hurdle?'c-good':'c-bad';
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+}
+</script>
+</body>
+</html>

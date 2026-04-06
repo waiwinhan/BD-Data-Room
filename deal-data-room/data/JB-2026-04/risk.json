@@ -1,0 +1,42 @@
+[
+  {
+    "id": "R01",
+    "category": "Title",
+    "description": "Lot amalgamation required before development order submission",
+    "severity": "amber",
+    "mitigation": "Engaged JUPEM for simultaneous survey; est. 8 weeks",
+    "owner": "Nurul Ain"
+  },
+  {
+    "id": "R02",
+    "category": "Market",
+    "description": "JB residential oversupply — absorption may drop below 60%",
+    "severity": "red",
+    "mitigation": "Phased launch strategy; pre-sales target 40% before construction",
+    "owner": "Wai Win Han"
+  },
+  {
+    "id": "R03",
+    "category": "Construction",
+    "description": "Build cost escalation due to material price volatility",
+    "severity": "amber",
+    "mitigation": "Fixed-price D&B contract with 5% contingency buffer",
+    "owner": "Azlan Ramli"
+  },
+  {
+    "id": "R04",
+    "category": "Regulatory",
+    "description": "Bumi release quota approval from State may delay launch",
+    "severity": "amber",
+    "mitigation": "Early engagement with MBJB; precedent from nearby project",
+    "owner": "Nurul Ain"
+  },
+  {
+    "id": "R05",
+    "category": "Financial",
+    "description": "Interest rate hike increasing bridging loan cost",
+    "severity": "green",
+    "mitigation": "Locked 3-year fixed rate facility with CIMB; sensitivity tested",
+    "owner": "Azlan Ramli"
+  }
+]

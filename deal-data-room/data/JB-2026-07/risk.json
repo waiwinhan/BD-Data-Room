@@ -1,0 +1,10 @@
+[
+  {
+    "id": "R01",
+    "category": "Title",
+    "description": "Leasehold renewal terms uncertain post-expiry",
+    "severity": "amber",
+    "mitigation": "Legal review of State lease renewal precedents",
+    "owner": "Wai Win Han"
+  }
+]
