@@ -43,7 +43,7 @@
     <!-- TAB CONTENT -->
     <div class="tab-content">
       <Transition name="fade-up" mode="out-in">
-        <OverviewTab   v-if="activeTab === 'overview'"   :meta="meta" />
+        <OverviewTab   v-if="activeTab === 'overview'"   :meta="meta" :deal="deal" />
         <DocumentsTab  v-else-if="activeTab === 'documents'"  />
         <FinancialsTab v-else-if="activeTab === 'financials'" />
         <RiskTab       v-else-if="activeTab === 'risk'"       />
@@ -65,12 +65,13 @@ if (error.value) {
   throw createError({ statusCode: 404, statusMessage: 'Deal not found' })
 }
 
-// Check restricted from deals list
+// Check restricted from deals list + expose full deal object
 const { data: dealsData } = await useFetch('/api/deals')
-const isRestricted = computed(() => {
+const deal = computed(() => {
   const deals = (dealsData.value as any)?.deals ?? []
-  return deals.find((d: any) => d.id === dealId)?.restricted ?? false
+  return deals.find((d: any) => d.id === dealId) ?? null
 })
+const isRestricted = computed(() => deal.value?.restricted ?? false)
 
 const stageBadgeMap: Record<string, string> = {
   'Active DD':    'badge-green',
