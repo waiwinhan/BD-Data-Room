@@ -11,10 +11,11 @@
 
 | Module | Name | Phase | Status | Target |
 |--------|------|-------|--------|--------|
-| M01 | Project Scaffold | 1 | ⏳ | Day 1 |
-| M02 | Deal List Page + DealCard | 1 | ⏳ | Day 1 |
-| M03 | Dashboard Shell + Tab Layout | 1 | ⏳ | Day 1 |
-| M04 | Overview Tab | 1 | ⏳ | Day 1–2 |
+| M01 | Project Scaffold | 1 | ✅ | Day 1 |
+| M02 | Deal List Page + DealCard | 1 | ✅ | Day 1 |
+| M03 | Dashboard Shell + Tab Layout | 1 | ✅ | Day 1 |
+| M04 | Overview Tab | 1 | ✅ | Day 1–2 |
+| M04b | Inline Edit Mode (Dashboard) | 1 | ⏳ | Day 2 |
 | M05 | Excel Parser (ExcelJS) | 2 | ⏳ | Day 2–3 |
 | M06 | Financials Tab | 2 | ⏳ | Day 3 |
 | M07 | Documents Tab | 3 | ⏳ | Day 4 |
@@ -47,7 +48,7 @@ Goal: Dashboard running locally with hardcoded/JSON data for one deal. No auth, 
 
 ---
 
-### M01 — Project Scaffold ⏳
+### M01 — Project Scaffold ✅
 
 **Milestone:** Nuxt dev server running at localhost:3000 with Tailwind CSS active.
 
@@ -67,7 +68,7 @@ Goal: Dashboard running locally with hardcoded/JSON data for one deal. No auth, 
 
 ---
 
-### M02 — Deal List Page ⏳
+### M02 — Deal List Page ✅
 
 **Milestone:** `/` page renders the full deal list — filter bar, portfolio summary strip, and deal cards. Clicking a card navigates to the deal dashboard.
 
@@ -144,7 +145,7 @@ const stageColors = {
 
 ---
 
-### M03 — Dashboard Shell + Tab Layout ⏳
+### M03 — Dashboard Shell + Tab Layout ✅
 
 **Milestone:** `/[dealId]` page loads with 5-tab navigation. Switching tabs shows different placeholder content.
 
@@ -169,7 +170,7 @@ const stageColors = {
 
 ---
 
-### M04 — Overview Tab ⏳
+### M04 — Overview Tab ✅
 
 **Milestone:** Overview tab shows real data: 4 KPI cards, Google Maps embed, DD milestones, development mix, key assumptions.
 
@@ -199,9 +200,56 @@ const stageColors = {
     - [ ] Progress bars for each dev type (pct + color from meta.devMix)
     - [ ] Key assumptions grid (2×2, from meta.assumptions)
 
-- [ ] Test: all data renders correctly from meta.json
+- [x] Test: all data renders correctly from meta.json
 - [ ] Test: Google Maps embed loads (may need Maps Embed API key in .env)
-- [ ] Commit: `git commit -m "M04: overview tab complete"`
+- [x] Commit: `git commit -m "M04: overview tab complete"`
+
+---
+
+### M04b — Inline Edit Mode ⏳
+
+**Milestone:** All qualitative deal data (name, location, stage, milestones, proximities, dev mix, assumptions, legal status) is editable directly from the dashboard UI — no JSON file editing required.
+
+**Server — write-back API endpoints**
+- [ ] Create `server/api/[dealId]/meta.put.ts` — accepts full meta object, writes back to `meta.json`
+- [ ] Create `server/api/[dealId]/deal.put.ts` — accepts deal fields, updates the matching entry in `deals.json`
+
+**Edit mode toggle**
+- [ ] Add "Edit" button to deal header (pencil icon + label), visible on all tabs
+- [ ] `editMode` ref in `[dealId]/index.vue` — passed down as prop to OverviewTab
+- [ ] "Save" and "Cancel" buttons replace "Edit" when in edit mode
+- [ ] Save triggers PUT requests to both endpoints; Cancel restores original data
+- [ ] Show saving spinner + "Saved ✓" confirmation toast on success
+
+**Editable fields — deal header** (writes to `deals.json`)
+- [ ] Deal name → inline text input
+- [ ] Location → inline text input
+- [ ] Stage → dropdown (Active DD / Under Review / Signed / On Hold)
+- [ ] Tenure → dropdown (Freehold / Leasehold 99yr)
+- [ ] DD Progress % → number input (0–100)
+- [ ] Stage note → inline text input
+
+**Editable fields — Overview tab** (writes to `meta.json`)
+- [ ] Site location: location text, lat, lng
+- [ ] Proximities list: edit label + distance + colour; add row; delete row (✕)
+- [ ] Milestones list: edit label + date + status; add row; delete row (✕)
+- [ ] Development mix list: edit type + units/sqft + pct; add row; delete row (✕)
+- [ ] Key assumptions: edit any label or value inline
+- [ ] Legal status: edit all 4 fields inline (Title Type, Encumbrance, Zoning, Bumi Quota)
+
+**UX behaviour**
+- [ ] In edit mode: text values become `<input>` fields, dropdowns use `<select>`
+- [ ] List items show a drag handle + ✕ delete button on hover
+- [ ] "＋ Add" button at bottom of each list section
+- [ ] Unsaved changes indicator in header (dot on "Edit" button)
+- [ ] Keyboard: `Escape` cancels edit mode, `Ctrl+S` / `Cmd+S` triggers save
+
+**Testing**
+- [ ] Edit deal name → Save → refresh page → new name persists
+- [ ] Add a proximity row → Save → appears in list after reload
+- [ ] Delete a milestone → Save → removed after reload
+- [ ] Cancel → all changes discarded, original data restored
+- [ ] Commit: `git commit -m "M04b: inline edit mode for deal metadata"`
 
 ---
 
