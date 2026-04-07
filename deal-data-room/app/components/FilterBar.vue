@@ -40,23 +40,23 @@ defineEmits<{
 
 const stageMap: Record<string, string> = {
   'Active DD': 'dd',
-  'Under Review': 'review',
-  'Signed': 'signed',
-  'On Hold': 'hold',
+  'KIV':       'kiv',
+  'Approved':  'approved',
+  'Rejected':  'rejected',
 }
 
 const pills = computed(() => {
-  const counts: Record<string, number> = { all: props.deals.length, dd: 0, review: 0, signed: 0, hold: 0 }
+  const counts: Record<string, number> = { all: props.deals.length, dd: 0, kiv: 0, approved: 0, rejected: 0 }
   for (const d of props.deals) {
     const key = stageMap[d.stage]
     if (key) counts[key]++
   }
   return [
-    { key: 'all', label: 'All', count: counts.all },
-    { key: 'dd', label: 'Active DD', count: counts.dd },
-    { key: 'review', label: 'Under Review', count: counts.review },
-    { key: 'signed', label: 'Signed', count: counts.signed },
-    { key: 'hold', label: 'On Hold', count: counts.hold },
+    { key: 'all',      label: 'All',       count: counts.all },
+    { key: 'dd',       label: 'Active DD', count: counts.dd },
+    { key: 'kiv',      label: 'KIV',       count: counts.kiv },
+    { key: 'approved', label: 'Approved',  count: counts.approved },
+    { key: 'rejected', label: 'Rejected',  count: counts.rejected },
   ]
 })
 </script>

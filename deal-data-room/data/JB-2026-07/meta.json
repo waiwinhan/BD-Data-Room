@@ -3,32 +3,118 @@
   "name": "Iskandar Waterfront Parcel C",
   "ref": "JB-2026-07",
   "location": "Iskandar Puteri, Johor",
-  "coordinates": { "lat": 1.4254, "lng": 103.6371 },
+  "coordinates": {
+    "lat": 1.4254,
+    "lng": 103.6371
+  },
   "tenure": "Leasehold 99yr",
-  "landArea": 8.20,
+  "landArea": 8.2,
   "stage": "Active DD",
   "hurdleRate": 15,
   "proximities": [
-    { "label": "EduCity Iskandar", "distance": "1.2 km", "color": "green" },
-    { "label": "Medini Mall", "distance": "2.5 km", "color": "blue" },
-    { "label": "Legoland Malaysia", "distance": "3.1 km", "color": "blue" }
+    {
+      "label": "EduCity Iskandar",
+      "distance": "1.2 km",
+      "color": "green"
+    },
+    {
+      "label": "Medini Mall",
+      "distance": "2.5 km",
+      "color": "blue"
+    },
+    {
+      "label": "Legoland Malaysia",
+      "distance": "3.1 km",
+      "color": "blue"
+    },
+    {
+      "label": "Sanrio Hello Kitty Town",
+      "distance": "2.4 km",
+      "color": "amber"
+    },
+    {
+      "label": "Sultan Abu Bakar (Tanjung Kupang)",
+      "distance": "6.6 km",
+      "color": "blue"
+    },
+    {
+      "label": "Sultan Abu Bakar / Tanjung Kupang (bus)",
+      "distance": "7.0 km",
+      "color": "blue"
+    },
+    {
+      "label": "Tuas",
+      "distance": "8.5 km",
+      "color": "blue"
+    },
+    {
+      "label": "Tuas Checkpoint (Arrival Alighting)",
+      "distance": "8.5 km",
+      "color": "green"
+    },
+    {
+      "label": "Tuas Checkpoint (Departure Boarding)",
+      "distance": "8.6 km",
+      "color": "green"
+    }
   ],
   "milestones": [
-    { "label": "LOI Signed", "date": "10 Mar 2026", "status": "done" },
-    { "label": "Title Search", "date": "25 Mar 2026", "status": "active" },
-    { "label": "Valuation Report", "date": "10 Apr 2026", "status": "pending" },
-    { "label": "Board Approval", "date": "30 Apr 2026", "status": "pending" }
+    {
+      "label": "LOI Signed",
+      "date": "10 Mar 2026",
+      "status": "done"
+    },
+    {
+      "label": "Title Search",
+      "date": "25 Mar 2026",
+      "status": "active"
+    },
+    {
+      "label": "Valuation Report",
+      "date": "10 Apr 2026",
+      "status": "pending"
+    },
+    {
+      "label": "Board Approval",
+      "date": "30 Apr 2026",
+      "status": "pending"
+    }
   ],
   "devMix": [
-    { "type": "Waterfront Condos", "units": 600, "pct": 65 },
-    { "type": "Retail F&B", "units": 0, "sqft": 22000, "pct": 20 },
-    { "type": "Hotel Suites", "units": 180, "pct": 15 }
+    {
+      "type": "Waterfront Condos",
+      "units": 600,
+      "pct": 65
+    },
+    {
+      "type": "Retail F&B",
+      "units": 0,
+      "sqft": 22000,
+      "pct": 20
+    },
+    {
+      "type": "Hotel Suites",
+      "units": 180,
+      "pct": 15
+    }
   ],
   "assumptions": [
-    { "label": "Plot Ratio", "value": "4.0x" },
-    { "label": "Build Cost PSF", "value": "RM 240" },
-    { "label": "Absorption", "value": "65% / yr" },
-    { "label": "Dev Period", "value": "5 years" }
+    {
+      "label": "Plot Ratio",
+      "value": "4.0x"
+    },
+    {
+      "label": "Build Cost PSF",
+      "value": "RM 240"
+    },
+    {
+      "label": "Absorption",
+      "value": "65% / yr"
+    },
+    {
+      "label": "Dev Period",
+      "value": "5 years"
+    }
   ],
   "legalStatus": {
     "titleType": "Pajakan Negeri",
@@ -38,7 +124,11 @@
   },
   "team": {
     "internal": [
-      { "name": "Wai Win Han", "role": "Deal Lead", "email": "waiwin@brdb.com.my" }
+      {
+        "name": "Wai Win Han",
+        "role": "Deal Lead",
+        "email": "waiwin@brdb.com.my"
+      }
     ],
     "external": []
   }

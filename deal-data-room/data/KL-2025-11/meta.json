@@ -6,7 +6,7 @@
   "coordinates": { "lat": 3.1835, "lng": 101.5855 },
   "tenure": "Freehold",
   "landArea": 14.8,
-  "stage": "Signed",
+  "stage": "Approved",
   "hurdleRate": 15,
   "proximities": [
     { "label": "Damansara Damai MRT", "distance": "0.3 km", "color": "green" },

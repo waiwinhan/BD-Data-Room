@@ -45,9 +45,9 @@
             <template v-else>
               <select v-model="draftDeal.stage" class="edit-select">
                 <option>Active DD</option>
-                <option>Under Review</option>
-                <option>Signed</option>
-                <option>On Hold</option>
+                <option>KIV</option>
+                <option>Approved</option>
+                <option>Rejected</option>
               </select>
             </template>
 
@@ -126,10 +126,10 @@ const deal = computed(() => {
 const isRestricted = computed(() => deal.value?.restricted ?? false)
 
 const stageBadgeMap: Record<string, string> = {
-  'Active DD':    'badge-green',
-  'Under Review': 'badge-amber',
-  'Signed':       'badge-purple',
-  'On Hold':      'badge-grey',
+  'Active DD': 'badge-green',
+  'KIV':       'badge-amber',
+  'Approved':  'badge-blue',
+  'Rejected':  'badge-red',
 }
 const stageBadge = computed(() => stageBadgeMap[(meta.value as any)?.stage] ?? 'badge-grey')
 
@@ -234,8 +234,9 @@ onMounted(() => {
 .badge { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; letter-spacing: 0.02em; }
 .badge-green  { background: var(--green-bg);  color: var(--green-txt); }
 .badge-amber  { background: var(--amber-bg);  color: var(--amber); }
-.badge-purple { background: var(--purple-bg); color: var(--purple); }
+.badge-blue   { background: #dbeafe;          color: #1d4ed8; }
 .badge-red    { background: var(--red-bg);    color: var(--red); }
+.badge-purple { background: var(--purple-bg); color: var(--purple); }
 .badge-grey   { background: var(--surface2);  color: var(--muted); border: 1px solid var(--border); }
 
 /* ── EDIT INPUTS ── */

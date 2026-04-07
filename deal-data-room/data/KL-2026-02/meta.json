@@ -6,7 +6,7 @@
   "coordinates": { "lat": 3.0576, "lng": 101.6855 },
   "tenure": "Freehold",
   "landArea": 12.4,
-  "stage": "Under Review",
+  "stage": "KIV",
   "hurdleRate": 15,
   "proximities": [
     { "label": "Bukit Jalil LRT Station", "distance": "0.5 km", "color": "green" },

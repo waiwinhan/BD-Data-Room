@@ -10,7 +10,7 @@ export default defineEventHandler(() => {
   const avgIRR = deals.reduce((sum: number, d: any) => sum + d.irr, 0) / deals.length
   const totalLandAcres = deals.reduce((sum: number, d: any) => sum + d.landAcres, 0)
   const pendingBoardCount = deals.filter((d: any) =>
-    d.stage === 'Active DD' || d.stage === 'Under Review'
+    d.stage === 'Active DD' || d.stage === 'KIV'
   ).length
 
   return {

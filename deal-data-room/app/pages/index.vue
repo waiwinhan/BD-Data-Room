@@ -56,10 +56,10 @@ const activeFilter = ref('all')
 const searchQuery = ref('')
 
 const stageFilterMap: Record<string, string> = {
-  dd: 'Active DD',
-  review: 'Under Review',
-  signed: 'Signed',
-  hold: 'On Hold',
+  dd:       'Active DD',
+  kiv:      'KIV',
+  approved: 'Approved',
+  rejected: 'Rejected',
 }
 
 const filteredDeals = computed(() => {

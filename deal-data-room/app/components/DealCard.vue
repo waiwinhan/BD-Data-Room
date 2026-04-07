@@ -88,13 +88,13 @@ const props = defineProps<{
 }>()
 
 const stageMap: Record<string, { barGradient: string; barColor: string; badge: string; dotColor: string }> = {
-  'Active DD':    { barGradient: 'linear-gradient(90deg,#5DCAA5,#1D9E75)', barColor: '#5DCAA5', badge: 'badge-green',  dotColor: '#1D9E75' },
-  'Under Review': { barGradient: 'linear-gradient(90deg,#F5C85A,#D48C0A)', barColor: '#F5C85A', badge: 'badge-amber',  dotColor: '#378ADD' },
-  'Signed':       { barGradient: 'linear-gradient(90deg,#9B94E8,#534AB7)', barColor: '#9B94E8', badge: 'badge-purple', dotColor: '#534AB7' },
-  'On Hold':      { barGradient: 'linear-gradient(90deg,#C8C5C0,#9A9690)', barColor: '#C8C5C0', badge: 'badge-grey',   dotColor: '#B0ADA8' },
+  'Active DD': { barGradient: 'linear-gradient(90deg,#5DCAA5,#1D9E75)', barColor: '#5DCAA5', badge: 'badge-green',  dotColor: '#1D9E75' },
+  'KIV':       { barGradient: 'linear-gradient(90deg,#F5C85A,#D48C0A)', barColor: '#F5C85A', badge: 'badge-amber',  dotColor: '#D48C0A' },
+  'Approved':  { barGradient: 'linear-gradient(90deg,#60A5FA,#1D60C8)', barColor: '#60A5FA', badge: 'badge-blue',   dotColor: '#1D60C8' },
+  'Rejected':  { barGradient: 'linear-gradient(90deg,#F87171,#DC2626)', barColor: '#F87171', badge: 'badge-red',    dotColor: '#DC2626' },
 }
 
-const stageStyle = computed(() => stageMap[props.deal.stage] ?? stageMap['On Hold'])
+const stageStyle = computed(() => stageMap[props.deal.stage] ?? stageMap['Rejected'])
 const irrDelta = computed(() => props.deal.irr - props.deal.hurdleRate)
 
 function formatDate(dateStr: string): string {
@@ -137,6 +137,7 @@ function formatDate(dateStr: string): string {
 .badge-blue   { background: var(--blue-bg);   color: var(--blue); }
 .badge-amber  { background: var(--amber-bg);  color: var(--amber); }
 .badge-red    { background: var(--red-bg);    color: var(--red); }
+.badge-blue   { background: #dbeafe;          color: #1d4ed8; }
 .badge-purple { background: var(--purple-bg); color: var(--purple); }
 .badge-grey   { background: var(--surface2);  color: var(--muted); border: 1px solid var(--border); }
 .card-location { font-size: 12px; color: var(--muted); margin-bottom: 14px; display: flex; align-items: center; gap: 5px; }

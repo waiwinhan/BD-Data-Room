@@ -6,7 +6,7 @@
   "coordinates": { "lat": 3.3320, "lng": 101.5740 },
   "tenure": "Leasehold 99yr",
   "landArea": 7.35,
-  "stage": "On Hold",
+  "stage": "Rejected",
   "hurdleRate": 15,
   "proximities": [
     { "label": "Rawang KTM Station", "distance": "2.5 km", "color": "blue" },
