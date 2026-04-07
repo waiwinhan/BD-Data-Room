@@ -514,7 +514,6 @@ Goal: NDA password gate, deal list page routing, shareable private URL.
 **Branding settings**
 - [ ] App title — editable text field (currently hardcoded "Deal Data Room")
 - [ ] Organisation name — editable text field (currently hardcoded "BRDB Berhad")
-- [ ] Organisation subtitle — editable text field (currently hardcoded "Business Development")
 - [ ] Logo — two options:
   - [ ] Text initials logo: editable 2-letter initials + background colour picker (currently "BR" on dark bg)
   - [ ] Image logo: upload a PNG/SVG file to replace the initials block
