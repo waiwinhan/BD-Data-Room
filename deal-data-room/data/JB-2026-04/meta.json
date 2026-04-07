@@ -3,36 +3,138 @@
   "name": "Permas Jaya Land Acquisition",
   "ref": "JB-2026-04",
   "location": "Permas Jaya, Johor Bahru",
-  "coordinates": { "lat": 1.5397, "lng": 103.8283 },
+  "coordinates": {
+    "lat": 1.5397,
+    "lng": 103.8283
+  },
   "tenure": "Freehold",
   "landArea": 5.55,
   "stage": "Active DD",
   "hurdleRate": 15,
   "proximities": [
-    { "label": "Permas Jaya LRT Station", "distance": "0.8 km", "color": "green" },
-    { "label": "AEON Mall JB City Square", "distance": "3.2 km", "color": "blue" },
-    { "label": "Johor Bahru CIQ", "distance": "6.5 km", "color": "blue" },
-    { "label": "Legoland Malaysia", "distance": "14 km", "color": "grey" }
+    {
+      "label": "Permas Jaya LRT Station",
+      "distance": "0.8 km",
+      "color": "green"
+    },
+    {
+      "label": "AEON Mall JB City Square",
+      "distance": "3.2 km",
+      "color": "blue"
+    },
+    {
+      "label": "Johor Bahru CIQ",
+      "distance": "6.5 km",
+      "color": "blue"
+    },
+    {
+      "label": "Legoland Malaysia",
+      "distance": "14 km",
+      "color": "grey"
+    },
+    {
+      "label": "Johor Jaya Express Bus Terminal",
+      "distance": "3.3 km",
+      "color": "green"
+    },
+    {
+      "label": "Terminal Ulu Tiram",
+      "distance": "6.5 km",
+      "color": "green"
+    },
+    {
+      "label": "Century Orthopaedic Specialist Clinic",
+      "distance": "9.8 km",
+      "color": "blue"
+    },
+    {
+      "label": "Sembawang",
+      "distance": "10.1 km",
+      "color": "green"
+    },
+    {
+      "label": "Johor Bahru (trucks)",
+      "distance": "10.7 km",
+      "color": "blue"
+    },
+    {
+      "label": "Johor Bahru",
+      "distance": "10.7 km",
+      "color": "blue"
+    }
   ],
   "milestones": [
-    { "label": "LOI Signed", "date": "15 Feb 2026", "status": "done" },
-    { "label": "Title Search", "date": "22 Feb 2026", "status": "done" },
-    { "label": "Valuation Report", "date": "10 Mar 2026", "status": "done" },
-    { "label": "Environmental Assessment", "date": "28 Mar 2026", "status": "active" },
-    { "label": "Board Approval", "date": "15 Apr 2026", "status": "pending" },
-    { "label": "SPA Execution", "date": "30 Apr 2026", "status": "pending" }
+    {
+      "label": "LOI Signed",
+      "date": "15 Feb 2026",
+      "status": "done"
+    },
+    {
+      "label": "Title Search",
+      "date": "22 Feb 2026",
+      "status": "done"
+    },
+    {
+      "label": "Valuation Report",
+      "date": "10 Mar 2026",
+      "status": "done"
+    },
+    {
+      "label": "Environmental Assessment",
+      "date": "28 Mar 2026",
+      "status": "active"
+    },
+    {
+      "label": "Board Approval",
+      "date": "15 Apr 2026",
+      "status": "pending"
+    },
+    {
+      "label": "SPA Execution",
+      "date": "30 Apr 2026",
+      "status": "pending"
+    }
   ],
   "devMix": [
-    { "type": "Serviced Apartments", "units": 480, "pct": 60 },
-    { "type": "Retail Podium", "units": 0, "sqft": 18000, "pct": 20 },
-    { "type": "SOHO Units", "units": 120, "pct": 15 },
-    { "type": "Car Parks", "units": 600, "pct": 5 }
+    {
+      "type": "Serviced Apartments",
+      "units": 480,
+      "pct": 60
+    },
+    {
+      "type": "Retail Podium",
+      "units": 0,
+      "sqft": 18000,
+      "pct": 20
+    },
+    {
+      "type": "SOHO Units",
+      "units": 120,
+      "pct": 15
+    },
+    {
+      "type": "Car Parks",
+      "units": 600,
+      "pct": 5
+    }
   ],
   "assumptions": [
-    { "label": "Plot Ratio", "value": "3.5x" },
-    { "label": "Build Cost PSF", "value": "RM 220" },
-    { "label": "Absorption", "value": "70% / yr" },
-    { "label": "Dev Period", "value": "4 years" }
+    {
+      "label": "Plot Ratio",
+      "value": "3.5x"
+    },
+    {
+      "label": "Build Cost PSF",
+      "value": "RM 220"
+    },
+    {
+      "label": "Absorption",
+      "value": "70% / yr"
+    },
+    {
+      "label": "Dev Period",
+      "value": "4 years"
+    }
   ],
   "legalStatus": {
     "titleType": "Geran Mukim",
@@ -42,13 +144,35 @@
   },
   "team": {
     "internal": [
-      { "name": "Wai Win Han", "role": "Deal Lead", "email": "waiwin@brdb.com.my" },
-      { "name": "Azlan Ramli", "role": "Finance Manager", "email": "azlan@brdb.com.my" },
-      { "name": "Nurul Ain", "role": "Legal Counsel", "email": "nurul@brdb.com.my" }
+      {
+        "name": "Wai Win Han",
+        "role": "Deal Lead",
+        "email": "waiwin@brdb.com.my"
+      },
+      {
+        "name": "Azlan Ramli",
+        "role": "Finance Manager",
+        "email": "azlan@brdb.com.my"
+      },
+      {
+        "name": "Nurul Ain",
+        "role": "Legal Counsel",
+        "email": "nurul@brdb.com.my"
+      }
     ],
     "external": [
-      { "name": "Hafiz Zainal", "firm": "KGV International", "role": "Valuer", "email": "hafiz@kgv.com.my" },
-      { "name": "David Tan", "firm": "Wong & Partners", "role": "Solicitor", "email": "david@wongpartners.com.my" }
+      {
+        "name": "Hafiz Zainal",
+        "firm": "KGV International",
+        "role": "Valuer",
+        "email": "hafiz@kgv.com.my"
+      },
+      {
+        "name": "David Tan",
+        "firm": "Wong & Partners",
+        "role": "Solicitor",
+        "email": "david@wongpartners.com.my"
+      }
     ]
   }
 }
