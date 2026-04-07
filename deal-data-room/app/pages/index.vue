@@ -52,7 +52,7 @@
         </div>
         <div class="legend-item">
           <span class="legend-dot" style="background:#F5C85A" />
-          <span class="legend-label"><strong>KIV</strong> — Keep in view, pending decision</span>
+          <span class="legend-label"><strong>KIV</strong> — Keep in view</span>
         </div>
         <div class="legend-item">
           <span class="legend-dot" style="background:#5DCAA5" />
