@@ -15,7 +15,7 @@
 | M02 | Deal List Page + DealCard | 1 | ✅ | Day 1 |
 | M03 | Dashboard Shell + Tab Layout | 1 | ✅ | Day 1 |
 | M04 | Overview Tab | 1 | ✅ | Day 1–2 |
-| M04b | Inline Edit Mode (Dashboard) | 1 | ⏳ | Day 2 |
+| M04b | Inline Edit Mode (Dashboard) | 1 | ✅ | Day 2 |
 | M05 | Excel Parser (ExcelJS) | 2 | ⏳ | Day 2–3 |
 | M06 | Financials Tab | 2 | ⏳ | Day 3 |
 | M07 | Documents Tab | 3 | ⏳ | Day 4 |
@@ -206,7 +206,7 @@ const stageColors = {
 
 ---
 
-### M04b — Inline Edit Mode ⏳
+### M04b — Inline Edit Mode ✅
 
 **Milestone:** All qualitative deal data (name, location, stage, milestones, proximities, dev mix, assumptions, legal status) is editable directly from the dashboard UI — no JSON file editing required.
 
