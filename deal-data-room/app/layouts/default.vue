@@ -4,9 +4,9 @@
     <header class="topbar">
       <div class="topbar-left">
         <div class="logo-mark">BR</div>
-        <span class="topbar-title">Deal Data Room</span>
+        <span class="topbar-title">BRDB Berhad</span>
         <div class="topbar-divider"></div>
-        <span class="topbar-sub">BRDB Berhad · Business Development</span>
+        <span class="topbar-sub">Deal Data Room</span>
       </div>
       <div class="topbar-right">
         <button class="btn-sm">Settings</button>
