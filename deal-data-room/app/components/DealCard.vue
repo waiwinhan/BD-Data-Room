@@ -11,7 +11,7 @@
           <div class="card-ref">{{ deal.ref }}</div>
         </div>
         <div class="card-badges">
-          <span v-if="deal.restricted" class="badge badge-red">Restricted</span>
+          <span v-if="deal.restricted" class="badge badge-red">Confidential</span>
           <span class="badge" :class="stageStyle.badge">{{ deal.stage }}</span>
         </div>
       </div>

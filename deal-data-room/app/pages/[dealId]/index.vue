@@ -36,7 +36,7 @@
 
           <!-- Right: badges + action buttons -->
           <div class="deal-badges">
-            <span v-if="isRestricted" class="badge badge-red">Restricted</span>
+            <span v-if="isRestricted" class="badge badge-red">Confidential</span>
 
             <!-- Stage: badge (view) or select (edit) -->
             <template v-if="!editMode">
