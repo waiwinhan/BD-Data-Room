@@ -23,6 +23,7 @@
 | M09 | Risk & Legal Tab | 3 | ⏳ | Day 4–5 |
 | M10 | Deal Team Tab | 3 | ⏳ | Day 5 |
 | M11 | Auth — NDA Password Gate | 4 | ⏳ | Day 5–6 |
+| M11b | Settings Panel (Branding + Password) | 4 | ⏳ | Day 6 |
 | M12 | Multi-Deal Routing | 4 | ⏳ | Day 6 |
 | M13 | Deployment (Railway / Vercel) | 4 | ⏳ | Day 6–7 |
 | M14 | Excel — BRDB Model Wiring | 2 | ⏳ | Day 3 |
@@ -503,6 +504,42 @@ Goal: NDA password gate, deal list page routing, shareable private URL.
 - [ ] Test: visiting `/` redirects to `/login` when not authenticated
 - [ ] Test: correct password grants access, incorrect password shows error
 - [ ] Commit: `git commit -m "M11: NDA password gate"`
+
+---
+
+### M11b — Settings Panel ⏳
+
+**Milestone:** Settings button in topbar opens a slide-over panel allowing the admin to customise the app branding and access credentials — no code editing required.
+
+**Branding settings**
+- [ ] App title — editable text field (currently hardcoded "Deal Data Room")
+- [ ] Organisation name — editable text field (currently hardcoded "BRDB Berhad")
+- [ ] Organisation subtitle — editable text field (currently hardcoded "Business Development")
+- [ ] Logo — two options:
+  - [ ] Text initials logo: editable 2-letter initials + background colour picker (currently "BR" on dark bg)
+  - [ ] Image logo: upload a PNG/SVG file to replace the initials block
+- [ ] NDA banner text — editable (the amber strip message at the top of every page)
+- [ ] Preview of topbar renders live as user types
+
+**Access settings**
+- [ ] Change deal password — current password + new password + confirm fields
+- [ ] On save: updates `DEAL_PASSWORD` in `.env` (or a local `settings.json` if `.env` write is restricted)
+
+**Storage**
+- [ ] Settings saved to `data/settings.json` (new file, read by layout on every page load)
+- [ ] Create `server/api/settings.get.ts` — returns settings.json
+- [ ] Create `server/api/settings.put.ts` — writes settings.json (admin only)
+- [ ] Layout reads settings on mount and applies branding dynamically
+
+**UI**
+- [ ] Settings panel opens as a right slide-over drawer (not a page)
+- [ ] "Save changes" button + success toast
+- [ ] Cancel / click-outside closes the panel without saving
+
+- [ ] Test: change org name → save → topbar reflects new name after reload
+- [ ] Test: upload a logo image → save → logo block shows image instead of initials
+- [ ] Test: change NDA banner text → save → amber strip shows new message
+- [ ] Commit: `git commit -m "M11b: settings panel with branding editor"`
 
 ---
 
