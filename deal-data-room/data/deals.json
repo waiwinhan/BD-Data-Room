@@ -3,33 +3,35 @@
     "id": "JB-2026-04",
     "name": "Permas Jaya Land Acquisition",
     "ref": "JB-2026-04",
-    "location": "Johor Bahru, Johor",
+    "location": "PTD 220475, Mukim Plentong, Johor Bahru",
     "stage": "Active DD",
+    "restricted": true,
     "gdv": 280,
+    "blendedPSF": 680,
     "irr": 18.4,
     "hurdleRate": 15,
     "landAcres": 5.55,
     "tenure": "Freehold",
     "ddProgress": 40,
     "updatedAt": "2026-04-01",
-    "stageNote": "Site visit + valuation due",
-    "statusDot": "green"
+    "stageNote": "Site visit + valuation due"
   },
   {
     "id": "JB-2026-07",
     "name": "Iskandar Waterfront Parcel C",
     "ref": "JB-2026-07",
-    "location": "Iskandar Puteri, Johor",
+    "location": "Lot 4821, Persiaran Danga, Iskandar Puteri, Johor",
     "stage": "Active DD",
+    "restricted": true,
     "gdv": 420,
+    "blendedPSF": 820,
     "irr": 19.1,
     "hurdleRate": 15,
     "landAcres": 8.20,
     "tenure": "Leasehold 99yr",
     "ddProgress": 25,
     "updatedAt": "2026-03-29",
-    "stageNote": "Title search in progress",
-    "statusDot": "green"
+    "stageNote": "Title search in progress"
   },
   {
     "id": "KL-2026-02",
@@ -37,31 +39,33 @@
     "ref": "KL-2026-02",
     "location": "Bukit Jalil, Kuala Lumpur",
     "stage": "Under Review",
+    "restricted": false,
     "gdv": 310,
+    "blendedPSF": 680,
     "irr": 16.9,
     "hurdleRate": 15,
     "landAcres": 12.4,
     "tenure": "Freehold",
     "ddProgress": 75,
     "updatedAt": "2026-03-25",
-    "stageNote": "Board paper preparation",
-    "statusDot": "blue"
+    "stageNote": "Board paper preparation"
   },
   {
     "id": "KL-2025-11",
     "name": "Damansara Damai Residences",
     "ref": "KL-2025-11",
-    "location": "Damansara Damai, KL",
+    "location": "Damansara Damai, Kuala Lumpur",
     "stage": "Signed",
+    "restricted": false,
     "gdv": 148,
+    "blendedPSF": 450,
     "irr": 17.2,
     "hurdleRate": 15,
     "landAcres": 14.8,
     "tenure": "Freehold",
     "ddProgress": 100,
     "updatedAt": "2026-02-14",
-    "stageNote": "SPA signed, deposit paid",
-    "statusDot": "purple"
+    "stageNote": "SPA signed, deposit paid"
   },
   {
     "id": "SL-2026-01",
@@ -69,14 +73,15 @@
     "ref": "SL-2026-01",
     "location": "Rawang, Selangor",
     "stage": "On Hold",
+    "restricted": false,
     "gdv": 82,
+    "blendedPSF": 380,
     "irr": 14.3,
     "hurdleRate": 15,
     "landAcres": 7.35,
     "tenure": "Leasehold 99yr",
     "ddProgress": 55,
     "updatedAt": "2026-01-30",
-    "stageNote": "Pending vendor price revision",
-    "statusDot": "grey"
+    "stageNote": "Pending vendor price revision"
   }
 ]

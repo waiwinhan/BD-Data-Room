@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "deal-data-room (dev)",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/nuxt/bin/nuxt.mjs", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "deal-data-room (preview build)",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [".output/server/index.mjs"],
+      "port": 3000
+    }
+  ]
+}
