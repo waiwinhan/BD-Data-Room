@@ -5,8 +5,10 @@
       :key="pill.key"
       class="filter-pill"
       :class="{ active: activeFilter === pill.key }"
+      :style="activeFilter === pill.key && pill.color ? { background: pill.color, borderColor: pill.color, color: '#fff' } : {}"
       @click="$emit('update:activeFilter', pill.key)"
     >
+      <span v-if="pill.color" class="pill-dot" :style="{ background: activeFilter === pill.key ? 'rgba(255,255,255,0.7)' : pill.color }" />
       {{ pill.label }}
       <span class="filter-count" :class="{ dark: activeFilter !== pill.key }">{{ pill.count }}</span>
     </button>
@@ -45,6 +47,14 @@ const stageMap: Record<string, string> = {
   'Rejected':  'rejected',
 }
 
+// Stage colours — must match DealCard stageMap
+const stageColors: Record<string, string> = {
+  dd:       '#60A5FA',  // Active DD — blue
+  kiv:      '#F5C85A',  // KIV — amber
+  approved: '#5DCAA5',  // Approved — green
+  rejected: '#F87171',  // Rejected — red
+}
+
 const pills = computed(() => {
   const counts: Record<string, number> = { all: props.deals.length, dd: 0, kiv: 0, approved: 0, rejected: 0 }
   for (const d of props.deals) {
@@ -52,11 +62,11 @@ const pills = computed(() => {
     if (key) counts[key]++
   }
   return [
-    { key: 'all',      label: 'All',       count: counts.all },
-    { key: 'dd',       label: 'Active DD', count: counts.dd },
-    { key: 'kiv',      label: 'KIV',       count: counts.kiv },
-    { key: 'approved', label: 'Approved',  count: counts.approved },
-    { key: 'rejected', label: 'Rejected',  count: counts.rejected },
+    { key: 'all',      label: 'All',       count: counts.all,      color: null },
+    { key: 'dd',       label: 'Active DD', count: counts.dd,       color: stageColors.dd },
+    { key: 'kiv',      label: 'KIV',       count: counts.kiv,      color: stageColors.kiv },
+    { key: 'approved', label: 'Approved',  count: counts.approved, color: stageColors.approved },
+    { key: 'rejected', label: 'Rejected',  count: counts.rejected, color: stageColors.rejected },
   ]
 })
 </script>
@@ -68,18 +78,27 @@ const pills = computed(() => {
   max-width: 1280px; margin: 0 auto; width: 100%;
 }
 .filter-pill {
-  height: 30px; padding: 0 14px;
+  height: 30px; padding: 0 12px;
   border: 1px solid var(--border2); border-radius: 20px;
-  background: transparent; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--muted);
+  background: transparent; font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 500; color: var(--muted);
   cursor: pointer; transition: all 0.15s; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 5px;
 }
 .filter-pill:hover { background: var(--surface); color: var(--text); }
-.filter-pill.active { background: var(--text); color: #fff; border-color: var(--text); }
+.filter-pill.active { color: #fff; border-color: var(--text); }
+/* fallback active (All pill) */
+.filter-pill.active:not([style*="background"]) { background: var(--text); }
+
+.pill-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+  transition: background 0.15s;
+}
 .filter-count {
   display: inline-flex; align-items: center; justify-content: center;
   width: 16px; height: 16px; border-radius: 50%;
   background: rgba(255,255,255,0.25); font-size: 10px; font-weight: 600;
-  margin-left: 4px;
+  margin-left: 2px;
 }
 .filter-count.dark { background: rgba(0,0,0,0.10); color: var(--text); }
 .filter-sep { flex: 1; }
@@ -87,8 +106,8 @@ const pills = computed(() => {
 .search-input {
   height: 30px; padding: 0 12px 0 30px; width: 200px;
   border: 1px solid var(--border2); border-radius: var(--radius-sm);
-  background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 12px; color: var(--text);
-  outline: none; transition: border-color 0.15s;
+  background: var(--surface); font-family: 'DM Sans', sans-serif;
+  font-size: 12px; color: var(--text); outline: none; transition: border-color 0.15s;
 }
 .search-input:focus { border-color: var(--text); }
 .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--faint); pointer-events: none; }

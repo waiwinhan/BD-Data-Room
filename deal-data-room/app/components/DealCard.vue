@@ -88,10 +88,10 @@ const props = defineProps<{
 }>()
 
 const stageMap: Record<string, { barGradient: string; barColor: string; badge: string; dotColor: string }> = {
-  'Active DD': { barGradient: 'linear-gradient(90deg,#5DCAA5,#1D9E75)', barColor: '#5DCAA5', badge: 'badge-green',  dotColor: '#1D9E75' },
-  'KIV':       { barGradient: 'linear-gradient(90deg,#F5C85A,#D48C0A)', barColor: '#F5C85A', badge: 'badge-amber',  dotColor: '#D48C0A' },
-  'Approved':  { barGradient: 'linear-gradient(90deg,#60A5FA,#1D60C8)', barColor: '#60A5FA', badge: 'badge-blue',   dotColor: '#1D60C8' },
-  'Rejected':  { barGradient: 'linear-gradient(90deg,#F87171,#DC2626)', barColor: '#F87171', badge: 'badge-red',    dotColor: '#DC2626' },
+  'Active DD': { barGradient: 'linear-gradient(90deg,#60A5FA,#1D60C8)', barColor: '#60A5FA', badge: 'badge-blue',  dotColor: '#1D60C8' },
+  'KIV':       { barGradient: 'linear-gradient(90deg,#F5C85A,#D48C0A)', barColor: '#F5C85A', badge: 'badge-amber', dotColor: '#D48C0A' },
+  'Approved':  { barGradient: 'linear-gradient(90deg,#5DCAA5,#1D9E75)', barColor: '#5DCAA5', badge: 'badge-green', dotColor: '#1D9E75' },
+  'Rejected':  { barGradient: 'linear-gradient(90deg,#F87171,#DC2626)', barColor: '#F87171', badge: 'badge-red',   dotColor: '#DC2626' },
 }
 
 const stageStyle = computed(() => stageMap[props.deal.stage] ?? stageMap['Rejected'])

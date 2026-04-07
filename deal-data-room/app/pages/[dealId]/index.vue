@@ -126,9 +126,9 @@ const deal = computed(() => {
 const isRestricted = computed(() => deal.value?.restricted ?? false)
 
 const stageBadgeMap: Record<string, string> = {
-  'Active DD': 'badge-green',
+  'Active DD': 'badge-blue',
   'KIV':       'badge-amber',
-  'Approved':  'badge-blue',
+  'Approved':  'badge-green',
   'Rejected':  'badge-red',
 }
 const stageBadge = computed(() => stageBadgeMap[(meta.value as any)?.stage] ?? 'badge-grey')
