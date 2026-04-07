@@ -9,9 +9,9 @@
         <span class="topbar-sub">Deal Data Room</span>
       </div>
       <div class="topbar-right">
+        <button class="btn-primary" @click="alert('Add new deal — coming in Phase 4')">+ New Deal</button>
         <button class="btn-sm">Settings</button>
         <button class="btn-sm">Logout</button>
-        <button class="btn-primary" @click="alert('Add new deal — coming in Phase 4')">+ New Deal</button>
       </div>
     </header>
 
