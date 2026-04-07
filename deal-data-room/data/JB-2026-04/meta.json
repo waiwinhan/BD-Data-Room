@@ -43,24 +43,9 @@
       "color": "green"
     },
     {
-      "label": "Century Orthopaedic Specialist Clinic",
-      "distance": "9.8 km",
-      "color": "blue"
-    },
-    {
       "label": "Sembawang",
       "distance": "10.1 km",
       "color": "green"
-    },
-    {
-      "label": "Johor Bahru (trucks)",
-      "distance": "10.7 km",
-      "color": "blue"
-    },
-    {
-      "label": "Johor Bahru",
-      "distance": "10.7 km",
-      "color": "blue"
     }
   ],
   "milestones": [
@@ -92,6 +77,11 @@
     {
       "label": "SPA Execution",
       "date": "30 Apr 2026",
+      "status": "pending"
+    },
+    {
+      "label": "",
+      "date": "",
       "status": "pending"
     }
   ],

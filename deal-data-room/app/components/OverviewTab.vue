@@ -98,6 +98,14 @@
           <!-- Suggest error -->
           <div v-if="suggestError" class="suggest-error">{{ suggestError }}</div>
 
+          <!-- Legend -->
+          <div class="prox-legend">
+            <span class="prox-legend-item"><span class="prox-dot prox-dot-green" />Transport</span>
+            <span class="prox-legend-item"><span class="prox-dot prox-dot-blue" />Mall / Hospital</span>
+            <span class="prox-legend-item"><span class="prox-dot prox-dot-amber" />Education / Landmark</span>
+            <span class="prox-legend-item"><span class="prox-dot prox-dot-grey" />Other</span>
+          </div>
+
           <!-- View mode list -->
           <template v-if="!editMode">
             <div v-for="p in meta?.proximities" :key="p.label" class="prox-row">
@@ -435,6 +443,15 @@ function removeAssumption(i: number) {
 .proximities { display: flex; flex-direction: column; }
 .prox-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .prox-title { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+
+.prox-legend {
+  display: flex; flex-wrap: wrap; gap: 8px 14px;
+  padding: 6px 0 8px; border-bottom: 1px solid var(--border);
+}
+.prox-legend-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; color: var(--muted);
+}
 
 .prox-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); }
 .prox-row:last-child { border-bottom: none; }
