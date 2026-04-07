@@ -43,28 +43,30 @@
     </div>
 
     <!-- STATUS LEGEND -->
-    <div class="status-legend">
+    <div class="legend-wrapper">
       <div class="legend-title">Status Guide</div>
-      <div class="legend-item">
-        <span class="legend-dot" style="background:#60A5FA" />
-        <span class="legend-label"><strong>Active DD</strong> — Deal under active due diligence</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-dot" style="background:#F5C85A" />
-        <span class="legend-label"><strong>KIV</strong> — Keep in view, pending evaluation</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-dot" style="background:#5DCAA5" />
-        <span class="legend-label"><strong>Approved</strong> — Deal approved and signed</span>
-      </div>
-      <div class="legend-item">
-        <span class="legend-dot" style="background:#F87171" />
-        <span class="legend-label"><strong>Rejected</strong> — Deal not proceeding</span>
-      </div>
-      <div class="legend-divider" />
-      <div class="legend-item">
-        <span class="legend-dot legend-dot-outline" style="border-color:#F87171" />
-        <span class="legend-label"><strong>Confidential</strong> — Sensitive deal, restricted access</span>
+      <div class="legend-rows">
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#60A5FA" />
+          <span class="legend-label"><strong>Active DD</strong> — Under active due diligence</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#F5C85A" />
+          <span class="legend-label"><strong>KIV</strong> — Keep in view, pending decision</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#5DCAA5" />
+          <span class="legend-label"><strong>Approved</strong> — Deal signed and approved</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot" style="background:#F87171" />
+          <span class="legend-label"><strong>Rejected</strong> — Not proceeding</span>
+        </div>
+        <div class="legend-divider" />
+        <div class="legend-item">
+          <span class="legend-dot legend-dot-outline" style="border-color:#F87171" />
+          <span class="legend-label"><strong>Confidential</strong> — Restricted access</span>
+        </div>
       </div>
     </div>
   </div>
@@ -143,18 +145,22 @@ const filteredDeals = computed(() => {
 .add-icon { font-size: 24px; opacity: 0.5; }
 
 /* ── STATUS LEGEND ── */
-.status-legend {
-  display: flex; flex-direction: column; gap: 8px;
+.legend-wrapper {
+  max-width: 1280px; margin: 0 auto; width: 100%;
   padding: 0 28px 40px;
-  max-width: 280px; margin: 0 28px;
 }
 .legend-title {
   font-size: 11px; font-weight: 600; color: var(--muted);
   text-transform: uppercase; letter-spacing: 0.07em;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+}
+.legend-rows {
+  display: flex; flex-direction: column; gap: 7px;
+  width: fit-content;
 }
 .legend-item {
   display: flex; align-items: center; gap: 9px;
+  white-space: nowrap;
 }
 .legend-dot {
   width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
@@ -164,7 +170,7 @@ const filteredDeals = computed(() => {
   border: 2px solid;
 }
 .legend-label {
-  font-size: 12px; color: var(--muted); line-height: 1.4;
+  font-size: 12px; color: var(--muted);
 }
 .legend-label strong {
   color: var(--text); font-weight: 600;
@@ -173,5 +179,6 @@ const filteredDeals = computed(() => {
   height: 1px;
   background: var(--border);
   margin: 2px 0;
+  width: 100%;
 }
 </style>
