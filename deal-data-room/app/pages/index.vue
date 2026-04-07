@@ -20,32 +20,6 @@
     <!-- PORTFOLIO SUMMARY -->
     <PortfolioSummary v-if="portfolio" :portfolio="{ ...portfolio, dealCount: allDeals.length }" />
 
-    <!-- STATUS LEGEND -->
-    <div class="status-legend">
-      <span class="legend-title">Status</span>
-      <span class="legend-item">
-        <span class="legend-dot" style="background:#60A5FA" />
-        <span class="legend-label"><strong>Active DD</strong> — Deal under active due diligence</span>
-      </span>
-      <span class="legend-item">
-        <span class="legend-dot" style="background:#F5C85A" />
-        <span class="legend-label"><strong>KIV</strong> — Keep in view, pending evaluation</span>
-      </span>
-      <span class="legend-item">
-        <span class="legend-dot" style="background:#5DCAA5" />
-        <span class="legend-label"><strong>Approved</strong> — Deal approved and signed</span>
-      </span>
-      <span class="legend-item">
-        <span class="legend-dot" style="background:#F87171" />
-        <span class="legend-label"><strong>Rejected</strong> — Deal not proceeding</span>
-      </span>
-      <span class="legend-divider" />
-      <span class="legend-item">
-        <span class="legend-dot legend-dot-outline" style="border-color:#F87171" />
-        <span class="legend-label"><strong>Confidential</strong> — Sensitive deal, restricted access</span>
-      </span>
-    </div>
-
     <!-- DEAL GRID -->
     <div class="deal-grid">
       <DealCard
@@ -65,6 +39,32 @@
       <div class="add-card" @click="alert('Add new deal — coming in Phase 4')">
         <span class="add-icon">＋</span>
         Add new deal
+      </div>
+    </div>
+
+    <!-- STATUS LEGEND -->
+    <div class="status-legend">
+      <div class="legend-title">Status Guide</div>
+      <div class="legend-item">
+        <span class="legend-dot" style="background:#60A5FA" />
+        <span class="legend-label"><strong>Active DD</strong> — Deal under active due diligence</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot" style="background:#F5C85A" />
+        <span class="legend-label"><strong>KIV</strong> — Keep in view, pending evaluation</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot" style="background:#5DCAA5" />
+        <span class="legend-label"><strong>Approved</strong> — Deal approved and signed</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot" style="background:#F87171" />
+        <span class="legend-label"><strong>Rejected</strong> — Deal not proceeding</span>
+      </div>
+      <div class="legend-divider" />
+      <div class="legend-item">
+        <span class="legend-dot legend-dot-outline" style="border-color:#F87171" />
+        <span class="legend-label"><strong>Confidential</strong> — Sensitive deal, restricted access</span>
       </div>
     </div>
   </div>
@@ -144,36 +144,34 @@ const filteredDeals = computed(() => {
 
 /* ── STATUS LEGEND ── */
 .status-legend {
-  display: flex; align-items: center; flex-wrap: wrap; gap: 6px 16px;
-  padding: 0 28px 16px;
-  max-width: 1280px; margin: 0 auto; width: 100%;
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 0 28px 40px;
+  max-width: 280px; margin: 0 28px;
 }
 .legend-title {
   font-size: 11px; font-weight: 600; color: var(--muted);
-  text-transform: uppercase; letter-spacing: 0.07em; margin-right: 4px;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin-bottom: 4px;
 }
 .legend-item {
-  display: inline-flex; align-items: center; gap: 6px;
+  display: flex; align-items: center; gap: 9px;
 }
 .legend-dot {
   width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
-  display: inline-block;
 }
 .legend-dot-outline {
   background: transparent !important;
   border: 2px solid;
 }
 .legend-label {
-  font-size: 11.5px; color: var(--muted);
+  font-size: 12px; color: var(--muted); line-height: 1.4;
 }
 .legend-label strong {
   color: var(--text); font-weight: 600;
 }
 .legend-divider {
-  display: inline-block;
-  width: 1px; height: 14px;
-  background: var(--border2);
-  margin: 0 4px;
-  vertical-align: middle;
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
 }
 </style>
