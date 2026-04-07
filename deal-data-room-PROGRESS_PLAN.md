@@ -16,6 +16,7 @@
 | M03 | Dashboard Shell + Tab Layout | 1 | ✅ | Day 1 |
 | M04 | Overview Tab | 1 | ✅ | Day 1–2 |
 | M04b | Inline Edit Mode (Dashboard) | 1 | ✅ | Day 2 |
+| M04c | UI Polish — Deal List Refinements | 1 | ✅ | Day 2 |
 | M05 | Excel Parser (ExcelJS) | 2 | ⏳ | Day 2–3 |
 | M06 | Financials Tab | 2 | ⏳ | Day 3 |
 | M07 | Documents Tab | 3 | ⏳ | Day 4 |
@@ -251,6 +252,33 @@ const stageColors = {
 - [ ] Delete a milestone → Save → removed after reload
 - [ ] Cancel → all changes discarded, original data restored
 - [ ] Commit: `git commit -m "M04b: inline edit mode for deal metadata"`
+
+---
+
+---
+
+### M04c — UI Polish — Deal List Refinements ✅
+
+**Milestone:** Deal list page reflects correct stage naming, colour system, status legend, and topbar layout.
+
+**Stage system overhaul**
+- [x] Rename stages: Under Review → **KIV**, Signed → **Approved**, On Hold → **Rejected**
+- [x] Colour code: Active DD = blue `#60A5FA`, KIV = amber `#F5C85A`, Approved = green `#5DCAA5`, Rejected = red `#F87171`
+- [x] Colour-coded dots on filter pills (always visible, not just on active state)
+- [x] Rename "Restricted" badge → **Confidential** (DealCard + deal header)
+
+**Topbar**
+- [x] Reorder: Org name first ("BRDB Berhad"), then divider, then "Deal Data Room"
+- [x] Remove organisation subtitle from topbar
+- [x] Button order: **+ New Deal** → Settings → Logout
+
+**Status Legend (deal list page)**
+- [x] Add status legend below deal grid with colour dot + definition for each stage
+- [x] Vertical layout, single row per item, no text wrapping
+- [x] Aligned with deal grid left edge (same `max-width: 1280px; padding: 0 28px` container)
+- [x] Simplified descriptions — all fit on one line
+- [x] Thin divider separates stage statuses from Confidential entry
+- [x] Legend items: Active DD · KIV · Approved · Rejected · *(divider)* · Confidential
 
 ---
 
