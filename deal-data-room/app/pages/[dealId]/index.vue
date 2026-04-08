@@ -98,7 +98,7 @@
           :edit-mode="editMode"
           :deal-id="dealId"
         />
-        <DocumentsTab  v-else-if="activeTab === 'documents'"  />
+        <DocumentsTab  v-else-if="activeTab === 'documents'"  :deal-id="dealId" />
         <FinancialsTab v-else-if="activeTab === 'financials'" :deal="deal" :meta="meta" />
         <RiskTab       v-else-if="activeTab === 'risk'"       />
         <TeamTab       v-else-if="activeTab === 'team'"       />
