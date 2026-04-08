@@ -54,19 +54,19 @@ Goal: Dashboard running locally with hardcoded/JSON data for one deal. No auth, 
 
 **Milestone:** Nuxt dev server running at localhost:3000 with Tailwind CSS active.
 
-- [ ] Run `npx nuxi@latest init deal-data-room`
-- [ ] `cd deal-data-room && npm install @nuxtjs/tailwindcss vue-chartjs chart.js exceljs nuxt-auth-utils`
-- [ ] Add `@nuxtjs/tailwindcss` and `nuxt-auth-utils` to `nuxt.config.ts` modules array
-- [ ] Create `tailwind.config.js` (or confirm auto-generated)
-- [ ] Verify Tailwind works — add a test class to `app.vue`, confirm styling applies
-- [ ] Create folder structure:
-  - [ ] `mkdir -p data/jb-2026-04/docs`
-  - [ ] `touch data/deals.json` (populate with one deal object)
-  - [ ] `touch data/jb-2026-04/meta.json` (populate with Permas Jaya data)
-  - [ ] `touch data/jb-2026-04/risk.json` (populate with 5 risk items)
-- [ ] Create `.env` with `NUXT_SESSION_PASSWORD` and `DEAL_PASSWORD`
-- [ ] Run `npm run dev` — confirm server starts without errors
-- [ ] Commit: `git init && git add . && git commit -m "M01: project scaffold"`
+- [x] Run `npx nuxi@latest init deal-data-room`
+- [x] `cd deal-data-room && npm install @nuxtjs/tailwindcss vue-chartjs chart.js exceljs nuxt-auth-utils`
+- [x] Add `@nuxtjs/tailwindcss` and `nuxt-auth-utils` to `nuxt.config.ts` modules array
+- [x] Create `tailwind.config.js` (or confirm auto-generated)
+- [x] Verify Tailwind works — add a test class to `app.vue`, confirm styling applies
+- [x] Create folder structure:
+  - [x] `mkdir -p data/jb-2026-04/docs`
+  - [x] `touch data/deals.json` (populate with one deal object)
+  - [x] `touch data/jb-2026-04/meta.json` (populate with Permas Jaya data)
+  - [x] `touch data/jb-2026-04/risk.json` (populate with 5 risk items)
+- [x] Create `.env` with `NUXT_SESSION_PASSWORD` and `DEAL_PASSWORD`
+- [x] Run `npm run dev` — confirm server starts without errors
+- [x] Commit: `git init && git add . && git commit -m "M01: project scaffold"`
 
 ---
 
