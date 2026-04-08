@@ -19,7 +19,7 @@
 | M04c | UI Polish — Deal List Refinements | 1 | ✅ | Day 2 |
 | M05 | Excel Parser (ExcelJS) | 2 | ⏳ | Day 2–3 |
 | M06 | Financials Tab | 2 | ✅ | Day 3 |
-| M07 | Documents Tab | 3 | ⏳ | Day 4 |
+| M07 | Documents Tab | 3 | ✅ | Day 4 |
 | M08 | Document Upload | 3 | ⏳ | Day 4 |
 | M09 | Risk & Legal Tab | 3 | ⏳ | Day 4–5 |
 | M10 | Deal Team Tab | 3 | ⏳ | Day 5 |
@@ -398,26 +398,28 @@ Goal: Documents tab shows real files with upload capability.
 
 ---
 
-### M07 — Documents Tab ⏳
+### M07 — Documents Tab ✅
 
-**Milestone:** Documents tab lists all files in `data/[dealId]/docs/` with correct metadata and status badges.
+**Milestone:** Documents tab lists all files in `data/[dealId]/docs/` with correct metadata, status badges, and full document management.
 
-- [ ] Create `server/api/[dealId]/documents.get.ts`:
-  - [ ] Scan `data/[dealId]/docs/` directory
-  - [ ] For each non-`.meta.json` file, read its `.meta.json` sidecar
-  - [ ] Return array: `{ filename, originalName, category, status, uploader, uploadDate, sizeMB, ext }`
-- [ ] Build `components/DocumentsTab.vue`:
-  - [ ] Two-column layout: legal documents | financial & technical (filter by `category`)
-  - [ ] Document row component:
-    - [ ] File type badge (PDF = coral, XLS = green, DOC = blue, IMG = amber) with 3-letter label
-    - [ ] Document name (from sidecar `originalName`)
-    - [ ] Upload meta (uploader + date + size)
-    - [ ] Status badge (New = green, Reviewed = grey, Pending = amber)
-    - [ ] Click to open/download the file
-  - [ ] "Upload document" button per category column
-- [ ] Add seed documents to `data/jb-2026-04/docs/` with sidecar `.meta.json` files
-- [ ] Test: all seed documents appear in the correct category column
-- [ ] Commit: `git commit -m "M07: documents tab listing"`
+- [x] Create `server/api/[dealId]/documents.get.ts` — scans docs/ and groups by category
+- [x] Build `components/DocumentsTab.vue`:
+  - [x] Dynamic 3-column grid (max 3 per row) with categories from `doc-categories.json`
+  - [x] File type badge (PDF/XLS/DOC/IMG) per file extension
+  - [x] Document name, uploader, date, size metadata
+  - [x] Status badge (New / Reviewed / Pending)
+  - [x] Click to preview (PDF/IMG inline, XLS/DOC via MS Office viewer, others download)
+  - [x] Download button (↓) per row
+  - [x] Rename document (✎ inline input → PUT `.meta.json`)
+  - [x] Delete document (🗑 → confirmation dialog → moves to `.trash/`)
+  - [x] Restore from trash bin panel
+  - [x] Add new category card ("+ New category")
+  - [x] Rename category card (✎ inline input)
+  - [x] Delete category (🗑 → confirmation → moves to `doc-categories-trash.json`)
+  - [x] Restore category from trash bin panel
+  - [x] Summary strip: Total / New / Reviewed / Pending counts
+- [x] Seed docs in `data/JB-2026-04/docs/` with `.meta.json` sidecars
+- [x] New server endpoints: `doc-categories.get/put`, `doc-categories-trash.put`, `[filename].delete`, `trash.get`, `trash/[filename].put`
 
 ---
 
