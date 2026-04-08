@@ -99,7 +99,7 @@
           :deal-id="dealId"
         />
         <DocumentsTab  v-else-if="activeTab === 'documents'"  />
-        <FinancialsTab v-else-if="activeTab === 'financials'" />
+        <FinancialsTab v-else-if="activeTab === 'financials'" :deal="deal" :meta="meta" />
         <RiskTab       v-else-if="activeTab === 'risk'"       />
         <TeamTab       v-else-if="activeTab === 'team'"       />
       </Transition>

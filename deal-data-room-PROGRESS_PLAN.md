@@ -18,7 +18,7 @@
 | M04b | Inline Edit Mode (Dashboard) | 1 | ✅ | Day 2 |
 | M04c | UI Polish — Deal List Refinements | 1 | ✅ | Day 2 |
 | M05 | Excel Parser (ExcelJS) | 2 | ⏳ | Day 2–3 |
-| M06 | Financials Tab | 2 | ⏳ | Day 3 |
+| M06 | Financials Tab | 2 | ✅ | Day 3 |
 | M07 | Documents Tab | 3 | ⏳ | Day 4 |
 | M08 | Document Upload | 3 | ⏳ | Day 4 |
 | M09 | Risk & Legal Tab | 3 | ⏳ | Day 4–5 |
@@ -28,7 +28,7 @@
 | M12 | Multi-Deal Routing | 4 | ⏳ | Day 6 |
 | M13 | Deployment (Railway / Vercel) | 4 | ⏳ | Day 6–7 |
 | M14 | Excel — BRDB Model Wiring | 2 | ⏳ | Day 3 |
-| M15 | Sensitivity Table | 2 | ⏳ | Day 3 |
+| M15 | Sensitivity Table | 2 | ✅ | Day 3 |
 | PL-01 | Supabase Auth (per-user) | Post | 📋 | Post-launch |
 | PL-02 | Document Comment Threads | Post | 📋 | Post-launch |
 | PL-03 | Email Notifications | Post | 📋 | Post-launch |
