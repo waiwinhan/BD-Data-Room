@@ -20,7 +20,7 @@
 | M05 | Excel Parser (ExcelJS) | 2 | ⏳ | Day 2–3 |
 | M06 | Financials Tab | 2 | ✅ | Day 3 |
 | M07 | Documents Tab | 3 | ✅ | Day 4 |
-| M08 | Document Upload | 3 | ⏳ | Day 4 |
+| M08 | Document Upload | 3 | ✅ | Day 4 |
 | M09 | Risk & Legal Tab | 3 | ⏳ | Day 4–5 |
 | M10 | Deal Team Tab | 3 | ⏳ | Day 5 |
 | M11 | Auth — NDA Password Gate | 4 | ⏳ | Day 5–6 |
