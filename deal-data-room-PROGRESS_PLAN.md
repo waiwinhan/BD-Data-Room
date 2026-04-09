@@ -17,6 +17,7 @@
 | M04 | Overview Tab | 1 | ✅ | Day 1–2 |
 | M04b | Inline Edit Mode (Dashboard) | 1 | ✅ | Day 2 |
 | M04c | UI Polish — Deal List Refinements | 1 | ✅ | Day 2 |
+| M04d | AI SWOT Analysis & Recommendation | 1 | ✅ | Day 2 |
 | M05 | Excel Parser (ExcelJS) | 2 | ⏳ | Day 2–3 |
 | M06 | Financials Tab | 2 | ✅ | Day 3 |
 | M07 | Documents Tab | 3 | ✅ | Day 4 |
@@ -174,36 +175,26 @@ const stageColors = {
 
 ### M04 — Overview Tab ✅
 
-**Milestone:** Overview tab shows real data: 4 KPI cards, Google Maps embed, DD milestones, development mix, key assumptions.
+**Milestone:** Overview tab shows real data: 5 KPI cards, Google Maps embed, DD milestones, development mix, key assumptions.
 
-- [ ] Create `server/api/[dealId]/meta.get.ts` — reads and returns `meta.json`
-- [ ] Build `components/OverviewTab.vue`:
+- [x] Create `server/api/[dealId]/meta.get.ts` — reads and returns `meta.json`
+- [x] Build `components/OverviewTab.vue`:
 
-**KPI cards row (4 cards)**
-  - [ ] Land area card (value + "Freehold title" sub-label)
-  - [ ] Est. GDV card (value + "Blended psf RM X" sub-label from meta)
-  - [ ] Land cost card (value + "RM X psf" sub-label)
-  - [ ] Proj. IRR card (value + "Threshold X%" sub-label, coloured based on above/below threshold)
+**KPI cards row (5 cards) — updated Apr 2026**
+  - [x] Land Area card (value + tenure sub-label)
+  - [x] NET DEV VALUE (NDV) card (value + "After S&M (RM X psf)" sub-label)
+  - [x] Land Cost card (value + "RM X psf land" sub-label)
+  - [x] Construction Cost card (value + "Hard cost only" sub-label)
+  - [x] NET DEV PROFIT (NDP) card (value + NDP margin %, green/red vs hurdle rate)
+  - [x] Shared `fin` computed moved to parent `[dealId]/index.vue` — both Overview and Financials tabs read from same source to ensure number consistency
 
 **Three-column grid**
-  - [ ] Left: Site location card
-    - [ ] Section label "Site location"
-    - [ ] Google Maps embed iframe (lat/lng from meta.json)
-    - [ ] Gradient overlay with parcel name + sub-label
-    - [ ] "Open ↗" button linking to `https://maps.google.com/?q={lat},{lng}`
-    - [ ] Coordinate pills (lat, lng, city)
-    - [ ] Key proximities list (coloured dots + label + distance from meta.json)
-  - [ ] Centre: DD milestones card
-    - [ ] Status dot (green=done, blue=active, grey=pending)
-    - [ ] Milestone label + date
-    - [ ] Status badge (Done / In progress / Pending)
-    - [ ] Loop over `meta.milestones` array
-  - [ ] Right: Development mix card
-    - [ ] Progress bars for each dev type (pct + color from meta.devMix)
-    - [ ] Key assumptions grid (2×2, from meta.assumptions)
+  - [x] Left: Site location card — Maps embed, coordinate pills, key proximities
+  - [x] Centre: DD milestones card — status dots, labels, dates, badges
+  - [x] Right: Development mix card — progress bars, key assumptions grid
 
+- [x] Stage badge fixed — now reads from `deal.value?.stage` (deals.json) not meta
 - [x] Test: all data renders correctly from meta.json
-- [ ] Test: Google Maps embed loads (may need Maps Embed API key in .env)
 - [x] Commit: `git commit -m "M04: overview tab complete"`
 
 ---
@@ -279,6 +270,29 @@ const stageColors = {
 - [x] Simplified descriptions — all fit on one line
 - [x] Thin divider separates stage statuses from Confidential entry
 - [x] Legend items: Active DD · KIV · Approved · Rejected · *(divider)* · Confidential
+
+### M04d — AI SWOT Analysis & Recommendation ✅
+
+**Milestone:** Overview tab includes a Claude AI-powered SWOT Analysis section and a separate AI Recommendation section, both always visible.
+
+**Backend — `server/api/[dealId]/swot.post.ts`**
+- [x] Reads `deals.json`, `meta.json`, `risk.json` for full deal context
+- [x] Extracts text from uploaded documents: PDF via `pdf-parse`, XLSX via ExcelJS (3,000 char limit per doc)
+- [x] Calls Claude API (`claude-opus-4-5`) with structured prompt
+- [x] Returns JSON: `{ swot: { strengths, weaknesses, opportunities, threats }, recommendation: { verdict, headline, rationale, keyConditions[] } }`
+- [x] Persists result to `meta.json` under `meta.swot` (survives page refresh)
+- [x] `ANTHROPIC_API_KEY` read from `.env` via `runtimeConfig.anthropicApiKey`
+
+**Frontend — `OverviewTab.vue`**
+- [x] SWOT section: always visible, 2×2 coloured grid (S=green, W=amber, O=blue, T=red)
+- [x] Recommendation section: always visible, verdict badge (Proceed=green / Hold=amber / Reject=red)
+- [x] "Generate AI Analysis" / "Regenerate" button triggers `POST /api/[dealId]/swot`
+- [x] Shows placeholder copy when no analysis exists yet
+- [x] `swot` ref initialised from `props.meta?.swot` — persists across page reload
+- [x] Full optional chaining on all `swot?.swot?.strengths` etc. — no crash on empty/partial data
+- [x] AI disclaimer: *"⚠ AI can make mistakes. Please double-check the responses."*
+- [x] **Demo data** seeded for all 5 deals with realistic deal-specific SWOT + Recommendation
+- [x] `isDemo: true` flag → shows amber "Demo" badge so users distinguish demo from real AI output
 
 ---
 
