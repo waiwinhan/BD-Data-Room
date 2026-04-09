@@ -423,7 +423,7 @@ Goal: Documents tab shows real files with upload capability.
 
 ---
 
-### M08 — Document Upload ⏳
+### M08 — Document Upload ✅
 
 **Milestone:** Users can upload PDF/XLS/DOC files from the Documents tab. New files appear immediately in the list.
 

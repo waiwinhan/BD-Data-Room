@@ -122,7 +122,8 @@ const fin = computed(() => props.fin ?? {})
 
 const ndpClass = computed(() => {
   const m = parseFloat(fin.value.ndpMargin)
-  return m >= 20 ? 'val-green' : m >= 12 ? 'val-amber' : 'val-red'
+  const hurdle = props.deal?.hurdleRate ?? 15
+  return m >= hurdle ? 'val-green' : 'val-red'
 })
 
 // ── Cost items (6 categories) ───────────────────────────────────────

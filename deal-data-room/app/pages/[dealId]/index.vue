@@ -40,7 +40,7 @@
 
             <!-- Stage: badge (view) or select (edit) -->
             <template v-if="!editMode">
-              <span class="badge" :class="stageBadge">{{ meta?.stage }}</span>
+              <span class="badge" :class="stageBadge">{{ deal?.stage }}</span>
             </template>
             <template v-else>
               <select v-model="draftDeal.stage" class="edit-select">
@@ -149,7 +149,7 @@ const stageBadgeMap: Record<string, string> = {
   'Approved':  'badge-green',
   'Rejected':  'badge-red',
 }
-const stageBadge = computed(() => stageBadgeMap[(meta.value as any)?.stage] ?? 'badge-grey')
+const stageBadge = computed(() => stageBadgeMap[deal.value?.stage] ?? 'badge-grey')
 
 const tabs = [
   { key: 'overview',   label: 'Overview' },
