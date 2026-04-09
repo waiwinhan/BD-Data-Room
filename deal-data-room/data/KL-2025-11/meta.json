@@ -35,6 +35,44 @@
     "zoning": "Residential (R2)",
     "bumiQuota": "30%"
   },
+  "swot": {
+    "swot": {
+      "strengths": [
+        "Freehold Geran title with 14.8 acres provides rare scale for a landed township in the Damansara corridor",
+        "0.3 km to Damansara Damai MRT station — strongest TOD fundamentals among current portfolio deals",
+        "All DD milestones completed and SPA executed — lowest execution risk in the pipeline",
+        "Landed product mix (terraces + semi-D + bungalows) targets the most liquid residential segment in the Klang Valley"
+      ],
+      "weaknesses": [
+        "Low 1.5x plot ratio limits density uplift potential compared to commercial-zoned sites",
+        "R2 residential zoning with 30% Bumi quota restricts open-market pricing on nearly one-third of units",
+        "3-year development period creates concentration risk — all revenue recognition skewed toward Year 2 and 3"
+      ],
+      "opportunities": [
+        "Damansara corridor continues to attract upgrader demand from PJ and Subang — strong end-user absorption expected",
+        "Bungalow component (10%) can be positioned as premium lots at RM 2.5M+ given MRT proximity",
+        "Potential to apply for plot ratio uplift under DBKL LSAS transit incentive for parcels within 400m of MRT"
+      ],
+      "threats": [
+        "Competing landed launches in Kepong and Segambut corridors may pressure absorption pace beyond Year 1",
+        "Rising construction costs for landed product due to labour shortages post-2024 could erode the RM 180 psf build cost",
+        "Interest rate environment: end-financier loan rejection rates elevated for medium-income bracket buyers"
+      ]
+    },
+    "recommendation": {
+      "verdict": "Proceed",
+      "headline": "Best-in-class TOD landed deal — full approval justified; focus now shifts to launch strategy and cost discipline.",
+      "rationale": "Damansara Damai Residences is the strongest deal in the current BRDB pipeline. The combination of freehold tenure, 0.3 km MRT frontage, and a completed SPA positions this as a low-risk, high-quality project. With all DD milestones closed, the focus should shift entirely to launch execution, pricing strategy, and securing construction financing at competitive rates.",
+      "keyConditions": [
+        "Finalise launch pricing for Phase 1 terraces by May 2026, targeting RM 1.1M–RM 1.3M range based on recent MRT-proximate comparable transactions",
+        "Lock in main contractor at or below RM 180 psf to protect the development margin",
+        "Pursue DBKL LSAS application for plot ratio uplift — even a 0.5x increase could add RM 30M+ to GDV"
+      ]
+    },
+    "generatedAt": "2026-04-09T08:00:00.000Z",
+    "docsAnalysed": 0,
+    "isDemo": true
+  },
   "team": {
     "internal": [
       { "name": "Wai Win Han", "role": "Deal Lead", "email": "waiwin@brdb.com.my" }

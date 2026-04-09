@@ -295,6 +295,94 @@
       </div>
 
     </div>
+
+    <!-- ── SWOT ANALYSIS ── -->
+    <div class="swot-section">
+      <div class="swot-header">
+        <div class="swot-title-block">
+          <span class="swot-title">SWOT Analysis</span>
+          <span v-if="swot?.generatedAt" class="swot-timestamp">
+            <span v-if="swot.isDemo" class="swot-demo-badge">Demo</span>
+            <span v-else>Generated {{ formatSwotDate(swot.generatedAt) }}</span>
+            <span v-if="swot.docsAnalysed" class="swot-docs-badge">{{ swot.docsAnalysed }} doc{{ swot.docsAnalysed > 1 ? 's' : '' }} analysed</span>
+          </span>
+        </div>
+        <button class="btn-generate" :disabled="generating" @click="generateSwot">
+          <span v-if="generating" class="gen-spinner"></span>
+          <span v-else>✦</span>
+          {{ generating ? 'Analysing…' : swot ? 'Regenerate' : 'Generate AI Analysis' }}
+        </button>
+      </div>
+      <div class="ai-disclaimer">⚠ AI can make mistakes. Please double-check the responses.</div>
+
+      <div v-if="swotError" class="swot-error">{{ swotError }}</div>
+
+      <div v-if="swot" class="swot-grid">
+        <div class="swot-card swot-s">
+          <div class="swot-card-label">💪 Strengths</div>
+          <ul class="swot-list">
+            <li v-for="(pt, i) in (swot?.swot?.strengths ?? [])" :key="i">{{ pt }}</li>
+          </ul>
+        </div>
+        <div class="swot-card swot-w">
+          <div class="swot-card-label">⚠ Weaknesses</div>
+          <ul class="swot-list">
+            <li v-for="(pt, i) in (swot?.swot?.weaknesses ?? [])" :key="i">{{ pt }}</li>
+          </ul>
+        </div>
+        <div class="swot-card swot-o">
+          <div class="swot-card-label">🚀 Opportunities</div>
+          <ul class="swot-list">
+            <li v-for="(pt, i) in (swot?.swot?.opportunities ?? [])" :key="i">{{ pt }}</li>
+          </ul>
+        </div>
+        <div class="swot-card swot-t">
+          <div class="swot-card-label">⚡ Threats</div>
+          <ul class="swot-list">
+            <li v-for="(pt, i) in (swot?.swot?.threats ?? [])" :key="i">{{ pt }}</li>
+          </ul>
+        </div>
+      </div>
+
+      <div v-else-if="!generating" class="swot-empty">
+        <span class="swot-empty-icon">✦</span>
+        <span>Click "Generate AI Analysis" to run a SWOT analysis using Claude AI — including all uploaded documents.</span>
+      </div>
+    </div>
+
+    <!-- ── AI RECOMMENDATION ── -->
+    <div class="rec-section">
+      <div class="rec-section-header">
+        <span class="swot-title">AI Recommendation</span>
+        <span class="rec-powered">Powered by Claude AI</span>
+      </div>
+
+      <!-- Populated -->
+      <div v-if="swot?.recommendation" class="rec-body" :class="`rec-${verdictClass}`">
+        <div class="rec-verdict-block">
+          <div class="rec-label">Verdict</div>
+          <div class="rec-verdict" :class="`rec-verdict-${verdictClass}`">{{ swot.recommendation?.verdict }}</div>
+        </div>
+        <div class="rec-divider"></div>
+        <div class="rec-detail">
+          <div class="rec-headline">{{ swot.recommendation?.headline ?? swot.recommendation?.summary }}</div>
+          <div v-if="swot.recommendation?.rationale" class="rec-rationale">{{ swot.recommendation.rationale }}</div>
+          <div v-if="swot.recommendation?.keyConditions?.length" class="rec-conditions">
+            <div class="rec-conditions-label">Key Conditions / Actions</div>
+            <ul class="rec-conditions-list">
+              <li v-for="(c, i) in swot.recommendation.keyConditions" :key="i">{{ c }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Placeholder -->
+      <div v-else class="swot-empty">
+        <span class="swot-empty-icon">✦</span>
+        <span>Run "Generate AI Analysis" above to receive a strategic recommendation for this deal.</span>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -376,6 +464,38 @@ function addAssumption() {
 }
 function removeAssumption(i: number) {
   props.meta.assumptions.splice(i, 1)
+}
+
+// ── SWOT AI ──────────────────────────────────────────────────────
+const generating = ref(false)
+const swotError  = ref('')
+const swot = ref<any>(props.meta?.swot ?? null)
+
+async function generateSwot() {
+  generating.value = true
+  swotError.value  = ''
+  try {
+    const result = await $fetch(`/api/${props.dealId}/swot`, { method: 'POST' })
+    swot.value = { ...(result as any), generatedAt: new Date().toISOString() }
+  } catch (err: any) {
+    swotError.value = err?.data?.message ?? 'Failed to generate analysis. Check API key.'
+  } finally {
+    generating.value = false
+  }
+}
+
+const verdictClass = computed(() => {
+  try {
+    const v = swot.value?.recommendation?.verdict ?? ''
+    if (v === 'Proceed') return 'green'
+    if (v === 'Proceed with Caution' || v === 'Hold') return 'amber'
+    if (v === 'Reject') return 'red'
+    return 'amber'
+  } catch { return 'amber' }
+})
+
+function formatSwotDate(iso: string) {
+  return new Date(iso).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 </script>
 
@@ -574,6 +694,100 @@ function removeAssumption(i: number) {
   font-size: 11px; border-radius: 4px; transition: all 0.15s; flex-shrink: 0;
 }
 .btn-delete-row:hover { background: var(--red-bg); color: var(--red); }
+
+/* ── SWOT SECTION ── */
+.swot-section {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 22px;
+  box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px;
+}
+.swot-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.swot-title-block { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.swot-title { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text); }
+.swot-timestamp { font-size: 10px; color: var(--faint); display: flex; align-items: center; gap: 6px; }
+.swot-docs-badge {
+  background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE;
+  font-size: 10px; font-weight: 600; padding: 1px 7px; border-radius: 20px;
+}
+
+.btn-generate {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: var(--radius-sm);
+  background: var(--text); color: #fff; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: opacity 0.15s; white-space: nowrap; flex-shrink: 0;
+}
+.btn-generate:hover:not(:disabled) { opacity: 0.85; }
+.btn-generate:disabled { opacity: 0.55; cursor: not-allowed; }
+.gen-spinner {
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+  animation: spin 0.6s linear infinite; display: inline-block; flex-shrink: 0;
+}
+
+.swot-error { font-size: 12px; color: var(--red); padding: 8px 12px; background: var(--red-bg); border-radius: var(--radius-sm); }
+.ai-disclaimer { font-size: 11px; color: var(--muted); opacity: 0.75; margin-bottom: 2px; }
+.swot-demo-badge { display: inline-block; background: #f0a500; color: #fff; font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 20px; letter-spacing: 0.05em; vertical-align: middle; }
+
+.swot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.swot-card { border-radius: var(--radius-sm); padding: 14px 16px; }
+.swot-s { background: #F0FDF4; border: 1px solid #BBF7D0; }
+.swot-w { background: #FFF7ED; border: 1px solid #FED7AA; }
+.swot-o { background: #EFF6FF; border: 1px solid #BFDBFE; }
+.swot-t { background: #FFF1F2; border: 1px solid #FECDD3; }
+
+.swot-card-label { font-size: 11px; font-weight: 700; margin-bottom: 8px; }
+.swot-s .swot-card-label { color: #15803D; }
+.swot-w .swot-card-label { color: #C2410C; }
+.swot-o .swot-card-label { color: #1D4ED8; }
+.swot-t .swot-card-label { color: #BE123C; }
+
+.swot-list { margin: 0; padding-left: 14px; display: flex; flex-direction: column; gap: 5px; }
+.swot-list li { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+.swot-empty { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--faint); padding: 16px 0; }
+.swot-empty-icon { font-size: 18px; opacity: 0.4; }
+
+/* ── RECOMMENDATION SECTION ── */
+.rec-section {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 20px 22px;
+  box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px;
+}
+.rec-section-header { display: flex; align-items: center; justify-content: space-between; }
+.rec-powered { font-size: 10px; color: var(--faint); font-style: italic; }
+
+.rec-body {
+  display: flex; align-items: flex-start; gap: 0;
+  border-radius: var(--radius-sm); border: 1px solid; overflow: hidden;
+}
+.rec-green { background: #F0FDF4; border-color: #BBF7D0; }
+.rec-amber { background: #FFFBEB; border-color: #FDE68A; }
+.rec-red   { background: #FFF1F2; border-color: #FECDD3; }
+
+.rec-verdict-block {
+  flex-shrink: 0; padding: 20px 22px;
+  display: flex; flex-direction: column; gap: 6px; min-width: 150px;
+  border-right: 1px solid rgba(0,0,0,0.08);
+}
+.rec-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.rec-verdict { font-size: 16px; font-weight: 700; line-height: 1.2; }
+.rec-verdict-green { color: #15803D; }
+.rec-verdict-amber { color: #B45309; }
+.rec-verdict-red   { color: #BE123C; }
+
+.rec-divider { width: 1px; background: rgba(0,0,0,0.06); flex-shrink: 0; }
+
+.rec-detail { flex: 1; padding: 20px 22px; display: flex; flex-direction: column; gap: 10px; }
+.rec-headline { font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.4; }
+.rec-rationale { font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+
+.rec-conditions { margin-top: 4px; }
+.rec-conditions-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 6px; }
+.rec-conditions-list { margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 4px; }
+.rec-conditions-list li { font-size: 12px; color: var(--text); line-height: 1.5; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 1100px) {

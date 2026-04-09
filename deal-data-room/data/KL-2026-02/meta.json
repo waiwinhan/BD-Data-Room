@@ -37,6 +37,44 @@
     "zoning": "Commercial (C3)",
     "bumiQuota": "30%"
   },
+  "swot": {
+    "swot": {
+      "strengths": [
+        "Bukit Jalil freehold parcel with 5.0x plot ratio enables high-density Grade A mixed-use development",
+        "0.5 km to Bukit Jalil LRT and Pavilion Bukit Jalil adjacency underpins strong retail and office demand fundamentals",
+        "JV structure reduces BRDB's upfront capital exposure while retaining development management fees",
+        "Grade A office component (45,000 sqft) provides recurring income potential via en-bloc sale or REIT injection"
+      ],
+      "weaknesses": [
+        "6-year development period is the longest in the pipeline — increases exposure to macro, interest rate, and cost cycles",
+        "RM 260 psf build cost for high-rise mixed-use is already stretched; any cost inflation erodes margin rapidly",
+        "KIV status reflects unresolved JV equity split — deal cannot progress until partner alignment is confirmed"
+      ],
+      "opportunities": [
+        "Bukit Jalil is increasingly positioned as KL's secondary CBD — growing demand for Grade A decentralised office space from MNCs and GLCs",
+        "Pavilion REIT expansion plans in Bukit Jalil create strong retail co-tenancy opportunity for the podium component",
+        "National Sports Complex events (SEA Games, concerts) drive hotel and serviced residence demand — potential for hotel JV component"
+      ],
+      "threats": [
+        "KL office market remains oversupplied — Grade A vacancy above 20% may compress achievable NLA rates and affect valuation",
+        "JV partner alignment risk: if equity split remains unresolved past Q2 2026, deal may lapse",
+        "Competing mixed-use developments in Bukit Jalil and Awan Besar corridors targeting the same tenant and buyer pool"
+      ]
+    },
+    "recommendation": {
+      "verdict": "Hold",
+      "headline": "Compelling site but JV terms must be resolved first — hold until equity structure and partner commitments are locked in.",
+      "rationale": "The Bukit Jalil parcel has genuine long-term value anchored by strong transit connectivity and Pavilion's retail ecosystem. However, the KIV status reflects an unresolved JV structure — proceeding without locked equity terms exposes BRDB to asymmetric downside risk. The 6-year timeline and RM 260 psf build cost assumption also leave limited margin for error in the current cost environment.",
+      "keyConditions": [
+        "Resolve JV equity split and governance framework with partner before May 2026 Board Paper submission",
+        "Commission independent office market study to stress-test NLA absorption assumptions before finalising GDV",
+        "Negotiate a land cost reduction of 5–8% or deferred payment structure to improve equity-on-equity return to ≥20%"
+      ]
+    },
+    "generatedAt": "2026-04-09T08:00:00.000Z",
+    "docsAnalysed": 0,
+    "isDemo": true
+  },
   "team": {
     "internal": [
       { "name": "Wai Win Han", "role": "Deal Lead", "email": "waiwin@brdb.com.my" }

@@ -132,6 +132,44 @@
     "zoning": "Commercial (C2)",
     "bumiQuota": "30%"
   },
+  "swot": {
+    "swot": {
+      "strengths": [
+        "Freehold title with no encumbrance — clean acquisition with minimal legal risk",
+        "0.8 km walk to Permas Jaya LRT station supports Transit-Oriented Development (TOD) positioning and premium pricing",
+        "Commercial C2 zoning with 3.5x plot ratio unlocks high-density mixed-use development",
+        "Strong blended PSF of RM 680 supported by proximity to Singapore demand corridor and CIQ connectivity"
+      ],
+      "weaknesses": [
+        "Land cost at RM 45M (RM 186 psf) is at the upper end for Permas Jaya submarket — leaves limited buffer on downside",
+        "Projected NDP margin of 19.0% is below the 20% internal benchmark, contingent on full absorption at RM 680 psf",
+        "30% Bumi quota requirement will constrain open market pricing on a significant portion of units"
+      ],
+      "opportunities": [
+        "RTS Link completion (2026) will materially boost cross-border demand from Singapore-based buyers and investors",
+        "Retail podium (18,000 sqft) can attract F&B or convenience anchor tenant to differentiate from competing residential projects",
+        "Johor-Singapore SEZ designation may drive institutional and corporate demand for SOHO and serviced apartment inventory"
+      ],
+      "threats": [
+        "Johor Bahru residential market remains oversupplied — absorption assumptions of 70%/yr may be optimistic given current unsold stock levels",
+        "Construction cost inflation risk: RM 220 psf hard cost assumption is tight given material price pressures post-2024",
+        "Competing TOD projects (e.g. Bukit Chagar, Medini) within 10 km targeting the same Singapore-linked buyer pool"
+      ]
+    },
+    "recommendation": {
+      "verdict": "Proceed with Caution",
+      "headline": "Attractive TOD land with sound fundamentals, but margin headroom is thin — proceed subject to tighter cost controls and pre-sales commitments.",
+      "rationale": "The Permas Jaya parcel benefits from a rare freehold TOD position with direct LRT access, well-suited for BRDB's mixed-use capabilities. However, the projected NDP margin of 19.0% on NDV sits below the 20% internal threshold, and the RM 680 psf blended ASP assumption carries execution risk in a currently subdued JB market. The deal is viable but requires disciplined cost management and early pre-sales validation before committing to SPA execution.",
+      "keyConditions": [
+        "Secure a minimum 30% pre-sales commitment before construction commencement to de-risk absorption assumptions",
+        "Renegotiate land cost to RM 42M or below, or structure a deferred payment mechanism to improve IRR to ≥18%",
+        "Appoint a quantity surveyor to validate the RM 220 psf build cost assumption before Board Approval on 15 Apr 2026"
+      ]
+    },
+    "generatedAt": "2026-04-09T08:00:00.000Z",
+    "docsAnalysed": 0,
+    "isDemo": true
+  },
   "team": {
     "internal": [
       {

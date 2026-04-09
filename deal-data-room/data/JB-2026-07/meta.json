@@ -122,6 +122,44 @@
     "zoning": "Mixed Development",
     "bumiQuota": "30%"
   },
+  "swot": {
+    "swot": {
+      "strengths": [
+        "Waterfront positioning in Iskandar Puteri is a rare asset — limited comparable inventory in the immediate Medini/EduCity precinct",
+        "Hotel suites component (15%) provides diversified income stream and supports hospitality demand from EduCity and Legoland catchment",
+        "4.0x plot ratio on mixed-use zoning enables efficient GDV stacking across condos, retail, and hotel",
+        "Strong Singapore cross-border demand supported by Tuas Checkpoint proximity (8.5 km) and ongoing Johor-Singapore SEZ tailwinds"
+      ],
+      "weaknesses": [
+        "Leasehold 99-year tenure is a structural pricing discount of 10–15% vs freehold — limits premium pricing ambition",
+        "5-year development period with hotel component increases execution complexity and requires specialist operator procurement",
+        "Title search still active — encumbrance status unconfirmed; deal cannot advance to valuation phase until cleared"
+      ],
+      "opportunities": [
+        "Johor-Singapore Special Economic Zone (SEZ) designation could drive institutional demand for hotel and retail components from Singapore-registered entities",
+        "EduCity Iskandar expansion (1.2 km) creates captive demand for serviced accommodation from international students and faculty",
+        "Waterfront retail F&B (22,000 sqft) can command significant premium as destination dining — benchmarked against Danga Bay precedent"
+      ],
+      "threats": [
+        "Iskandar Puteri waterfront market has a track record of delayed absorption — Forest City overhang still suppresses buyer sentiment in the broader precinct",
+        "Hotel feasibility is sensitive to tourism recovery assumptions — post-pandemic RevPAR in Iskandar has been inconsistent",
+        "Currency risk: a significant proportion of target buyers are Singapore-based — SGD/MYR movements directly impact affordability"
+      ]
+    },
+    "recommendation": {
+      "verdict": "Proceed with Caution",
+      "headline": "High-potential waterfront site with SEZ upside, but clear title and market absorption evidence must be confirmed before committing.",
+      "rationale": "The Iskandar Waterfront Parcel C offers genuine scarcity value in a precinct benefiting from the Singapore SEZ macro tailwind. However, the deal is at an early stage — title search is still active, valuation is pending, and the 5-year timeline with hotel complexity adds meaningful execution risk. The leasehold tenure will require careful pricing strategy to maintain buyer interest against freehold alternatives in the market.",
+      "keyConditions": [
+        "Obtain clean title search confirmation with no encumbrances before releasing valuation budget — do not advance to Board Approval until cleared",
+        "Engage a hotel operator (Marriott, IHG, or Ascott) for a letter of intent before committing the 15% hotel allocation — operator backing de-risks the component materially",
+        "Stress-test GDV at 80% of blended PSF assumption to model a conservative SEZ adoption scenario before Board Paper submission"
+      ]
+    },
+    "generatedAt": "2026-04-09T08:00:00.000Z",
+    "docsAnalysed": 0,
+    "isDemo": true
+  },
   "team": {
     "internal": [
       {

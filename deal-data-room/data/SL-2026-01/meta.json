@@ -34,6 +34,44 @@
     "zoning": "Residential (R1)",
     "bumiQuota": "40%"
   },
+  "swot": {
+    "swot": {
+      "strengths": [
+        "Large 7.35-acre site provides township-scale development potential in a growing Selangor corridor",
+        "Linked house product targeting mass-market entry price appeals to the broadest buyer demographic",
+        "Shophouse component (20%) provides commercial plinth value and natural amenities for the township"
+      ],
+      "weaknesses": [
+        "Leasehold 99-year tenure significantly limits resale value and financing options for end-buyers",
+        "2.5 km distance from Rawang KTM station is too far for genuine TOD positioning — lacks transit premium",
+        "40% Bumi quota is the highest in the portfolio — severely constrains open-market pricing and sales velocity",
+        "Deal has been Rejected — vendor price negotiations stalled without resolution path"
+      ],
+      "opportunities": [
+        "If land cost can be renegotiated down 15–20%, development margin could recover to above hurdle rate",
+        "Rawang infrastructure investment (SUKE highway completion) may improve accessibility and support long-term appreciation",
+        "Affordable housing incentives (PR1MA, RUMAWIP equivalents) could unlock government co-funding if product is repositioned"
+      ],
+      "threats": [
+        "Rawang submarket has persistent oversupply of landed affordable housing — absorption rate below 60%/yr is likely",
+        "Leasehold stigma in Selangor market increasingly limits buyer pool, especially post-2025 financing tightening",
+        "Opportunity cost: capital and management attention is better deployed in higher-IRR deals in the current pipeline"
+      ]
+    },
+    "recommendation": {
+      "verdict": "Reject",
+      "headline": "Reject at current terms — leasehold tenure, high Bumi quota, and weak submarket fundamentals make this deal unviable.",
+      "rationale": "The Rawang Township Phase 3 deal fails on multiple dimensions: leasehold tenure limits buyer demand, the 40% Bumi quota constrains pricing, and the 2.5 km KTM distance eliminates any transit premium. Projected IRR falls below the 15% hurdle rate even before stress-testing absorption assumptions. Management time is better allocated to the Permas Jaya and Bukit Jalil deals which offer superior risk-adjusted returns.",
+      "keyConditions": [
+        "Only reconsider if vendor agrees to a ≥20% land cost reduction from current asking price",
+        "Any re-engagement must be contingent on Selangor state government confirmation of Bumi quota waiver or reduction to 20%",
+        "Commission a submarket study before any new LOI — current absorption assumptions are materially optimistic"
+      ]
+    },
+    "generatedAt": "2026-04-09T08:00:00.000Z",
+    "docsAnalysed": 0,
+    "isDemo": true
+  },
   "team": {
     "internal": [
       { "name": "Wai Win Han", "role": "Deal Lead", "email": "waiwin@brdb.com.my" }
