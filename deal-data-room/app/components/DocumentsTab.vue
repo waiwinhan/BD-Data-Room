@@ -61,14 +61,22 @@
                 <div class="doc-meta">{{ doc.uploader }}{{ doc.uploader ? ' · ' : '' }}{{ formatDate(doc.date) }} · {{ formatSize(doc.sizeKB) }}</div>
               </template>
             </div>
-            <span class="doc-status" :class="statusClass(doc.status)">{{ doc.status }}</span>
+            <button
+              class="doc-status"
+              :class="[statusClass(doc.status), cyclingStatus === doc.filename ? 'status-cycling' : '']"
+              title="Click to cycle status"
+              @click.stop="cycleStatus(doc)"
+            >{{ doc.status }}</button>
             <button class="icon-btn" title="Rename file" @click.stop="startRename(doc)">✎</button>
             <a :href="dlUrl(doc)" download class="icon-btn dl-btn" title="Download">↓</a>
             <button class="icon-btn delete-btn" title="Delete file" @click.stop="askDeleteDoc(doc)">🗑</button>
           </div>
         </div>
 
-        <button class="upload-btn" @click="triggerUpload(cat.id)">+ Add document</button>
+        <button class="upload-btn" :disabled="uploadingFor === cat.id" @click="triggerUpload(cat.id)">
+          <span v-if="uploadingFor === cat.id" class="upload-spinner"></span>
+          <span v-else>+ Add document</span>
+        </button>
       </div>
 
       <!-- ── ADD NEW CARD ── -->
@@ -97,7 +105,7 @@
 
     </div>
 
-    <input ref="fileInput" type="file" style="display:none" @change="onFileChosen" />
+    <input ref="fileInput" type="file" accept=".pdf,.xlsx,.xls,.doc,.docx,.jpg,.jpeg,.png" style="display:none" @change="onFileChosen" />
 
     <!-- ── SUMMARY STRIP ── -->
     <div class="doc-summary">
@@ -352,15 +360,55 @@ function previewDoc(doc: any) {
   }
 }
 
-// ── Upload stub (M08) ──
+// ── Upload (M08) ──
 const fileInput    = ref<HTMLInputElement>()
+const uploadingFor = ref<string | null>(null)
 let uploadCategory = ''
+
 function triggerUpload(category: string) {
   uploadCategory = category
   fileInput.value?.click()
 }
-function onFileChosen() {
-  alert(`Upload to ${uploadCategory} — coming in M08`)
+
+async function onFileChosen(event: Event) {
+  const file = (event.target as HTMLInputElement).files?.[0]
+  if (!file) return
+
+  const ALLOWED = /\.(pdf|xlsx|xls|doc|docx|jpg|jpeg|png)$/i
+  if (!ALLOWED.test(file.name)) {
+    alert(`File type not allowed. Please upload PDF, Excel, Word, or image files.`)
+    ;(event.target as HTMLInputElement).value = ''
+    return
+  }
+
+  uploadingFor.value = uploadCategory
+  const form = new FormData()
+  form.append('file', file)
+  form.append('category', uploadCategory)
+
+  try {
+    await $fetch(`/api/${props.dealId}/upload`, { method: 'POST', body: form })
+    await refresh()
+  } catch (err: any) {
+    alert(`Upload failed: ${err?.data?.message ?? err.message ?? 'Unknown error'}`)
+  } finally {
+    uploadingFor.value = null
+    ;(event.target as HTMLInputElement).value = ''
+  }
+}
+
+// ── Status cycle ──
+const cyclingStatus = ref<string | null>(null)
+
+async function cycleStatus(doc: any) {
+  if (cyclingStatus.value === doc.filename) return
+  cyclingStatus.value = doc.filename
+  try {
+    await $fetch(`/api/${props.dealId}/documents/${encodeURIComponent(doc.filename)}`, { method: 'PATCH' })
+    await refresh()
+  } finally {
+    cyclingStatus.value = null
+  }
 }
 </script>
 
@@ -494,8 +542,21 @@ function onFileChosen() {
   border: 1px dashed var(--border2); border-radius: var(--radius-sm);
   background: transparent; font-family: 'DM Sans', sans-serif;
   font-size: 12px; color: var(--muted); cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
 }
-.upload-btn:hover { background: var(--surface2); color: var(--text); border-color: var(--text); }
+.upload-btn:hover:not(:disabled) { background: var(--surface2); color: var(--text); border-color: var(--text); }
+.upload-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.upload-spinner {
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 2px solid var(--border2); border-top-color: var(--blue);
+  animation: spin 0.6s linear infinite; display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.doc-status { cursor: pointer; transition: opacity 0.15s; }
+.doc-status:hover { opacity: 0.75; }
+.status-cycling { opacity: 0.5; pointer-events: none; }
 
 /* ── Summary strip ── */
 .doc-summary {

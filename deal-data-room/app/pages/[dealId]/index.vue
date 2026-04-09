@@ -95,11 +95,12 @@
           v-if="activeTab === 'overview'"
           :meta="editMode ? draftMeta : meta"
           :deal="editMode ? draftDeal : deal"
+          :fin="fin"
           :edit-mode="editMode"
           :deal-id="dealId"
         />
         <DocumentsTab  v-else-if="activeTab === 'documents'"  :deal-id="dealId" />
-        <FinancialsTab v-else-if="activeTab === 'financials'" :deal="deal" :meta="meta" />
+        <FinancialsTab v-else-if="activeTab === 'financials'" :deal="deal" :meta="meta" :fin="fin" />
         <RiskTab       v-else-if="activeTab === 'risk'"       />
         <TeamTab       v-else-if="activeTab === 'team'"       />
       </Transition>
@@ -122,6 +123,23 @@ const { data: dealsData, refresh: refreshDeals } = await useFetch('/api/deals')
 const deal = computed(() => {
   const deals = (dealsData.value as any)?.deals ?? []
   return deals.find((d: any) => d.id === dealId) ?? null
+})
+
+// ── Shared financials — single source of truth for both Overview + Financials tabs ──
+const fin = computed(() => {
+  const gdv      = deal.value?.gdv      ?? 0
+  const landCost = deal.value?.landCost ?? 0
+  const constr    = Math.round(gdv * 0.40)
+  const authority = Math.round(gdv * 0.03)
+  const siteStaff = Math.round(gdv * 0.025)
+  const finance   = Math.round(gdv * 0.035)
+  const marketing = Math.round(gdv * 0.03)
+  const totalDevCost = landCost + constr + authority + siteStaff + finance + marketing
+  const ndv       = Math.round(gdv * 0.93)
+  const ndp       = ndv - totalDevCost
+  const ndpMargin = ndv > 0 ? parseFloat(((ndp / ndv) * 100).toFixed(1)) : 0
+  const equity    = Math.round(totalDevCost * 0.27)
+  return { ndv, constr, authority, siteStaff, finance, marketing, totalDevCost, ndp, ndpMargin, equityRequired: equity, landCost }
 })
 const isRestricted = computed(() => deal.value?.restricted ?? false)
 

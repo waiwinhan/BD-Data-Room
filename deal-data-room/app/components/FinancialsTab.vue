@@ -115,24 +115,10 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 const props = defineProps<{
   deal?: any
   meta?: any
+  fin?: any
 }>()
 
-// ── Derived financials (mock until Excel parser ready) ──────────────
-const fin = computed(() => {
-  const gdv      = props.deal?.gdv      ?? 280
-  const landCost = props.deal?.landCost ?? 65
-  const constr   = Math.round(gdv * 0.40)   // hard construction
-  const authority = Math.round(gdv * 0.03)  // authority fees & planning
-  const siteStaff = Math.round(gdv * 0.025) // site staff & PM
-  const finance  = Math.round(gdv * 0.035)  // finance cost
-  const marketing = Math.round(gdv * 0.03)  // marketing & agency
-  const totalDevCost = landCost + constr + authority + siteStaff + finance + marketing
-  const ndv      = Math.round(gdv * 0.93)   // after ~7% sales costs
-  const ndp      = ndv - totalDevCost
-  const ndpMargin = ((ndp / ndv) * 100).toFixed(1)
-  const equity   = Math.round(totalDevCost * 0.27)
-  return { ndv, constr, authority, siteStaff, finance, marketing, totalDevCost, ndp, ndpMargin, equityRequired: equity, landCost }
-})
+const fin = computed(() => props.fin ?? {})
 
 const ndpClass = computed(() => {
   const m = parseFloat(fin.value.ndpMargin)

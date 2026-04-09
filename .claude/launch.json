@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "deal-data-room (Nuxt dev)",
-      "runtimeExecutable": "/usr/local/bin/node",
-      "runtimeArgs": ["/Users/waiwinhan/Desktop/claude-code/BD Data Room/deal-data-room/node_modules/.bin/nuxt", "dev"],
-      "cwd": "/Users/waiwinhan/Desktop/claude-code/BD Data Room/deal-data-room",
+      "name": "deal-data-room (dev)",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["node_modules/nuxt/bin/nuxt.mjs", "dev"],
+      "cwd": "deal-data-room",
       "port": 3000
     }
   ]

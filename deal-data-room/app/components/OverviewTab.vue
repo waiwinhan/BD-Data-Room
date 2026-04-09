@@ -9,9 +9,9 @@
         <div class="kpi-sub">{{ meta?.tenure }} title</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">EST. GDV</div>
-        <div class="kpi-value">RM {{ deal?.gdv }}M</div>
-        <div class="kpi-sub">Blended RM {{ deal?.blendedPSF }} psf</div>
+        <div class="kpi-label">NET DEV VALUE (NDV)</div>
+        <div class="kpi-value">RM {{ fin?.ndv }}M</div>
+        <div class="kpi-sub">After S&amp;M (RM {{ deal?.blendedPSF }} psf)</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">LAND COST</div>
@@ -19,11 +19,14 @@
         <div class="kpi-sub">RM {{ deal?.landCostPSF }} psf land</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">PROJ. IRR</div>
-        <div class="kpi-value" :class="irrClass">{{ deal?.irr }}%</div>
-        <div class="kpi-sub" :class="irrClass">
-          {{ irrDelta >= 0 ? '+' : '' }}{{ irrDelta.toFixed(1) }}% vs {{ deal?.hurdleRate }}% hurdle
-        </div>
+        <div class="kpi-label">CONSTRUCTION COST</div>
+        <div class="kpi-value">RM {{ fin?.constr }}M</div>
+        <div class="kpi-sub">Hard cost only</div>
+      </div>
+      <div class="kpi-card" :class="ndpClass">
+        <div class="kpi-label">NET DEV PROFIT (NDP)</div>
+        <div class="kpi-value" :class="ndpClass">RM {{ fin?.ndp }}M</div>
+        <div class="kpi-sub" :class="ndpClass">{{ fin?.ndpMargin?.toFixed(1) }}% on NDV</div>
       </div>
     </div>
 
@@ -299,12 +302,12 @@
 const props = defineProps<{
   meta: any
   deal: any
+  fin: any
   editMode: boolean
   dealId: string
 }>()
 
-const irrDelta = computed(() => (props.deal?.irr ?? 0) - (props.deal?.hurdleRate ?? 15))
-const irrClass = computed(() => irrDelta.value >= 0 ? 'irr-green' : 'irr-red')
+const ndpClass = computed(() => (props.fin?.ndpMargin ?? 0) >= (props.deal?.hurdleRate ?? 15) ? 'ndp-green' : 'ndp-red')
 
 const doneCount = computed(() =>
   (props.meta?.milestones ?? []).filter((m: any) => m.status === 'done').length
@@ -380,7 +383,7 @@ function removeAssumption(i: number) {
 .overview { display: flex; flex-direction: column; gap: 20px; }
 
 /* ── KPI CARDS ── */
-.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
 .kpi-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 16px 18px;
@@ -391,8 +394,8 @@ function removeAssumption(i: number) {
 }
 .kpi-value { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; margin-bottom: 4px; }
 .kpi-sub   { font-size: 11.5px; color: var(--muted); }
-.irr-green { color: var(--green) !important; }
-.irr-red   { color: var(--red)   !important; }
+.ndp-green { color: var(--green) !important; }
+.ndp-red   { color: var(--red)   !important; }
 
 /* ── OVERVIEW GRID ── */
 .overview-grid { display: grid; grid-template-columns: 2fr 1.6fr 1.4fr; gap: 16px; align-items: start; }
@@ -573,7 +576,10 @@ function removeAssumption(i: number) {
 .btn-delete-row:hover { background: var(--red-bg); color: var(--red); }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
+  .kpi-row      { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 700px) {
   .kpi-row      { grid-template-columns: repeat(2, 1fr); }
   .overview-grid { grid-template-columns: 1fr; }
 }
