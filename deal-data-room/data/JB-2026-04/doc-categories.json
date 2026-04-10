@@ -1,0 +1,18 @@
+[
+  {
+    "id": "legal",
+    "label": "Legal"
+  },
+  {
+    "id": "financial",
+    "label": "Financial"
+  },
+  {
+    "id": "technical",
+    "label": "Technical"
+  },
+  {
+    "id": "other",
+    "label": "Other"
+  }
+]
