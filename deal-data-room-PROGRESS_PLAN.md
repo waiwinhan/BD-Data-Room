@@ -22,7 +22,7 @@
 | M06 | Financials Tab | 2 | ✅ | Day 3 |
 | M07 | Documents Tab | 3 | ✅ | Day 4 |
 | M08 | Document Upload | 3 | ✅ | Day 4 |
-| M09 | Risk & Legal Tab | 3 | ⏳ | Day 4–5 |
+| M09 | Risk & Legal Tab | 3 | ✅ | Day 4–5 |
 | M10 | Deal Team Tab | 3 | ⏳ | Day 5 |
 | M11 | Auth — NDA Password Gate | 4 | ⏳ | Day 5–6 |
 | M11b | Settings Panel (Branding + Password) | 4 | ⏳ | Day 6 |
@@ -461,37 +461,21 @@ Goal: Documents tab shows real files with upload capability.
 
 ---
 
-### M09 — Risk & Legal Tab ⏳
+### M09 — Risk & Legal Tab ✅
 
-**Milestone:** Risk & Legal tab shows the risk register from `risk.json` and a static legal status table.
+**Milestone:** Risk & Legal tab shows the risk register from `risk.json` and a legal status/key dates panel.
 
-- [ ] Add legal status fields to `meta.json`:
-  ```json
-  "legalStatus": {
-    "titleType": "Freehold (Hakmilik Kekal)",
-    "encumbrance": "Clear (post Mar 18)",
-    "encumbranceStatus": "clear",
-    "currentZoning": "Commercial",
-    "requiredRezoning": "Residential — pending",
-    "rezoningStatus": "pending",
-    "bumiQuota": "30% (negotiable)",
-    "legalCounsel": "Messrs. Zaid Ibrahim & Co."
-  }
-  ```
-- [ ] Create `server/api/[dealId]/risk.get.ts` — reads `risk.json`, returns array
-- [ ] Build `components/RiskTab.vue`:
-  - [ ] Two-column grid
-  - [ ] Left: Risk register card
-    - [ ] Section label
-    - [ ] Risk items: coloured dot (red=high, amber=med, green=low) + title (bold) + description
-    - [ ] Loop over risk array
-  - [ ] Right: Legal status card
-    - [ ] Row for each field: label (muted) + value (colour-coded based on status)
-    - [ ] "Clear" encumbrance = green text
-    - [ ] "pending" items = amber text
-    - [ ] Normal items = primary text
-- [ ] Test: risk items display with correct severity colours
-- [ ] Commit: `git commit -m "M09: risk and legal tab"`
+- [x] Enriched `legalStatus` in `meta.json` with `{ value, status }` shape + `keyDates` array
+- [x] Created `server/api/[dealId]/risk.get.ts` — reads `risk.json`, returns array
+- [x] Built `components/RiskTab.vue`:
+  - [x] Summary banner: High / Medium / Low / Total counts with coloured dots
+  - [x] Two-column grid (risk register | legal + dates)
+  - [x] Risk register: grouped by severity (High → Medium → Low), expandable rows showing mitigation
+  - [x] Each risk item: severity dot, description, category badge, owner, expand/collapse ▼
+  - [x] Legal status card: colour-coded values (green=ok, amber=pending, red=issue)
+  - [x] Key dates section with status-coded date values
+  - [x] DD progress bar from `deal.ddProgress`
+- [x] Wired `dealId`, `meta`, `deal` props in `index.vue`
 
 ---
 

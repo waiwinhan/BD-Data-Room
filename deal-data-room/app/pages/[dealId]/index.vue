@@ -101,7 +101,7 @@
         />
         <DocumentsTab  v-else-if="activeTab === 'documents'"  :deal-id="dealId" />
         <FinancialsTab v-else-if="activeTab === 'financials'" :deal="deal" :meta="meta" :fin="fin" />
-        <RiskTab       v-else-if="activeTab === 'risk'"       />
+        <RiskTab       v-else-if="activeTab === 'risk'"       :deal-id="dealId" :meta="meta" :deal="deal" />
         <TeamTab       v-else-if="activeTab === 'team'"       />
       </Transition>
     </div>
