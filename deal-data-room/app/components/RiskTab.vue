@@ -31,12 +31,11 @@
 
       <!-- ── LEFT: RISK REGISTER ── -->
       <div class="risk-card">
-        <div class="card-label">Risk Register</div>
+        <div class="card-label">Risk Register <span class="hint">· click dot to change severity</span></div>
 
         <div v-if="pending" class="empty-state">Loading…</div>
         <div v-else-if="risks.length === 0" class="empty-state">No risk items found.</div>
 
-        <!-- Group by severity: red → amber → green -->
         <template v-for="sev in ['red', 'amber', 'green']" :key="sev">
           <template v-if="bySeverity(sev).length > 0">
             <div class="sev-group-label" :class="`sev-${sev}`">
@@ -50,7 +49,13 @@
               @click="toggle(risk.id)"
             >
               <div class="risk-item-header">
-                <div class="risk-dot" :class="`dot-${risk.severity}`"></div>
+                <!-- Clickable severity dot -->
+                <button
+                  class="risk-dot"
+                  :class="[`dot-${risk.severity}`, savingRisk === risk.id ? 'dot-saving' : '']"
+                  :title="`Severity: ${risk.severity} — click to change`"
+                  @click.stop="cycleSeverity(risk)"
+                ></button>
                 <div class="risk-main">
                   <div class="risk-title">{{ risk.description }}</div>
                   <div class="risk-meta">
@@ -72,22 +77,32 @@
       <div class="risk-card">
 
         <!-- Legal Status -->
-        <div class="card-label">Legal Status</div>
+        <div class="card-label">Legal Status <span class="hint">· click status to change</span></div>
         <div class="legal-table">
           <div v-for="(field, key) in legalFields" :key="key" class="lr-row">
             <span class="lr-key">{{ fieldLabel(String(key)) }}</span>
-            <span class="lr-val" :class="statusClass(field.status)">{{ field.value }}</span>
+            <button
+              class="lr-val lr-val-btn"
+              :class="[statusClass(field.status), savingLegal === key ? 'val-saving' : '']"
+              :title="`Status: ${field.status} — click to cycle`"
+              @click="cycleLegalStatus(String(key), field)"
+            >{{ field.value }}</button>
           </div>
         </div>
 
         <!-- Key Dates -->
         <template v-if="keyDates.length > 0">
           <div class="section-sep"></div>
-          <div class="card-label">Key Dates</div>
+          <div class="card-label">Key Dates <span class="hint">· click status to change</span></div>
           <div class="legal-table">
-            <div v-for="kd in keyDates" :key="kd.label" class="lr-row">
+            <div v-for="(kd, idx) in keyDates" :key="kd.label" class="lr-row">
               <span class="lr-key">{{ kd.label }}</span>
-              <span class="lr-val" :class="statusClass(kd.status)">{{ kd.date }}</span>
+              <button
+                class="lr-val lr-val-btn"
+                :class="[statusClass(kd.status), savingDate === idx ? 'val-saving' : '']"
+                :title="`Status: ${kd.status} — click to cycle`"
+                @click="cycleDateStatus(idx, kd)"
+              >{{ kd.date }}</button>
             </div>
           </div>
         </template>
@@ -118,7 +133,7 @@ const props = defineProps<{
 }>()
 
 // ── Risk data ──
-const { data: riskData, pending } = await useFetch(() => `/api/${props.dealId}/risk`)
+const { data: riskData, pending, refresh: refreshRisk } = await useFetch(() => `/api/${props.dealId}/risk`)
 const risks = computed(() => (riskData.value as any[]) ?? [])
 
 function bySeverity(sev: string) {
@@ -132,6 +147,22 @@ function countBySeverity(sev: string) {
 const expanded = ref<string | null>(null)
 function toggle(id: string) {
   expanded.value = expanded.value === id ? null : id
+}
+
+// Cycle risk severity: red → amber → green → red
+const SEVERITY_CYCLE = ['red', 'amber', 'green']
+const savingRisk = ref<string | null>(null)
+
+async function cycleSeverity(risk: any) {
+  if (savingRisk.value) return
+  const next = SEVERITY_CYCLE[(SEVERITY_CYCLE.indexOf(risk.severity) + 1) % SEVERITY_CYCLE.length]
+  savingRisk.value = risk.id
+  try {
+    await $fetch(`/api/${props.dealId}/risk/${risk.id}`, { method: 'PUT', body: { severity: next } })
+    await refreshRisk()
+  } finally {
+    savingRisk.value = null
+  }
 }
 
 // ── Legal status ──
@@ -148,8 +179,54 @@ const legalFields = computed(() => {
   return normalised
 })
 
-const keyDates  = computed(() => props.meta?.keyDates ?? [])
+const keyDates   = computed(() => props.meta?.keyDates ?? [])
 const ddProgress = computed(() => props.deal?.ddProgress ?? null)
+
+// Cycle legal status: ok → pending → issue → ok
+const STATUS_CYCLE = ['ok', 'pending', 'issue']
+const savingLegal  = ref<string | null>(null)
+const savingDate   = ref<number | null>(null)
+
+async function cycleLegalStatus(key: string, field: { value: string; status: string }) {
+  if (savingLegal.value) return
+  const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(field.status) + 1) % STATUS_CYCLE.length]
+  savingLegal.value = key
+  const updatedLegal = {
+    ...props.meta?.legalStatus,
+    [key]: { ...field, status: next },
+  }
+  try {
+    await $fetch(`/api/${props.dealId}/meta`, {
+      method: 'PUT',
+      body: { ...props.meta, legalStatus: updatedLegal },
+    })
+    // Parent will re-fetch via its own refresh — optimistic update for now
+    if (props.meta?.legalStatus?.[key]) {
+      props.meta.legalStatus[key].status = next
+    }
+  } finally {
+    savingLegal.value = null
+  }
+}
+
+async function cycleDateStatus(idx: number, kd: any) {
+  if (savingDate.value !== null) return
+  const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(kd.status) + 1) % STATUS_CYCLE.length]
+  savingDate.value = idx
+  const updatedDates = [...(props.meta?.keyDates ?? [])]
+  updatedDates[idx] = { ...kd, status: next }
+  try {
+    await $fetch(`/api/${props.dealId}/meta`, {
+      method: 'PUT',
+      body: { ...props.meta, keyDates: updatedDates },
+    })
+    if (props.meta?.keyDates?.[idx]) {
+      props.meta.keyDates[idx].status = next
+    }
+  } finally {
+    savingDate.value = null
+  }
+}
 
 const FIELD_LABELS: Record<string, string> = {
   titleType:        'Title type',
@@ -173,6 +250,8 @@ function statusClass(status: string) {
 
 <style scoped>
 .risk-tab { padding: 24px 28px; display: flex; flex-direction: column; gap: 16px; }
+
+.hint { font-weight: 400; font-size: 10px; color: var(--faint); text-transform: none; letter-spacing: 0; }
 
 /* ── Summary banner ── */
 .risk-summary {
@@ -215,34 +294,41 @@ function statusClass(status: string) {
   border: 1px solid var(--border); border-radius: var(--radius-sm);
   margin-bottom: 8px; cursor: pointer; transition: border-color 0.15s;
 }
-.risk-item:hover      { border-color: var(--border2); }
-.risk-item--expanded  { border-color: var(--blue); }
+.risk-item:hover     { border-color: var(--border2); }
+.risk-item--expanded { border-color: var(--blue); }
 
 .risk-item-header {
   display: flex; align-items: flex-start; gap: 10px; padding: 11px 12px;
 }
-.risk-dot  {
-  width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; margin-top: 4px;
+
+/* Severity dot — now a button */
+.risk-dot {
+  width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; margin-top: 3px;
+  border: 2px solid transparent; cursor: pointer; padding: 0;
+  transition: transform 0.15s, box-shadow 0.15s;
 }
-.risk-main  { flex: 1; min-width: 0; }
-.risk-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; }
-.risk-meta  { display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+.risk-dot:hover  { transform: scale(1.35); box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+.dot-saving      { opacity: 0.4; pointer-events: none; }
+
+.risk-main   { flex: 1; min-width: 0; }
+.risk-title  { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.4; }
+.risk-meta   { display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
 .risk-cat-badge {
   font-size: 10px; font-weight: 600; padding: 1px 7px;
   border-radius: 20px; background: var(--surface2); color: var(--muted);
   border: 1px solid var(--border);
 }
-.risk-owner  { font-size: 11px; color: var(--faint); }
+.risk-owner   { font-size: 11px; color: var(--faint); }
 .risk-chevron { font-size: 9px; color: var(--muted); flex-shrink: 0; margin-top: 3px; }
 
 .risk-mitigation {
   font-size: 12px; color: var(--muted); line-height: 1.55;
-  padding: 10px 12px 12px 31px;
+  padding: 10px 12px 12px 36px;
   border-top: 1px solid var(--border);
 }
 .mit-label { font-weight: 600; color: var(--text); }
 
-/* Severity dot colours (shared with summary) */
+/* Severity dot colours */
 .dot-red   { background: #DC2626; }
 .dot-amber { background: #D97706; }
 .dot-green { background: #059669; }
@@ -256,6 +342,16 @@ function statusClass(status: string) {
 .lr-row:last-child { border-bottom: none; }
 .lr-key { font-size: 12px; color: var(--muted); flex-shrink: 0; }
 .lr-val { font-size: 13px; font-weight: 500; color: var(--text); text-align: right; }
+
+/* Clickable status value */
+.lr-val-btn {
+  background: transparent; border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; padding: 2px 6px;
+  border-radius: var(--radius-sm); transition: background 0.15s;
+}
+.lr-val-btn:hover { background: var(--surface2); }
+.val-saving       { opacity: 0.4; pointer-events: none; }
+
 .val-ok      { color: var(--green-txt); }
 .val-pending { color: var(--amber); }
 .val-issue   { color: #DC2626; }
