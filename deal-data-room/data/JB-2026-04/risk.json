@@ -3,7 +3,7 @@
     "id": "R01",
     "category": "Title",
     "description": "Lot amalgamation required before development order submission",
-    "severity": "amber",
+    "severity": "green",
     "mitigation": "Engaged JUPEM for simultaneous survey; est. 8 weeks",
     "owner": "Nurul Ain"
   },
@@ -11,7 +11,7 @@
     "id": "R02",
     "category": "Market",
     "description": "JB residential oversupply — absorption may drop below 60%",
-    "severity": "red",
+    "severity": "amber",
     "mitigation": "Phased launch strategy; pre-sales target 40% before construction",
     "owner": "Wai Win Han"
   },
