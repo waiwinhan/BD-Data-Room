@@ -13,5 +13,6 @@ export default defineNuxtConfig({
     dataDir: join(projectRoot, 'data'),
     dealPassword: process.env.DEAL_PASSWORD || 'brdb2024',
     sessionPassword: process.env.NUXT_SESSION_PASSWORD || 'change-me-in-production-32chars!!',
+    anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
   },
 })
