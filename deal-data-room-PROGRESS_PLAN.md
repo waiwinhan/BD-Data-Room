@@ -25,7 +25,7 @@
 | M12 | Multi-Deal Routing | 4 | ⏳ | Day 6 |
 | M13 | Deployment (Railway / Vercel) | 4 | ⏳ | Day 6–7 |
 | M14 | Excel — BRDB Model Wiring | 2 | ⏳ | Day 3 |
-| M15 | Sensitivity Table | 2 | ⏳ | Day 3 |
+| M15 | Sensitivity Table | 2 | ✅ | Day 3 |
 | PL-01 | Supabase Auth (per-user) | Post | 📋 | Post-launch |
 | PL-02 | Document Comment Threads | Post | 📋 | Post-launch |
 | PL-03 | Email Notifications | Post | 📋 | Post-launch |
@@ -299,7 +299,7 @@ Goal: Financials tab renders live data from the actual BRDB `.xlsx` model.
 
 ---
 
-### M15 — Sensitivity Table (detailed) ⏳
+### M15 — Sensitivity Table (detailed) ✅
 
 **Milestone:** Sensitivity table correctly calculates and colour-codes IRR values from the parsed Sensitivity sheet.
 
