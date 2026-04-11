@@ -24,15 +24,15 @@
       <!-- KPI grid -->
       <div class="card-kpis">
         <div class="card-kpi">
-          <div class="ck-label">GDV</div>
-          <div class="ck-value">RM {{ deal.gdv }}M</div>
+          <div class="ck-label">NDV</div>
+          <div class="ck-value">RM {{ deal.ndv }}M</div>
           <div class="ck-sub">RM {{ deal.blendedPSF }} psf</div>
         </div>
         <div class="card-kpi">
-          <div class="ck-label">IRR</div>
-          <div class="ck-value">{{ deal.irr }}%</div>
-          <div class="ck-sub" :class="irrDelta >= 0 ? 'positive' : 'negative'">
-            {{ irrDelta >= 0 ? '+' : '' }}{{ irrDelta.toFixed(1) }}% vs hurdle
+          <div class="ck-label">NDP Margin</div>
+          <div class="ck-value">{{ deal.ndpMargin }}%</div>
+          <div class="ck-sub" :class="ndpDelta >= 0 ? 'positive' : 'negative'">
+            {{ ndpDelta >= 0 ? '+' : '' }}{{ ndpDelta.toFixed(1) }}% vs hurdle
           </div>
         </div>
         <div class="card-kpi">
@@ -74,9 +74,9 @@ const props = defineProps<{
     location: string
     stage: string
     restricted: boolean
-    gdv: number
+    ndv: number
     blendedPSF: number
-    irr: number
+    ndpMargin: number
     hurdleRate: number
     landAcres: number
     tenure: string
@@ -95,7 +95,7 @@ const stageMap: Record<string, { barGradient: string; barColor: string; badge: s
 }
 
 const stageStyle = computed(() => stageMap[props.deal.stage] ?? stageMap['Rejected'])
-const irrDelta = computed(() => props.deal.irr - props.deal.hurdleRate)
+const ndpDelta = computed(() => props.deal.ndpMargin - props.deal.hurdleRate)
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr)

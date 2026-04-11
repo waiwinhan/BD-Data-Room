@@ -1,19 +1,19 @@
 <template>
   <div class="summary-strip">
     <div class="sum-card">
-      <div class="sum-label">Total Pipeline GDV</div>
-      <div class="sum-value">{{ formatGDV(portfolio.totalGDV) }}</div>
-      <div class="sum-sub">Across {{ portfolio.dealCount }} active deals</div>
+      <div class="sum-label">Total Pipeline NDV</div>
+      <div class="sum-value">{{ formatRM(portfolio.totalNDV) }}</div>
+      <div class="sum-sub">{{ portfolio.activeCount }} deals · Active DD, KIV &amp; Approved</div>
     </div>
     <div class="sum-card">
-      <div class="sum-label">Avg. Projected IRR</div>
-      <div class="sum-value">{{ portfolio.avgIRR.toFixed(1) }}%</div>
-      <div class="sum-sub">Above 15% hurdle rate</div>
+      <div class="sum-label">Avg. NDP Margin</div>
+      <div class="sum-value">{{ portfolio.avgNDPMargin.toFixed(1) }}%</div>
+      <div class="sum-sub">{{ portfolio.activeCount }} deals · Active DD, KIV &amp; Approved</div>
     </div>
     <div class="sum-card">
       <div class="sum-label">Total Land Area</div>
       <div class="sum-value">{{ portfolio.totalLandAcres.toFixed(1) }} ac</div>
-      <div class="sum-sub">Freehold &amp; leasehold mix</div>
+      <div class="sum-sub">{{ portfolio.activeCount }} deals · Active DD, KIV &amp; Approved</div>
     </div>
     <div class="sum-card">
       <div class="sum-label">Pending Board Sign-off</div>
@@ -26,15 +26,16 @@
 <script setup lang="ts">
 defineProps<{
   portfolio: {
-    totalGDV: number
-    avgIRR: number
+    totalNDV: number
+    avgNDPMargin: number
     totalLandAcres: number
+    activeCount: number
     pendingBoardCount: number
     dealCount: number
   }
 }>()
 
-function formatGDV(rmMillions: number): string {
+function formatRM(rmMillions: number): string {
   if (rmMillions >= 1000) return `RM ${(rmMillions / 1000).toFixed(2)}B`
   return `RM ${rmMillions}M`
 }

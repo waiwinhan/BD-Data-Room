@@ -12,24 +12,20 @@
 | Module | Name | Phase | Status | Target |
 |--------|------|-------|--------|--------|
 | M01 | Project Scaffold | 1 | ✅ | Day 1 |
-| M02 | Deal List Page + DealCard | 1 | ✅ | Day 1 |
-| M03 | Dashboard Shell + Tab Layout | 1 | ✅ | Day 1 |
-| M04 | Overview Tab | 1 | ✅ | Day 1–2 |
-| M04b | Inline Edit Mode (Dashboard) | 1 | ✅ | Day 2 |
-| M04c | UI Polish — Deal List Refinements | 1 | ✅ | Day 2 |
-| M04d | AI SWOT Analysis & Recommendation | 1 | ✅ | Day 2 |
+| M02 | Deal List Page + DealCard | 1 | ⏳ | Day 1 |
+| M03 | Dashboard Shell + Tab Layout | 1 | ⏳ | Day 1 |
+| M04 | Overview Tab | 1 | ⏳ | Day 1–2 |
 | M05 | Excel Parser (ExcelJS) | 2 | ⏳ | Day 2–3 |
-| M06 | Financials Tab | 2 | ✅ | Day 3 |
-| M07 | Documents Tab | 3 | ✅ | Day 4 |
-| M08 | Document Upload | 3 | ✅ | Day 4 |
-| M09 | Risk & Legal Tab | 3 | ✅ | Day 4–5 |
+| M06 | Financials Tab | 2 | ⏳ | Day 3 |
+| M07 | Documents Tab | 3 | ⏳ | Day 4 |
+| M08 | Document Upload | 3 | ⏳ | Day 4 |
+| M09 | Risk & Legal Tab | 3 | ⏳ | Day 4–5 |
 | M10 | Deal Team Tab | 3 | ⏳ | Day 5 |
 | M11 | Auth — NDA Password Gate | 4 | ⏳ | Day 5–6 |
-| M11b | Settings Panel (Branding + Password) | 4 | ⏳ | Day 6 |
 | M12 | Multi-Deal Routing | 4 | ⏳ | Day 6 |
 | M13 | Deployment (Railway / Vercel) | 4 | ⏳ | Day 6–7 |
 | M14 | Excel — BRDB Model Wiring | 2 | ⏳ | Day 3 |
-| M15 | Sensitivity Table | 2 | ✅ | Day 3 |
+| M15 | Sensitivity Table | 2 | ⏳ | Day 3 |
 | PL-01 | Supabase Auth (per-user) | Post | 📋 | Post-launch |
 | PL-02 | Document Comment Threads | Post | 📋 | Post-launch |
 | PL-03 | Email Notifications | Post | 📋 | Post-launch |
@@ -55,23 +51,23 @@ Goal: Dashboard running locally with hardcoded/JSON data for one deal. No auth, 
 
 **Milestone:** Nuxt dev server running at localhost:3000 with Tailwind CSS active.
 
-- [x] Run `npx nuxi@latest init deal-data-room`
-- [x] `cd deal-data-room && npm install @nuxtjs/tailwindcss vue-chartjs chart.js exceljs nuxt-auth-utils`
-- [x] Add `@nuxtjs/tailwindcss` and `nuxt-auth-utils` to `nuxt.config.ts` modules array
-- [x] Create `tailwind.config.js` (or confirm auto-generated)
-- [x] Verify Tailwind works — add a test class to `app.vue`, confirm styling applies
-- [x] Create folder structure:
-  - [x] `mkdir -p data/jb-2026-04/docs`
-  - [x] `touch data/deals.json` (populate with one deal object)
-  - [x] `touch data/jb-2026-04/meta.json` (populate with Permas Jaya data)
-  - [x] `touch data/jb-2026-04/risk.json` (populate with 5 risk items)
-- [x] Create `.env` with `NUXT_SESSION_PASSWORD` and `DEAL_PASSWORD`
-- [x] Run `npm run dev` — confirm server starts without errors
-- [x] Commit: `git init && git add . && git commit -m "M01: project scaffold"`
+- [ ] Run `npx nuxi@latest init deal-data-room`
+- [ ] `cd deal-data-room && npm install @nuxtjs/tailwindcss vue-chartjs chart.js exceljs nuxt-auth-utils`
+- [ ] Add `@nuxtjs/tailwindcss` and `nuxt-auth-utils` to `nuxt.config.ts` modules array
+- [ ] Create `tailwind.config.js` (or confirm auto-generated)
+- [ ] Verify Tailwind works — add a test class to `app.vue`, confirm styling applies
+- [ ] Create folder structure:
+  - [ ] `mkdir -p data/jb-2026-04/docs`
+  - [ ] `touch data/deals.json` (populate with one deal object)
+  - [ ] `touch data/jb-2026-04/meta.json` (populate with Permas Jaya data)
+  - [ ] `touch data/jb-2026-04/risk.json` (populate with 5 risk items)
+- [ ] Create `.env` with `NUXT_SESSION_PASSWORD` and `DEAL_PASSWORD`
+- [ ] Run `npm run dev` — confirm server starts without errors
+- [ ] Commit: `git init && git add . && git commit -m "M01: project scaffold"`
 
 ---
 
-### M02 — Deal List Page ✅
+### M02 — Deal List Page ⏳
 
 **Milestone:** `/` page renders the full deal list — filter bar, portfolio summary strip, and deal cards. Clicking a card navigates to the deal dashboard.
 
@@ -148,7 +144,7 @@ const stageColors = {
 
 ---
 
-### M03 — Dashboard Shell + Tab Layout ✅
+### M03 — Dashboard Shell + Tab Layout ⏳
 
 **Milestone:** `/[dealId]` page loads with 5-tab navigation. Switching tabs shows different placeholder content.
 
@@ -173,126 +169,39 @@ const stageColors = {
 
 ---
 
-### M04 — Overview Tab ✅
+### M04 — Overview Tab ⏳
 
-**Milestone:** Overview tab shows real data: 5 KPI cards, Google Maps embed, DD milestones, development mix, key assumptions.
+**Milestone:** Overview tab shows real data: 4 KPI cards, Google Maps embed, DD milestones, development mix, key assumptions.
 
-- [x] Create `server/api/[dealId]/meta.get.ts` — reads and returns `meta.json`
-- [x] Build `components/OverviewTab.vue`:
+- [ ] Create `server/api/[dealId]/meta.get.ts` — reads and returns `meta.json`
+- [ ] Build `components/OverviewTab.vue`:
 
-**KPI cards row (5 cards) — updated Apr 2026**
-  - [x] Land Area card (value + tenure sub-label)
-  - [x] NET DEV VALUE (NDV) card (value + "After S&M (RM X psf)" sub-label)
-  - [x] Land Cost card (value + "RM X psf land" sub-label)
-  - [x] Construction Cost card (value + "Hard cost only" sub-label)
-  - [x] NET DEV PROFIT (NDP) card (value + NDP margin %, green/red vs hurdle rate)
-  - [x] Shared `fin` computed moved to parent `[dealId]/index.vue` — both Overview and Financials tabs read from same source to ensure number consistency
+**KPI cards row (4 cards)**
+  - [ ] Land area card (value + "Freehold title" sub-label)
+  - [ ] Est. GDV card (value + "Blended psf RM X" sub-label from meta)
+  - [ ] Land cost card (value + "RM X psf" sub-label)
+  - [ ] Proj. IRR card (value + "Threshold X%" sub-label, coloured based on above/below threshold)
 
 **Three-column grid**
-  - [x] Left: Site location card — Maps embed, coordinate pills, key proximities
-  - [x] Centre: DD milestones card — status dots, labels, dates, badges
-  - [x] Right: Development mix card — progress bars, key assumptions grid
+  - [ ] Left: Site location card
+    - [ ] Section label "Site location"
+    - [ ] Google Maps embed iframe (lat/lng from meta.json)
+    - [ ] Gradient overlay with parcel name + sub-label
+    - [ ] "Open ↗" button linking to `https://maps.google.com/?q={lat},{lng}`
+    - [ ] Coordinate pills (lat, lng, city)
+    - [ ] Key proximities list (coloured dots + label + distance from meta.json)
+  - [ ] Centre: DD milestones card
+    - [ ] Status dot (green=done, blue=active, grey=pending)
+    - [ ] Milestone label + date
+    - [ ] Status badge (Done / In progress / Pending)
+    - [ ] Loop over `meta.milestones` array
+  - [ ] Right: Development mix card
+    - [ ] Progress bars for each dev type (pct + color from meta.devMix)
+    - [ ] Key assumptions grid (2×2, from meta.assumptions)
 
-- [x] Stage badge fixed — now reads from `deal.value?.stage` (deals.json) not meta
-- [x] Test: all data renders correctly from meta.json
-- [x] Commit: `git commit -m "M04: overview tab complete"`
-
----
-
-### M04b — Inline Edit Mode ✅
-
-**Milestone:** All qualitative deal data (name, location, stage, milestones, proximities, dev mix, assumptions, legal status) is editable directly from the dashboard UI — no JSON file editing required.
-
-**Server — write-back API endpoints**
-- [ ] Create `server/api/[dealId]/meta.put.ts` — accepts full meta object, writes back to `meta.json`
-- [ ] Create `server/api/[dealId]/deal.put.ts` — accepts deal fields, updates the matching entry in `deals.json`
-
-**Edit mode toggle**
-- [ ] Add "Edit" button to deal header (pencil icon + label), visible on all tabs
-- [ ] `editMode` ref in `[dealId]/index.vue` — passed down as prop to OverviewTab
-- [ ] "Save" and "Cancel" buttons replace "Edit" when in edit mode
-- [ ] Save triggers PUT requests to both endpoints; Cancel restores original data
-- [ ] Show saving spinner + "Saved ✓" confirmation toast on success
-
-**Editable fields — deal header** (writes to `deals.json`)
-- [ ] Deal name → inline text input
-- [ ] Location → inline text input
-- [ ] Stage → dropdown (Active DD / Under Review / Signed / On Hold)
-- [ ] Tenure → dropdown (Freehold / Leasehold 99yr)
-- [ ] DD Progress % → number input (0–100)
-- [ ] Stage note → inline text input
-
-**Editable fields — Overview tab** (writes to `meta.json`)
-- [ ] Site location: location text, lat, lng
-- [ ] Proximities list: edit label + distance + colour; add row; delete row (✕)
-- [ ] Milestones list: edit label + date + status; add row; delete row (✕)
-- [ ] Development mix list: edit type + units/sqft + pct; add row; delete row (✕)
-- [ ] Key assumptions: edit any label or value inline
-- [ ] Legal status: edit all 4 fields inline (Title Type, Encumbrance, Zoning, Bumi Quota)
-
-**UX behaviour**
-- [ ] In edit mode: text values become `<input>` fields, dropdowns use `<select>`
-- [ ] List items show a drag handle + ✕ delete button on hover
-- [ ] "＋ Add" button at bottom of each list section
-- [ ] Unsaved changes indicator in header (dot on "Edit" button)
-- [ ] Keyboard: `Escape` cancels edit mode, `Ctrl+S` / `Cmd+S` triggers save
-
-**Testing**
-- [ ] Edit deal name → Save → refresh page → new name persists
-- [ ] Add a proximity row → Save → appears in list after reload
-- [ ] Delete a milestone → Save → removed after reload
-- [ ] Cancel → all changes discarded, original data restored
-- [ ] Commit: `git commit -m "M04b: inline edit mode for deal metadata"`
-
----
-
----
-
-### M04c — UI Polish — Deal List Refinements ✅
-
-**Milestone:** Deal list page reflects correct stage naming, colour system, status legend, and topbar layout.
-
-**Stage system overhaul**
-- [x] Rename stages: Under Review → **KIV**, Signed → **Approved**, On Hold → **Rejected**
-- [x] Colour code: Active DD = blue `#60A5FA`, KIV = amber `#F5C85A`, Approved = green `#5DCAA5`, Rejected = red `#F87171`
-- [x] Colour-coded dots on filter pills (always visible, not just on active state)
-- [x] Rename "Restricted" badge → **Confidential** (DealCard + deal header)
-
-**Topbar**
-- [x] Reorder: Org name first ("BRDB Berhad"), then divider, then "Deal Data Room"
-- [x] Remove organisation subtitle from topbar
-- [x] Button order: **+ New Deal** → Settings → Logout
-
-**Status Legend (deal list page)**
-- [x] Add status legend below deal grid with colour dot + definition for each stage
-- [x] Vertical layout, single row per item, no text wrapping
-- [x] Aligned with deal grid left edge (same `max-width: 1280px; padding: 0 28px` container)
-- [x] Simplified descriptions — all fit on one line
-- [x] Thin divider separates stage statuses from Confidential entry
-- [x] Legend items: Active DD · KIV · Approved · Rejected · *(divider)* · Confidential
-
-### M04d — AI SWOT Analysis & Recommendation ✅
-
-**Milestone:** Overview tab includes a Claude AI-powered SWOT Analysis section and a separate AI Recommendation section, both always visible.
-
-**Backend — `server/api/[dealId]/swot.post.ts`**
-- [x] Reads `deals.json`, `meta.json`, `risk.json` for full deal context
-- [x] Extracts text from uploaded documents: PDF via `pdf-parse`, XLSX via ExcelJS (3,000 char limit per doc)
-- [x] Calls Claude API (`claude-opus-4-5`) with structured prompt
-- [x] Returns JSON: `{ swot: { strengths, weaknesses, opportunities, threats }, recommendation: { verdict, headline, rationale, keyConditions[] } }`
-- [x] Persists result to `meta.json` under `meta.swot` (survives page refresh)
-- [x] `ANTHROPIC_API_KEY` read from `.env` via `runtimeConfig.anthropicApiKey`
-
-**Frontend — `OverviewTab.vue`**
-- [x] SWOT section: always visible, 2×2 coloured grid (S=green, W=amber, O=blue, T=red)
-- [x] Recommendation section: always visible, verdict badge (Proceed=green / Hold=amber / Reject=red)
-- [x] "Generate AI Analysis" / "Regenerate" button triggers `POST /api/[dealId]/swot`
-- [x] Shows placeholder copy when no analysis exists yet
-- [x] `swot` ref initialised from `props.meta?.swot` — persists across page reload
-- [x] Full optional chaining on all `swot?.swot?.strengths` etc. — no crash on empty/partial data
-- [x] AI disclaimer: *"⚠ AI can make mistakes. Please double-check the responses."*
-- [x] **Demo data** seeded for all 5 deals with realistic deal-specific SWOT + Recommendation
-- [x] `isDemo: true` flag → shows amber "Demo" badge so users distinguish demo from real AI output
+- [ ] Test: all data renders correctly from meta.json
+- [ ] Test: Google Maps embed loads (may need Maps Embed API key in .env)
+- [ ] Commit: `git commit -m "M04: overview tab complete"`
 
 ---
 
@@ -412,32 +321,30 @@ Goal: Documents tab shows real files with upload capability.
 
 ---
 
-### M07 — Documents Tab ✅
+### M07 — Documents Tab ⏳
 
-**Milestone:** Documents tab lists all files in `data/[dealId]/docs/` with correct metadata, status badges, and full document management.
+**Milestone:** Documents tab lists all files in `data/[dealId]/docs/` with correct metadata and status badges.
 
-- [x] Create `server/api/[dealId]/documents.get.ts` — scans docs/ and groups by category
-- [x] Build `components/DocumentsTab.vue`:
-  - [x] Dynamic 3-column grid (max 3 per row) with categories from `doc-categories.json`
-  - [x] File type badge (PDF/XLS/DOC/IMG) per file extension
-  - [x] Document name, uploader, date, size metadata
-  - [x] Status badge (New / Reviewed / Pending)
-  - [x] Click to preview (PDF/IMG inline, XLS/DOC via MS Office viewer, others download)
-  - [x] Download button (↓) per row
-  - [x] Rename document (✎ inline input → PUT `.meta.json`)
-  - [x] Delete document (🗑 → confirmation dialog → moves to `.trash/`)
-  - [x] Restore from trash bin panel
-  - [x] Add new category card ("+ New category")
-  - [x] Rename category card (✎ inline input)
-  - [x] Delete category (🗑 → confirmation → moves to `doc-categories-trash.json`)
-  - [x] Restore category from trash bin panel
-  - [x] Summary strip: Total / New / Reviewed / Pending counts
-- [x] Seed docs in `data/JB-2026-04/docs/` with `.meta.json` sidecars
-- [x] New server endpoints: `doc-categories.get/put`, `doc-categories-trash.put`, `[filename].delete`, `trash.get`, `trash/[filename].put`
+- [ ] Create `server/api/[dealId]/documents.get.ts`:
+  - [ ] Scan `data/[dealId]/docs/` directory
+  - [ ] For each non-`.meta.json` file, read its `.meta.json` sidecar
+  - [ ] Return array: `{ filename, originalName, category, status, uploader, uploadDate, sizeMB, ext }`
+- [ ] Build `components/DocumentsTab.vue`:
+  - [ ] Two-column layout: legal documents | financial & technical (filter by `category`)
+  - [ ] Document row component:
+    - [ ] File type badge (PDF = coral, XLS = green, DOC = blue, IMG = amber) with 3-letter label
+    - [ ] Document name (from sidecar `originalName`)
+    - [ ] Upload meta (uploader + date + size)
+    - [ ] Status badge (New = green, Reviewed = grey, Pending = amber)
+    - [ ] Click to open/download the file
+  - [ ] "Upload document" button per category column
+- [ ] Add seed documents to `data/jb-2026-04/docs/` with sidecar `.meta.json` files
+- [ ] Test: all seed documents appear in the correct category column
+- [ ] Commit: `git commit -m "M07: documents tab listing"`
 
 ---
 
-### M08 — Document Upload ✅
+### M08 — Document Upload ⏳
 
 **Milestone:** Users can upload PDF/XLS/DOC files from the Documents tab. New files appear immediately in the list.
 
@@ -461,21 +368,37 @@ Goal: Documents tab shows real files with upload capability.
 
 ---
 
-### M09 — Risk & Legal Tab ✅
+### M09 — Risk & Legal Tab ⏳
 
-**Milestone:** Risk & Legal tab shows the risk register from `risk.json` and a legal status/key dates panel.
+**Milestone:** Risk & Legal tab shows the risk register from `risk.json` and a static legal status table.
 
-- [x] Enriched `legalStatus` in `meta.json` with `{ value, status }` shape + `keyDates` array
-- [x] Created `server/api/[dealId]/risk.get.ts` — reads `risk.json`, returns array
-- [x] Built `components/RiskTab.vue`:
-  - [x] Summary banner: High / Medium / Low / Total counts with coloured dots
-  - [x] Two-column grid (risk register | legal + dates)
-  - [x] Risk register: grouped by severity (High → Medium → Low), expandable rows showing mitigation
-  - [x] Each risk item: severity dot, description, category badge, owner, expand/collapse ▼
-  - [x] Legal status card: colour-coded values (green=ok, amber=pending, red=issue)
-  - [x] Key dates section with status-coded date values
-  - [x] DD progress bar from `deal.ddProgress`
-- [x] Wired `dealId`, `meta`, `deal` props in `index.vue`
+- [ ] Add legal status fields to `meta.json`:
+  ```json
+  "legalStatus": {
+    "titleType": "Freehold (Hakmilik Kekal)",
+    "encumbrance": "Clear (post Mar 18)",
+    "encumbranceStatus": "clear",
+    "currentZoning": "Commercial",
+    "requiredRezoning": "Residential — pending",
+    "rezoningStatus": "pending",
+    "bumiQuota": "30% (negotiable)",
+    "legalCounsel": "Messrs. Zaid Ibrahim & Co."
+  }
+  ```
+- [ ] Create `server/api/[dealId]/risk.get.ts` — reads `risk.json`, returns array
+- [ ] Build `components/RiskTab.vue`:
+  - [ ] Two-column grid
+  - [ ] Left: Risk register card
+    - [ ] Section label
+    - [ ] Risk items: coloured dot (red=high, amber=med, green=low) + title (bold) + description
+    - [ ] Loop over risk array
+  - [ ] Right: Legal status card
+    - [ ] Row for each field: label (muted) + value (colour-coded based on status)
+    - [ ] "Clear" encumbrance = green text
+    - [ ] "pending" items = amber text
+    - [ ] Normal items = primary text
+- [ ] Test: risk items display with correct severity colours
+- [ ] Commit: `git commit -m "M09: risk and legal tab"`
 
 ---
 
@@ -532,41 +455,6 @@ Goal: NDA password gate, deal list page routing, shareable private URL.
 - [ ] Test: visiting `/` redirects to `/login` when not authenticated
 - [ ] Test: correct password grants access, incorrect password shows error
 - [ ] Commit: `git commit -m "M11: NDA password gate"`
-
----
-
-### M11b — Settings Panel ⏳
-
-**Milestone:** Settings button in topbar opens a slide-over panel allowing the admin to customise the app branding and access credentials — no code editing required.
-
-**Branding settings**
-- [ ] App title — editable text field (currently hardcoded "Deal Data Room")
-- [ ] Organisation name — editable text field (currently hardcoded "BRDB Berhad")
-- [ ] Logo — two options:
-  - [ ] Text initials logo: editable 2-letter initials + background colour picker (currently "BR" on dark bg)
-  - [ ] Image logo: upload a PNG/SVG file to replace the initials block
-- [ ] NDA banner text — editable (the amber strip message at the top of every page)
-- [ ] Preview of topbar renders live as user types
-
-**Access settings**
-- [ ] Change deal password — current password + new password + confirm fields
-- [ ] On save: updates `DEAL_PASSWORD` in `.env` (or a local `settings.json` if `.env` write is restricted)
-
-**Storage**
-- [ ] Settings saved to `data/settings.json` (new file, read by layout on every page load)
-- [ ] Create `server/api/settings.get.ts` — returns settings.json
-- [ ] Create `server/api/settings.put.ts` — writes settings.json (admin only)
-- [ ] Layout reads settings on mount and applies branding dynamically
-
-**UI**
-- [ ] Settings panel opens as a right slide-over drawer (not a page)
-- [ ] "Save changes" button + success toast
-- [ ] Cancel / click-outside closes the panel without saving
-
-- [ ] Test: change org name → save → topbar reflects new name after reload
-- [ ] Test: upload a logo image → save → logo block shows image instead of initials
-- [ ] Test: change NDA banner text → save → amber strip shows new message
-- [ ] Commit: `git commit -m "M11b: settings panel with branding editor"`
 
 ---
 

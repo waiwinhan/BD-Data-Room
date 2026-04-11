@@ -20,6 +20,11 @@
     <!-- PORTFOLIO SUMMARY -->
     <PortfolioSummary v-if="portfolio" :portfolio="{ ...portfolio, dealCount: allDeals.length }" />
 
+    <!-- DEAL MAP -->
+    <ClientOnly>
+      <DealMap :deals="allDeals" />
+    </ClientOnly>
+
     <!-- DEAL GRID -->
     <div class="deal-grid">
       <DealCard
