@@ -12,14 +12,14 @@
 | Module | Name | Phase | Status | Target |
 |--------|------|-------|--------|--------|
 | M01 | Project Scaffold | 1 | ✅ | Day 1 |
-| M02 | Deal List Page + DealCard | 1 | ⏳ | Day 1 |
-| M03 | Dashboard Shell + Tab Layout | 1 | ⏳ | Day 1 |
-| M04 | Overview Tab | 1 | ⏳ | Day 1–2 |
-| M05 | Excel Parser (ExcelJS) | 2 | ⏳ | Day 2–3 |
-| M06 | Financials Tab | 2 | ⏳ | Day 3 |
-| M07 | Documents Tab | 3 | ⏳ | Day 4 |
-| M08 | Document Upload | 3 | ⏳ | Day 4 |
-| M09 | Risk & Legal Tab | 3 | ⏳ | Day 4–5 |
+| M02 | Deal List Page + DealCard | 1 | ✅ | Day 1 |
+| M03 | Dashboard Shell + Tab Layout | 1 | ✅ | Day 1 |
+| M04 | Overview Tab | 1 | ✅ | Day 1–2 |
+| M05 | Excel Parser (ExcelJS) | 2 | ✅ | Day 2–3 |
+| M06 | Financials Tab | 2 | ✅ | Day 3 |
+| M07 | Documents Tab | 3 | ✅ | Day 4 |
+| M08 | Document Upload | 3 | ✅ | Day 4 |
+| M09 | Risk & Legal Tab | 3 | ✅ | Day 4–5 |
 | M10 | Deal Team Tab | 3 | ⏳ | Day 5 |
 | M11 | Auth — NDA Password Gate | 4 | ⏳ | Day 5–6 |
 | M12 | Multi-Deal Routing | 4 | ⏳ | Day 6 |
@@ -67,7 +67,7 @@ Goal: Dashboard running locally with hardcoded/JSON data for one deal. No auth, 
 
 ---
 
-### M02 — Deal List Page ⏳
+### M02 — Deal List Page ✅
 
 **Milestone:** `/` page renders the full deal list — filter bar, portfolio summary strip, and deal cards. Clicking a card navigates to the deal dashboard.
 
@@ -144,7 +144,7 @@ const stageColors = {
 
 ---
 
-### M03 — Dashboard Shell + Tab Layout ⏳
+### M03 — Dashboard Shell + Tab Layout ✅
 
 **Milestone:** `/[dealId]` page loads with 5-tab navigation. Switching tabs shows different placeholder content.
 
@@ -169,7 +169,7 @@ const stageColors = {
 
 ---
 
-### M04 — Overview Tab ⏳
+### M04 — Overview Tab ✅
 
 **Milestone:** Overview tab shows real data: 4 KPI cards, Google Maps embed, DD milestones, development mix, key assumptions.
 
@@ -211,7 +211,7 @@ Goal: Financials tab renders live data from the actual BRDB `.xlsx` model.
 
 ---
 
-### M05 — Excel Parser (ExcelJS) ⏳
+### M05 — Excel Parser (ExcelJS) ✅
 
 **Milestone:** `GET /api/[dealId]/financials` returns correct JSON from the real Excel file.
 
@@ -260,7 +260,7 @@ Goal: Financials tab renders live data from the actual BRDB `.xlsx` model.
 
 ---
 
-### M06 — Financials Tab ⏳
+### M06 — Financials Tab ✅
 
 **Milestone:** Financials tab shows real KPI cards, cost doughnut, cashflow bar chart, and IRR sensitivity table — all from the Excel model.
 
@@ -321,7 +321,7 @@ Goal: Documents tab shows real files with upload capability.
 
 ---
 
-### M07 — Documents Tab ⏳
+### M07 — Documents Tab ✅
 
 **Milestone:** Documents tab lists all files in `data/[dealId]/docs/` with correct metadata and status badges.
 
@@ -344,7 +344,7 @@ Goal: Documents tab shows real files with upload capability.
 
 ---
 
-### M08 — Document Upload ⏳
+### M08 — Document Upload ✅
 
 **Milestone:** Users can upload PDF/XLS/DOC files from the Documents tab. New files appear immediately in the list.
 
@@ -368,7 +368,7 @@ Goal: Documents tab shows real files with upload capability.
 
 ---
 
-### M09 — Risk & Legal Tab ⏳
+### M09 — Risk & Legal Tab ✅
 
 **Milestone:** Risk & Legal tab shows the risk register from `risk.json` and a static legal status table.
 
