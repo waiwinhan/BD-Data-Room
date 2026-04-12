@@ -216,6 +216,13 @@
     "docsAnalysed": 0,
     "isDemo": true
   },
+  "accessLog": [
+    { "user": "Wai Win Han", "action": "viewed", "file": "Feasibility model v4", "timestamp": "2026-04-06T09:14:00" },
+    { "user": "Rebecca Lim", "action": "uploaded", "file": "Feasibility model v4", "timestamp": "2026-04-05T17:42:00" },
+    { "user": "Ahmad Kamil", "action": "uploaded", "file": "Draft term sheet v3", "timestamp": "2026-03-22T16:20:00" },
+    { "user": "Knight Frank MY", "action": "uploaded", "file": "Valuation report (JPPH)", "timestamp": "2026-03-21T11:05:00" },
+    { "user": "Siti Tan", "action": "viewed", "file": "Survey plan & lot boundaries", "timestamp": "2026-03-20T14:38:00" }
+  ],
   "team": {
     "internal": [
       {

@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from 'fs'
-import { join, extname } from 'path'
+import { join, extname, basename } from 'path'
 
 const MIME: Record<string, string> = {
   pdf:  'application/pdf',
@@ -35,6 +35,16 @@ export default defineEventHandler((event) => {
   setHeader(event, 'Content-Type', mime)
   setHeader(event, 'Content-Disposition',
     `${inline ? 'inline' : 'attachment'}; filename="${filename}"`)
+
+  const metaPath = join(config.dataDir, dealId, 'docs', filename + '.meta.json')
+  const docName = existsSync(metaPath)
+    ? (JSON.parse(readFileSync(metaPath, 'utf-8')).name ?? basename(filename, extname(filename)))
+    : basename(filename, extname(filename))
+  appendAccessLog(config.dataDir, dealId, {
+    user: 'You',
+    action: forceDownload ? 'downloaded' : 'viewed',
+    file: docName,
+  })
 
   return readFileSync(filePath)
 })

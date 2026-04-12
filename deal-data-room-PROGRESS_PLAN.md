@@ -20,7 +20,7 @@
 | M07 | Documents Tab | 3 | ✅ | Day 4 |
 | M08 | Document Upload | 3 | ✅ | Day 4 |
 | M09 | Risk & Legal Tab | 3 | ✅ | Day 4–5 |
-| M10 | Deal Team Tab | 3 | ⏳ | Day 5 |
+| M10 | Deal Team Tab | 3 | ✅ | Day 5 |
 | M11 | Auth — NDA Password Gate | 4 | ⏳ | Day 5–6 |
 | M12 | Multi-Deal Routing | 4 | ⏳ | Day 6 |
 | M13 | Deployment (Railway / Vercel) | 4 | ⏳ | Day 6–7 |
@@ -402,7 +402,7 @@ Goal: Documents tab shows real files with upload capability.
 
 ---
 
-### M10 — Deal Team Tab ⏳
+### M10 — Deal Team Tab ✅
 
 **Milestone:** Deal Team tab shows internal team + external advisors with avatar initials and an access log.
 
