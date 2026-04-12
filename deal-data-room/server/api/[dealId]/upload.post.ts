@@ -46,5 +46,11 @@ export default defineEventHandler(async (event) => {
   }
   writeFileSync(filePath + '.meta.json', JSON.stringify(meta, null, 2))
 
+  appendAccessLog(config.dataDir, dealId, {
+    user: 'You',
+    action: 'uploaded',
+    file: meta.name || filename,
+  })
+
   return { success: true, filename }
 })
