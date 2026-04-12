@@ -189,19 +189,19 @@
             <div class="legal-grid">
               <div class="legal-item">
                 <div class="legal-key">Title Type</div>
-                <div class="legal-val">{{ meta?.legalStatus?.titleType }}</div>
+                <div class="legal-val">{{ lsGet('titleType') }}</div>
               </div>
               <div class="legal-item">
                 <div class="legal-key">Encumbrance</div>
-                <div class="legal-val">{{ meta?.legalStatus?.encumbrance }}</div>
+                <div class="legal-val">{{ lsGet('encumbrance') }}</div>
               </div>
               <div class="legal-item">
                 <div class="legal-key">Zoning</div>
-                <div class="legal-val">{{ meta?.legalStatus?.zoning }}</div>
+                <div class="legal-val">{{ lsZoning() }}</div>
               </div>
               <div class="legal-item">
                 <div class="legal-key">Bumi Quota</div>
-                <div class="legal-val">{{ meta?.legalStatus?.bumiQuota }}</div>
+                <div class="legal-val">{{ lsGet('bumiQuota') }}</div>
               </div>
             </div>
           </template>
@@ -209,19 +209,19 @@
             <div class="legal-edit-grid">
               <div class="legal-edit-item">
                 <div class="edit-field-label">Title Type</div>
-                <input v-model="meta.legalStatus.titleType" class="edit-input" placeholder="e.g. Geran Mukim" />
+                <input :value="lsGet('titleType')" class="edit-input" placeholder="e.g. Geran Mukim" @input="lsSet('titleType', ($event.target as HTMLInputElement).value)" />
               </div>
               <div class="legal-edit-item">
                 <div class="edit-field-label">Encumbrance</div>
-                <input v-model="meta.legalStatus.encumbrance" class="edit-input" placeholder="e.g. Nil" />
+                <input :value="lsGet('encumbrance')" class="edit-input" placeholder="e.g. Nil" @input="lsSet('encumbrance', ($event.target as HTMLInputElement).value)" />
               </div>
               <div class="legal-edit-item">
                 <div class="edit-field-label">Zoning</div>
-                <input v-model="meta.legalStatus.zoning" class="edit-input" placeholder="e.g. Commercial (C2)" />
+                <input :value="lsZoning()" class="edit-input" placeholder="e.g. Commercial (C2)" @input="lsSetZoning(($event.target as HTMLInputElement).value)" />
               </div>
               <div class="legal-edit-item">
                 <div class="edit-field-label">Bumi Quota</div>
-                <input v-model="meta.legalStatus.bumiQuota" class="edit-input" placeholder="e.g. 30%" />
+                <input :value="lsGet('bumiQuota')" class="edit-input" placeholder="e.g. 30%" @input="lsSet('bumiQuota', ($event.target as HTMLInputElement).value)" />
               </div>
             </div>
           </template>
@@ -456,6 +456,36 @@ function addDevMix() {
 }
 function removeDevMix(i: number) {
   props.meta.devMix.splice(i, 1)
+}
+
+// ── LEGAL STATUS HELPERS ─────────────────────────────────────────
+// Handles both flat string format (old) and {value, status} object format (new)
+function lsGet(key: string): string {
+  const field = props.meta?.legalStatus?.[key]
+  if (field === undefined || field === null) return '—'
+  if (typeof field === 'object' && 'value' in field) return field.value
+  return String(field)
+}
+function lsZoning(): string {
+  // new format uses 'currentZoning', old format uses 'zoning'
+  const cur = lsGet('currentZoning')
+  return cur !== '—' ? cur : lsGet('zoning')
+}
+function lsSet(key: string, val: string) {
+  if (!props.meta?.legalStatus) return
+  const field = props.meta.legalStatus[key]
+  if (field && typeof field === 'object' && 'value' in field) {
+    props.meta.legalStatus[key].value = val
+  } else {
+    props.meta.legalStatus[key] = val
+  }
+}
+function lsSetZoning(val: string) {
+  // write to whichever key already exists
+  const ls = props.meta?.legalStatus
+  if (!ls) return
+  if ('currentZoning' in ls) lsSet('currentZoning', val)
+  else lsSet('zoning', val)
 }
 
 // ── ASSUMPTIONS EDITING ──────────────────────────────────────────
