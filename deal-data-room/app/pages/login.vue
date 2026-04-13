@@ -61,6 +61,8 @@ const error     = ref('')
 const loading   = ref(false)
 const inputRef  = ref<HTMLInputElement | null>(null)
 
+const { fetch: refreshSession } = useUserSession()
+
 onMounted(() => inputRef.value?.focus())
 
 async function submit() {
@@ -69,6 +71,8 @@ async function submit() {
   error.value   = ''
   try {
     await $fetch('/api/auth/login', { method: 'POST', body: { password: password.value } })
+    // Refresh session state client-side before navigating so middleware sees it
+    await refreshSession()
     await navigateTo('/')
   } catch (err: any) {
     error.value = err?.data?.message ?? 'Incorrect password. Please try again.'
