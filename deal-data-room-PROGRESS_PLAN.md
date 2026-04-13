@@ -15,7 +15,7 @@
 | M02 | Deal List Page + DealCard | 1 | ✅ | Day 1 |
 | M03 | Dashboard Shell + Tab Layout | 1 | ✅ | Day 1 |
 | M04 | Overview Tab | 1 | ✅ | Day 1–2 |
-| M05 | Excel Parser (ExcelJS) | 2 | ✅ | Day 2–3 |
+| M05 | Excel Parser (ExcelJS) | 2 | ⏳ | Day 2–3 |
 | M06 | Financials Tab | 2 | ✅ | Day 3 |
 | M07 | Documents Tab | 3 | ✅ | Day 4 |
 | M08 | Document Upload | 3 | ✅ | Day 4 |
@@ -211,7 +211,7 @@ Goal: Financials tab renders live data from the actual BRDB `.xlsx` model.
 
 ---
 
-### M05 — Excel Parser (ExcelJS) ✅
+### M05 — Excel Parser (ExcelJS) ⏳
 
 **Milestone:** `GET /api/[dealId]/financials` returns correct JSON from the real Excel file.
 
