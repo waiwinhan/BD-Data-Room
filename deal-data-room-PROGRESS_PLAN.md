@@ -472,32 +472,46 @@ Goal: NDA password gate, deal list page routing, shareable private URL.
 
 ---
 
-### M13 — Deployment ⏳
+### M13 — Deployment (Netlify) ⏳
 
-**Milestone:** App is running on a private HTTPS URL (Railway or Vercel). Shareable with teammates.
+**Milestone:** App is running on a private HTTPS Netlify URL. Shareable with BRDB teammates.
 
-**Option A — Railway**
-- [ ] Install Railway CLI: `npm install -g @railway/cli`
-- [ ] `railway login`
-- [ ] `railway init` in project root
-- [ ] Add environment variables in Railway dashboard: `NUXT_SESSION_PASSWORD`, `DEAL_PASSWORD`
-- [ ] Push to Railway: `railway up`
-- [ ] Note the Railway domain (e.g. `deal-data-room-production.up.railway.app`)
-- [ ] Test: visit URL + login with DEAL_PASSWORD
+> **Platform chosen: Netlify** — supports Nuxt 3 SSR via Netlify Functions, free tier available, connects directly to GitHub for auto-deploy on every push.
 
-**Option B — Vercel (alternative)**
-- [ ] `npm install -g vercel`
-- [ ] `vercel` in project root — follow prompts
-- [ ] Add env vars in Vercel dashboard
-- [ ] Note Vercel domain
+**Step 1 — Prepare Nuxt for Netlify**
+- [ ] Install Netlify adapter: `npm install -D @netlify/nuxt`
+- [ ] Add `@netlify/nuxt` to modules in `nuxt.config.ts`
+- [ ] Ensure SSR stays on (do NOT add `ssr: false`) — server API routes require it
+
+**Step 2 — Connect GitHub to Netlify**
+- [ ] Log in to [app.netlify.com](https://app.netlify.com)
+- [ ] Click **Add new site → Import an existing project → GitHub**
+- [ ] Select repo: `waiwinhan/BD-Data-Room`
+- [ ] Set **Base directory**: `deal-data-room`
+- [ ] Set **Build command**: `npm run build`
+- [ ] Set **Publish directory**: `deal-data-room/.output/public`
+
+**Step 3 — Set Environment Variables in Netlify Dashboard**
+- [ ] Site settings → Environment variables → Add:
+  - `DEAL_PASSWORD` = strong password (change from `brdb2024` before sharing)
+  - `NUXT_SESSION_PASSWORD` = random 32+ character string
+  - `ANTHROPIC_API_KEY` = your Claude API key
+
+**Step 4 — Deploy & Test**
+- [ ] Trigger first deploy from Netlify dashboard
+- [ ] Visit the Netlify URL (e.g. `https://brdb-data-room.netlify.app`)
+- [ ] Test: unauthenticated visit redirects to `/login`
+- [ ] Test: correct password grants access
+- [ ] Test: all 5 deals load with correct data
+- [ ] Test: Documents, Financials, Risk & Legal, Deal Team tabs all work
 
 **Data persistence note**
-- [ ] Understand: Railway/Vercel ephemeral filesystem means uploaded docs are lost on redeploy
-- [ ] For v1: keep `data/` folder committed to git (no sensitive docs in git)
-- [ ] For v2: migrate to Supabase Storage for persistent file storage
+- Netlify has an ephemeral filesystem — uploaded documents will NOT persist across redeploys
+- For v1: `data/` folder is committed to git — all seed data is version-controlled and safe
+- For v2 (post-launch): migrate file uploads to Supabase Storage or Netlify Blobs
 
-- [ ] Share URL + password with BRDB team
-- [ ] Commit: `git commit -m "M13: deployed to [railway/vercel]"`
+- [ ] Share Netlify URL + password with BRDB team
+- [ ] Commit: `git commit -m "M13: deployed to Netlify"`
 
 ---
 
