@@ -22,7 +22,7 @@
 | M09 | Risk & Legal Tab | 3 | ✅ | Day 4–5 |
 | M10 | Deal Team Tab | 3 | ✅ | Day 5 |
 | M11 | Auth — NDA Password Gate | 4 | ✅ | Day 5–6 |
-| M12 | Multi-Deal Routing | 4 | ⏳ | Day 6 |
+| M12 | Multi-Deal Routing | 4 | ✅ | Day 6 |
 | M13 | Deployment (Railway / Vercel) | 4 | ⏳ | Day 6–7 |
 | M14 | Excel — BRDB Model Wiring | 2 | ⏳ | Day 3 |
 | M15 | Sensitivity Table | 2 | ✅ | Day 3 |
@@ -457,18 +457,18 @@ Goal: NDA password gate, deal list page routing, shareable private URL.
 
 ---
 
-### M12 — Multi-Deal Routing ⏳
+### M12 — Multi-Deal Routing ✅
 
 **Milestone:** Multiple deals exist in `deals.json`. The deal list page shows all of them. Each links to its own dashboard.
 
-- [ ] Add second deal to `deals.json` (can use dummy data)
-- [ ] Create `data/[second-deal-id]/` folder structure with `meta.json`, `risk.json`
-- [ ] Test: deal list shows 2 cards
-- [ ] Test: each card navigates to the correct deal dashboard
-- [ ] Test: `/api/[dealId]/meta` returns deal-specific data (not always jb-2026-04)
-- [ ] Handle 404: if `meta.json` doesn't exist for a dealId, return 404 from API
-- [ ] Add 404 page in Nuxt for invalid deal routes
-- [ ] Commit: `git commit -m "M12: multi-deal routing"`
+- [x] 5 deals in `deals.json` (JB-2026-04, JB-2026-07, KL-2026-02, KL-2025-11, SL-2026-01)
+- [x] All 5 deal data directories exist with `meta.json` and `risk.json`
+- [x] Deal list page shows all 5 cards with filter/search
+- [x] Each card navigates to the correct deal dashboard via `/[dealId]`
+- [x] `/api/[dealId]/meta` returns deal-specific data per deal ID
+- [x] API returns 404 with message if `meta.json` doesn't exist for a dealId
+- [x] Added `app/error.vue` — branded 404/error page with "Back to Deal List" and "Login" buttons
+- [x] Commit: `git commit -m "M12: multi-deal routing"`
 
 ---
 
