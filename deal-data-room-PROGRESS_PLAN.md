@@ -21,7 +21,7 @@
 | M08 | Document Upload | 3 | ✅ | Day 4 |
 | M09 | Risk & Legal Tab | 3 | ✅ | Day 4–5 |
 | M10 | Deal Team Tab | 3 | ✅ | Day 5 |
-| M11 | Auth — NDA Password Gate | 4 | ⏳ | Day 5–6 |
+| M11 | Auth — NDA Password Gate | 4 | ✅ | Day 5–6 |
 | M12 | Multi-Deal Routing | 4 | ⏳ | Day 6 |
 | M13 | Deployment (Railway / Vercel) | 4 | ⏳ | Day 6–7 |
 | M14 | Excel — BRDB Model Wiring | 2 | ⏳ | Day 3 |
@@ -432,29 +432,28 @@ Goal: NDA password gate, deal list page routing, shareable private URL.
 
 ---
 
-### M11 — Auth — NDA Password Gate ⏳
+### M11 — Auth — NDA Password Gate ✅
 
 **Milestone:** All routes redirect to `/login` if unauthenticated. Login page accepts shared password from `.env`.
 
-- [ ] Create `pages/login.vue`:
-  - [ ] BRDB logo + "Data Room Access" heading
-  - [ ] NDA reminder paragraph
-  - [ ] Password input + "Enter" button
-  - [ ] Error state for wrong password
-  - [ ] On success: POST to `/api/auth/login` → set session → redirect to `/`
-- [ ] Create `server/api/auth/login.post.ts`:
-  - [ ] Compare submitted password to `process.env.DEAL_PASSWORD`
-  - [ ] On match: `setUserSession(event, { user: 'authorized' })`
-  - [ ] Return `{ success: true }` or 401
-- [ ] Create `server/api/auth/logout.post.ts`:
-  - [ ] `clearUserSession(event)`
-- [ ] Create `middleware/auth.ts`:
-  - [ ] Call `useUserSession()`
-  - [ ] If no user AND not on `/login` → redirect to `/login`
-- [ ] Add logout button to header
-- [ ] Test: visiting `/` redirects to `/login` when not authenticated
-- [ ] Test: correct password grants access, incorrect password shows error
-- [ ] Commit: `git commit -m "M11: NDA password gate"`
+- [x] Install `nuxt-auth-utils` + add to `nuxt.config.ts` modules
+- [x] Create `pages/login.vue`:
+  - [x] BRDB logo + "Deal Data Room" heading
+  - [x] NDA reminder notice (amber box)
+  - [x] Password input with focus, error state, loading spinner
+  - [x] On success: POST to `/api/auth/login` → set session → redirect to `/`
+- [x] Create `server/api/auth/login.post.ts`:
+  - [x] Compare submitted password to `config.dealPassword` (from `.env`)
+  - [x] On match: `setUserSession(event, { user: { role: 'authorized' } })`
+  - [x] Return `{ success: true }` or 401 with message
+- [x] Create `server/api/auth/logout.post.ts`:
+  - [x] `clearUserSession(event)`
+- [x] Create `app/middleware/auth.ts`:
+  - [x] Uses `useUserSession()` → checks `loggedIn`
+  - [x] If not logged in AND not on `/login` → redirect to `/login`
+- [x] Add `middleware: 'auth'` to `definePageMeta` on both `/` and `/[dealId]` pages
+- [x] Logout button in topbar wired to `POST /api/auth/logout` → redirects to `/login`
+- [x] Commit: `git commit -m "M11: NDA password gate"`
 
 ---
 

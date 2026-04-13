@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   experimental: { appManifest: false },
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: ['@nuxtjs/tailwindcss', 'nuxt-auth-utils'],
   runtimeConfig: {
     dataDir: join(projectRoot, 'data'),
     dealPassword: process.env.DEAL_PASSWORD || 'brdb2024',

@@ -109,7 +109,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'default' })
+definePageMeta({ layout: 'default', middleware: 'auth' })
 
 const route = useRoute()
 const dealId = route.params.dealId as string

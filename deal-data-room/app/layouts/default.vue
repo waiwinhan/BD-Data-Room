@@ -11,7 +11,9 @@
       <div class="topbar-right">
         <button class="btn-primary" @click="alert('Add new deal — coming in Phase 4')">+ New Deal</button>
         <button class="btn-sm">Settings</button>
-        <button class="btn-sm">Logout</button>
+        <button class="btn-sm btn-logout" :disabled="loggingOut" @click="logout">
+          {{ loggingOut ? '…' : 'Logout' }}
+        </button>
       </div>
     </header>
 
@@ -25,6 +27,15 @@
     <slot />
   </div>
 </template>
+
+<script setup lang="ts">
+const loggingOut = ref(false)
+async function logout() {
+  loggingOut.value = true
+  await $fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
+  await navigateTo('/login')
+}
+</script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
