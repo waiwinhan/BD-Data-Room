@@ -31,6 +31,7 @@
   ],
   "legalStatus": {
     "titleType": "Geran",
+    "titleLandUse": { "value": "Residential", "status": "ok" },
     "encumbrance": "Nil",
     "zoning": "Residential (R2)",
     "bumiQuota": "30%"

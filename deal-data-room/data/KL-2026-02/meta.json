@@ -33,6 +33,7 @@
   ],
   "legalStatus": {
     "titleType": "Geran",
+    "titleLandUse": { "value": "Commercial", "status": "ok" },
     "encumbrance": "Nil",
     "zoning": "Commercial (C3)",
     "bumiQuota": "30%"

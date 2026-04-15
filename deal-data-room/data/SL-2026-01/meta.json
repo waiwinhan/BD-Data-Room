@@ -30,6 +30,7 @@
   ],
   "legalStatus": {
     "titleType": "Pajakan Negeri",
+    "titleLandUse": { "value": "Residential", "status": "ok" },
     "encumbrance": "Nil",
     "zoning": "Residential (R1)",
     "bumiQuota": "40%"

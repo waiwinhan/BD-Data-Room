@@ -118,6 +118,7 @@
   ],
   "legalStatus": {
     "titleType": "Pajakan Negeri",
+    "titleLandUse": { "value": "Commercial", "status": "ok" },
     "encumbrance": "Nil",
     "zoning": "Mixed Development",
     "bumiQuota": "30%"
