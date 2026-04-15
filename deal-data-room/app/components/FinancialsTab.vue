@@ -6,7 +6,7 @@
       <div class="kpi-card">
         <div class="kpi-label">NET DEV VALUE (NDV)</div>
         <div class="kpi-value">RM {{ fin.ndv }}M</div>
-        <div class="kpi-sub n">After sales costs (RM {{ deal?.blendedPSF }} psf)</div>
+        <div class="kpi-sub n">After sales costs (RM {{ fin.blendedPSF ?? deal?.blendedPSF }} psf)</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">CONSTRUCTION COST</div>
@@ -71,8 +71,8 @@
           <thead>
             <tr>
               <th class="th-left">Absorption \ ASP</th>
-              <th v-for="asp in asps" :key="asp" :class="{ 'th-base': asp === baseASP }">
-                RM {{ asp }}{{ asp === baseASP ? ' ★' : '' }}
+              <th v-for="asp in asps" :key="asp" :class="{ 'th-base': asp === baseASPVal }">
+                RM {{ asp }}{{ asp === baseASPVal ? ' ★' : '' }}
               </th>
             </tr>
           </thead>
@@ -80,22 +80,27 @@
             <tr v-for="abs in absorptions" :key="abs">
               <td class="td-label">{{ abs }}% abs.</td>
               <td v-for="asp in asps" :key="asp" :class="cellClass(abs, asp)">
-                {{ irrFor(abs, asp).toFixed(1) }}{{ abs === baseAbs && asp === baseASP ? '% ★' : '%' }}
+                {{ irrFor(abs, asp).toFixed(1) }}{{ abs === baseAbsVal && asp === baseASPVal ? '% ★' : '%' }}
               </td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="sens-legend">
-        <span class="sl-item sl-good">≥ hurdle rate ({{ deal?.hurdleRate }}%)</span>
+        <span class="sl-item sl-good">≥ hurdle rate ({{ hurdleVal }}%)</span>
         <span class="sl-item sl-base">Base case</span>
         <span class="sl-item sl-bad">Below hurdle</span>
       </div>
     </div>
 
     <!-- ── DATA SOURCE NOTE ── -->
-    <div class="data-note">
-      ⚠ Financials shown are indicative estimates. Upload the BRDB feasibility model (.xlsx) to replace with live figures.
+    <div :class="fin.source === 'xlsx' ? 'data-note data-note-live' : 'data-note'">
+      <template v-if="fin.source === 'xlsx'">
+        ✓ Live figures — parsed from BRDB Feasibility Study (.xlsx)
+      </template>
+      <template v-else>
+        ⚠ Indicative estimates only. Upload the BRDB feasibility model (.xlsx) to replace with live figures.
+      </template>
     </div>
 
   </div>
@@ -237,20 +242,32 @@ const barOpts = {
   }
 }
 
-// ── Sensitivity table ───────────────────────────────────────────────
-const asps        = [620, 650, 680, 710, 740]
-const absorptions = [60, 70, 80, 90, 100]
-const baseASP     = 680
-const baseAbs     = 80
+// ── Sensitivity table — driven by Excel inputs when available ───────
+const baseASPVal  = computed(() => fin.value.baseASP        ?? 680)
+const baseAbsVal  = computed(() => fin.value.baseAbsorption ?? 80)
+const hurdleVal   = computed(() => fin.value.hurdleIRR      ?? props.deal?.hurdleRate ?? 15)
 
+// Build ±3 ASP steps centred on baseASP, rounded to nearest 10
+const asps = computed(() => {
+  const base = baseASPVal.value
+  const step = Math.round(base * 0.05 / 10) * 10 || 30  // ~5% step, min 30
+  return [-2, -1, 0, 1, 2].map(n => base + n * step)
+})
+
+// Absorption rows: 50% to 110% in steps of 15
+const absorptions = [50, 65, 80, 95, 110]
+
+// Proportional IRR estimate: IRR scales linearly with revenue (ASP × Abs).
+// Anchor: at base ASP + base absorption, IRR ≈ hurdle + 6% (typical feasibility target).
 function irrFor(abs: number, asp: number): number {
-  return Math.round((14 + (asp - 620) / 30 * 1.8 + (abs - 60) / 40 * 2.2) * 10) / 10
+  const baseIRR = hurdleVal.value + 6
+  const revenueRatio = (asp / baseASPVal.value) * (abs / baseAbsVal.value)
+  return Math.round(baseIRR * revenueRatio * 10) / 10
 }
 
 function cellClass(abs: number, asp: number): string {
-  if (abs === baseAbs && asp === baseASP) return 'c-base'
-  const hurdle = props.deal?.hurdleRate ?? 15
-  return irrFor(abs, asp) >= hurdle ? 'c-good' : 'c-bad'
+  if (abs === baseAbsVal.value && asp === baseASPVal.value) return 'c-base'
+  return irrFor(abs, asp) >= hurdleVal.value ? 'c-good' : 'c-bad'
 }
 </script>
 
@@ -314,5 +331,9 @@ function cellClass(abs: number, asp: number): string {
   font-size: 11px; color: var(--amber); background: var(--amber-bg);
   border: 1px solid rgba(133,79,11,0.15); border-radius: var(--radius-sm);
   padding: 8px 12px;
+}
+.data-note-live {
+  color: #0F6E56; background: #E9F8F1;
+  border-color: rgba(15,110,86,0.2);
 }
 </style>

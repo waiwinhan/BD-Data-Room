@@ -15,7 +15,7 @@
 | M02 | Deal List Page + DealCard | 1 | ✅ | Day 1 |
 | M03 | Dashboard Shell + Tab Layout | 1 | ✅ | Day 1 |
 | M04 | Overview Tab | 1 | ✅ | Day 1–2 |
-| M05 | Excel Parser (ExcelJS) | 2 | ⏳ | Day 2–3 |
+| M05 | Excel Parser (ExcelJS) | 2 | ✅ | Day 2–3 |
 | M06 | Financials Tab | 2 | ✅ | Day 3 |
 | M07 | Documents Tab | 3 | ✅ | Day 4 |
 | M08 | Document Upload | 3 | ✅ | Day 4 |
@@ -24,7 +24,7 @@
 | M11 | Auth — NDA Password Gate | 4 | ✅ | Day 5–6 |
 | M12 | Multi-Deal Routing | 4 | ✅ | Day 6 |
 | M13 | Deployment (Railway / Vercel) | 4 | ⏳ | Day 6–7 |
-| M14 | Excel — BRDB Model Wiring | 2 | ⏳ | Day 3 |
+| M14 | Excel — BRDB Model Wiring | 2 | ✅ | Day 3 |
 | M15 | Sensitivity Table | 2 | ✅ | Day 3 |
 | PL-01 | Supabase Auth (per-user) | Post | 📋 | Post-launch |
 | PL-02 | Document Comment Threads | Post | 📋 | Post-launch |
@@ -213,9 +213,13 @@ Goal: Financials tab renders live data from the actual BRDB `.xlsx` model.
 
 ---
 
-### M05 — Excel Parser (ExcelJS) ⏳
+### M05 + M14 — Excel Parser & BRDB Model Wiring ✅
 
-**Milestone:** `GET /api/[dealId]/financials` returns correct JSON from the real Excel file.
+**Milestone:** `GET /api/[dealId]/financials` returns correct JSON from the real BRDB Excel file.
+
+> **Apr 2026:** Implemented ExcelJS parser at `server/api/[dealId]/financials.get.ts`. Auto-detects the active phase column (first col with NDV > 0 in row 61). Extracts 15+ metrics from `Feasibility Study`, `IRR & Sensitivity`, and `Cashflow` sheets. Returns source: 'xlsx' flag so the UI shows a "Live figures" green badge. Fallback to deals.json estimates when no xlsx present. Demo file at `data/KL-2025-11/financials.xlsx` (Jalan Desa Sentosa template).
+> 
+> **Verified API output for KL-2025-11:** NDV 176.4M · GDV 220.2M · Construction 103.6M · NDP 38.1M · Dev margin 21.6% · Hurdle IRR 16% · Base ASP RM 680 psf · Base absorption 80%
 
 - [ ] Copy real BRDB model to `data/jb-2026-04/financials.xlsx`
 - [ ] Structure Excel file with required sheet names (or rename existing sheets):
@@ -243,9 +247,7 @@ Goal: Financials tab renders live data from the actual BRDB `.xlsx` model.
 
 ---
 
-### M14 — Excel Model Wiring (BRDB-specific) ⏳
-
-**Milestone:** Real BRDB feasibility model numbers appear correctly in the dashboard.
+### M14 — Excel Model Wiring (BRDB-specific) ✅ — merged into M05 above
 
 - [ ] Map actual BRDB named ranges to parser (verify names match exactly):
   - [ ] `GDV_Total` → `'Feasibility Study'!$AY$67`

@@ -93,16 +93,17 @@
       <Transition name="fade-up" mode="out-in">
         <OverviewTab
           v-if="activeTab === 'overview'"
+          key="overview"
           :meta="editMode ? draftMeta : meta"
           :deal="editMode ? draftDeal : deal"
           :fin="fin"
           :edit-mode="editMode"
           :deal-id="dealId"
         />
-        <DocumentsTab  v-else-if="activeTab === 'documents'"  :deal-id="dealId" />
-        <FinancialsTab v-else-if="activeTab === 'financials'" :deal="deal" :meta="meta" :fin="fin" />
-        <RiskTab       v-else-if="activeTab === 'risk'"       :deal-id="dealId" :meta="meta" :deal="deal" @meta-updated="refreshMeta" />
-        <TeamTab       v-else-if="activeTab === 'team'"       :deal-id="dealId" />
+        <DocumentsTab  v-else-if="activeTab === 'documents'"  key="documents"  :deal-id="dealId" />
+        <FinancialsTab v-else-if="activeTab === 'financials'" key="financials" :deal="deal" :meta="meta" :fin="fin" />
+        <RiskTab       v-else-if="activeTab === 'risk'"       key="risk"       :deal-id="dealId" :meta="meta" :deal="deal" @meta-updated="refreshMeta" />
+        <TeamTab       v-else-if="activeTab === 'team'"       key="team"       :deal-id="dealId" />
       </Transition>
     </div>
   </div>
@@ -125,8 +126,22 @@ const deal = computed(() => {
   return deals.find((d: any) => d.id === dealId) ?? null
 })
 
-// ── Shared financials — single source of truth for both Overview + Financials tabs ──
+// ── Excel-based financials (M05) — client-only, post-mount ──
+// Fetched after hydration so it never interferes with SSR or Suspense
+const xlsxFin = ref<Record<string, any> | null>(null)
+onMounted(async () => {
+  try {
+    xlsxFin.value = await $fetch(`/api/${dealId}/financials`) as Record<string, any>
+  } catch {
+    // No financials.xlsx for this deal — fin falls back to deal-list estimates
+  }
+})
+
+// ── Shared financials — Excel takes priority; falls back to deal-list estimates ──
 const fin = computed(() => {
+  if (xlsxFin.value) return xlsxFin.value as Record<string, any>
+
+  // Fallback: derive rough estimates from deals.json fields
   const gdv      = deal.value?.gdv      ?? 0
   const landCost = deal.value?.landCost ?? 0
   const constr    = Math.round(gdv * 0.40)
@@ -139,7 +154,14 @@ const fin = computed(() => {
   const ndp       = ndv - totalDevCost
   const ndpMargin = ndv > 0 ? parseFloat(((ndp / ndv) * 100).toFixed(1)) : 0
   const equity    = Math.round(totalDevCost * 0.27)
-  return { ndv, constr, authority, siteStaff, finance, marketing, totalDevCost, ndp, ndpMargin, equityRequired: equity, landCost }
+  const hurdleIRR = deal.value?.hurdleRate ?? 15
+  const baseASP   = deal.value?.blendedPSF ?? 680
+  return {
+    ndv, constr, authority, siteStaff, finance, marketing,
+    totalDevCost, ndp, ndpMargin, equityRequired: equity, landCost,
+    gdv, blendedPSF: baseASP, hurdleIRR, baseASP, baseAbsorption: 80,
+    devPeriodYears: 5, source: 'estimate',
+  }
 })
 const isRestricted = computed(() => deal.value?.restricted ?? false)
 
