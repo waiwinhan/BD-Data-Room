@@ -171,7 +171,9 @@ const stageColors = {
 
 ### M04 — Overview Tab ✅
 
-**Milestone:** Overview tab shows real data: 4 KPI cards, Google Maps embed, DD milestones, development mix, key assumptions.
+**Milestone:** Overview tab shows real data: 4 KPI cards, interactive Leaflet satellite map, DD milestones, development mix, key assumptions.
+
+> **Apr 2026 enhancement:** Replaced static Google Maps iframe with a fully interactive Leaflet map (scroll-to-zoom, click-drag pan). Base layer: Esri World Imagery satellite + street labels. Site marker placed at deal coordinates.
 
 - [ ] Create `server/api/[dealId]/meta.get.ts` — reads and returns `meta.json`
 - [ ] Build `components/OverviewTab.vue`:

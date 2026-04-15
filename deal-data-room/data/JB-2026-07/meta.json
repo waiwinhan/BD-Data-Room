@@ -108,17 +108,16 @@
       "value": "RM 240"
     },
     {
-      "label": "Absorption",
-      "value": "65% / yr"
-    },
-    {
       "label": "Dev Period",
       "value": "5 years"
     }
   ],
   "legalStatus": {
     "titleType": "Pajakan Negeri",
-    "titleLandUse": { "value": "Commercial", "status": "ok" },
+    "titleLandUse": {
+      "value": "Commercial",
+      "status": "ok"
+    },
     "encumbrance": "Nil",
     "zoning": "Mixed Development",
     "bumiQuota": "30%"

@@ -46,13 +46,7 @@
 
         <!-- Map embed (view mode only) -->
         <div v-if="!editMode" class="map-wrap">
-          <iframe
-            :src="`https://maps.google.com/maps?q=${meta?.coordinates?.lat},${meta?.coordinates?.lng}&z=16&output=embed`"
-            class="map-iframe"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          />
+          <div ref="siteMapEl" class="map-leaflet" />
           <div class="map-overlay">
             <div class="map-parcel-name">{{ meta?.name }}</div>
             <div class="map-parcel-sub">{{ meta?.location }}</div>
@@ -496,6 +490,71 @@ function removeAssumption(i: number) {
   props.meta.assumptions.splice(i, 1)
 }
 
+// ── LEAFLET SITE MAP ─────────────────────────────────────────────
+const siteMapEl = ref<HTMLElement | null>(null)
+let siteMap: any = null
+
+async function initSiteMap() {
+  if (!siteMapEl.value) return
+  const coords = props.meta?.coordinates
+  if (!coords?.lat || !coords?.lng) return
+
+  const L = await import('leaflet')
+
+  siteMap = L.map(siteMapEl.value, {
+    center: [coords.lat, coords.lng],
+    zoom: 17,
+    zoomControl: true,
+    attributionControl: true,
+    scrollWheelZoom: true,
+  })
+
+  // Esri World Imagery — satellite base, free, no API key
+  L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    {
+      attribution: 'Tiles &copy; Esri',
+      maxZoom: 19,
+    }
+  ).addTo(siteMap)
+
+  // Street label overlay on top of satellite
+  L.tileLayer(
+    'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+    { maxZoom: 19, opacity: 0.8 }
+  ).addTo(siteMap)
+
+  // Site marker
+  L.circleMarker([coords.lat, coords.lng], {
+    radius: 7,
+    fillColor: '#5DCAA5',
+    color: '#fff',
+    weight: 2.5,
+    opacity: 1,
+    fillOpacity: 1,
+  }).addTo(siteMap).bindPopup(
+    `<b style="font-family:DM Sans,sans-serif;font-size:12px;">${props.meta?.name ?? ''}</b>
+     <div style="font-size:10px;color:#888;margin-top:2px;">${props.meta?.location ?? ''}</div>`
+  )
+}
+
+onMounted(async () => {
+  await nextTick()
+  if (!props.editMode) await initSiteMap()
+})
+
+onBeforeUnmount(() => {
+  if (siteMap) { siteMap.remove(); siteMap = null }
+})
+
+watch(() => props.editMode, async (isEditing) => {
+  if (!isEditing) {
+    siteMap = null
+    await nextTick()
+    await initSiteMap()
+  }
+})
+
 // ── SWOT AI ──────────────────────────────────────────────────────
 const generating = ref(false)
 const swotError  = ref('')
@@ -528,6 +587,10 @@ function formatSwotDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 </script>
+
+<style>
+@import 'leaflet/dist/leaflet.css';
+</style>
 
 <style scoped>
 .overview { display: flex; flex-direction: column; gap: 20px; }
@@ -568,7 +631,7 @@ function formatSwotDate(iso: string) {
 .open-map-btn:hover { color: var(--text); background: var(--surface2); }
 
 .map-wrap { position: relative; border-radius: var(--radius-sm); overflow: hidden; height: 180px; }
-.map-iframe { width: 100%; height: 100%; border: none; display: block; }
+.map-leaflet { width: 100%; height: 100%; }
 .map-overlay {
   position: absolute; bottom: 0; left: 0; right: 0;
   background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 100%);
