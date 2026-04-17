@@ -47,13 +47,6 @@
       </div>
     </div>
 
-    <!-- Add Deal Modal -->
-    <AddDealModal
-      :show="showAddDeal"
-      @close="showAddDeal = false"
-      @created="onDealCreated"
-    />
-
     <!-- STATUS LEGEND -->
     <div class="legend-wrapper">
       <div class="legend-title">Status Guide</div>
@@ -94,13 +87,7 @@ const portfolio = computed(() => (data.value as any)?.portfolio ?? null)
 
 const activeFilter = ref('all')
 const searchQuery  = ref('')
-const showAddDeal  = ref(false)
-
-const router = useRouter()
-async function onDealCreated(dealId: string) {
-  await refreshNuxtData()
-  router.push(`/${dealId}`)
-}
+const showAddDeal  = useState('showAddDeal', () => false)
 
 const stageFilterMap: Record<string, string> = {
   dd:       'Active DD',

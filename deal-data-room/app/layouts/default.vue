@@ -9,7 +9,7 @@
         <span class="topbar-sub">Deal Data Room</span>
       </div>
       <div class="topbar-right">
-        <button class="btn-primary" @click="alert('Add new deal — coming in Phase 4')">+ New Deal</button>
+        <button class="btn-primary" @click="showAddDeal = true">+ New Deal</button>
         <button class="btn-sm">Settings</button>
         <button class="btn-sm btn-logout" :disabled="loggingOut" @click="logout">
           {{ loggingOut ? '…' : 'Logout' }}
@@ -25,10 +25,26 @@
 
     <!-- PAGE CONTENT -->
     <slot />
+
+    <!-- Add Deal Modal — global, accessible from topbar + deal list card -->
+    <AddDealModal
+      :show="showAddDeal"
+      @close="showAddDeal = false"
+      @created="onDealCreated"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
+// Shared modal state — readable by any page via useState('showAddDeal')
+const showAddDeal = useState('showAddDeal', () => false)
+
+const router = useRouter()
+async function onDealCreated(dealId: string) {
+  await refreshNuxtData()
+  router.push(`/${dealId}`)
+}
+
 const loggingOut = ref(false)
 async function logout() {
   loggingOut.value = true
