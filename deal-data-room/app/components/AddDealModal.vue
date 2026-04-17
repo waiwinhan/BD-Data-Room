@@ -129,6 +129,8 @@ const emit  = defineEmits<{ close: [], created: [dealId: string] }>()
 const saving = ref(false)
 const error  = ref('')
 
+const defaultHurdleRate = ref(15)
+
 const form = reactive({
   name:       '',
   location:   '',
@@ -138,7 +140,7 @@ const form = reactive({
   gdv:        '' as string | number,
   landCost:   '' as string | number,
   landAcres:  '' as string | number,
-  hurdleRate: 15,
+  hurdleRate: defaultHurdleRate.value,
   stageNote:  '',
   restricted: false,
 })
@@ -147,11 +149,19 @@ function reset() {
   form.name = ''; form.location = ''; form.prefix = 'KL'
   form.stage = 'Active DD'; form.tenure = 'Freehold'
   form.gdv = ''; form.landCost = ''; form.landAcres = ''
-  form.hurdleRate = 15; form.stageNote = ''; form.restricted = false
+  form.hurdleRate = defaultHurdleRate.value; form.stageNote = ''; form.restricted = false
   error.value = ''
 }
 
-watch(() => props.show, (v) => { if (!v) reset() })
+watch(() => props.show, async (v) => {
+  if (!v) { reset(); return }
+  // Pull default hurdle rate from settings
+  try {
+    const s = await $fetch('/api/settings') as any
+    defaultHurdleRate.value = s.defaultHurdleRate ?? 15
+    form.hurdleRate = defaultHurdleRate.value
+  } catch {}
+})
 
 // Close on Escape
 onMounted(() => {
@@ -182,7 +192,7 @@ async function submit() {
 <style scoped>
 /* Backdrop */
 .modal-backdrop {
-  position: fixed; inset: 0; z-index: 200;
+  position: fixed; inset: 0; z-index: 1000;
   background: rgba(26,25,22,0.55);
   backdrop-filter: blur(3px);
   display: flex; align-items: center; justify-content: center;

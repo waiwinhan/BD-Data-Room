@@ -210,6 +210,8 @@ function cancelEdit() {
 async function saveChanges() {
   saving.value = true
   try {
+    // Keep name in sync — it lives in both meta.json and deals.json
+    if (draftMeta.name) draftDeal.name = draftMeta.name
     await Promise.all([
       $fetch(`/api/${dealId}/meta`, { method: 'PUT', body: draftMeta }),
       $fetch(`/api/${dealId}/deal`, { method: 'PUT', body: draftDeal }),

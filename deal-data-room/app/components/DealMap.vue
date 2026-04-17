@@ -234,6 +234,9 @@ onBeforeUnmount(() => {
   overflow: hidden;
   border: 1px solid var(--border);
   box-shadow: var(--shadow-md);
+  isolation: isolate;
+  z-index: 0;
+  position: relative;
 }
 
 .map-el {

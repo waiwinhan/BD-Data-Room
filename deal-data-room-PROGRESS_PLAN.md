@@ -29,6 +29,7 @@
 | M15 | Sensitivity Table | 2 | ✅ | Day 3 |
 | M16 | Feasibility Model Upload (in-UI) | 3 | ✅ | Apr 17 |
 | M17 | Add New Deal (modal + API) | 4 | ✅ | Apr 17 |
+| M19 | Settings Modal (branding, security, defaults) | 4 | ✅ | Apr 17 |
 | PL-01 | Supabase Auth (per-user) | Post | 📋 | Post-launch |
 | PL-02 | Document Comment Threads | Post | 📋 | Post-launch |
 | PL-03 | Email Notifications | Post | 📋 | Post-launch |
@@ -357,6 +358,30 @@ Goal: Financials tab renders live data from the actual BRDB `.xlsx` model.
   - [x] `showAddDeal` ref wired to "Add new deal" card
   - [x] `onDealCreated(dealId)` refreshes data and navigates to new deal
 - [x] Commit: `git commit -m "feat(M17): add new deal modal + API"`
+
+---
+
+### M19 — Settings Modal (branding, security, defaults) ✅
+
+**Milestone:** Admins can update room branding, change the shared password, and set default deal parameters entirely from the UI — no file editing required.
+
+> **Apr 17 2026:** Built a full Settings modal (3 tabs) accessible from the topbar Settings button. Settings persisted in `data/settings.json`. Login route updated to read password from settings.json first. Logo + room name update live in the topbar on save. Fixed Leaflet map z-index overlap issue across all modals.
+
+- [x] Create `data/settings.json` with defaults (roomName, logoDataUrl, defaultHurdleRate, password)
+- [x] Create `server/api/settings.get.ts` — returns settings without exposing password to client
+- [x] Create `server/api/settings.put.ts` — handles branding, password change (with current password verification), and hurdle rate default
+- [x] Update `server/api/auth/login.post.ts` — reads password from settings.json, falls back to .env
+- [x] Create `app/components/SettingsModal.vue` — 3-tab modal:
+  - [x] Branding tab: room name field + logo upload (PNG/JPG/SVG, up to 2 MB, base64 stored)
+  - [x] Security tab: current password verification + new password (min 6 chars)
+  - [x] Defaults tab: default hurdle IRR % pre-fills Add New Deal form
+- [x] Update `app/layouts/default.vue`:
+  - [x] Settings button wired to open SettingsModal
+  - [x] Topbar logo + room name read dynamically from settings API
+  - [x] Logo/name wrapped in `<NuxtLink to="/">` — clicking navigates back to deal list
+- [x] Fix Leaflet z-index bleed — raised all modal backdrops to `z-index: 1000`, added `isolation: isolate` to map containers
+- [x] Fix deal title sync — `saveChanges()` now writes name to both `meta.json` and `deals.json`
+- [x] Commit: `git commit -m "feat(M19): settings modal — branding, password, defaults"`
 
 ---
 

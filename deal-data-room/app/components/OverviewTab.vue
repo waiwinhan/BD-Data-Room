@@ -630,7 +630,7 @@ function formatSwotDate(iso: string) {
 }
 .open-map-btn:hover { color: var(--text); background: var(--surface2); }
 
-.map-wrap { position: relative; border-radius: var(--radius-sm); overflow: hidden; height: 180px; }
+.map-wrap { position: relative; border-radius: var(--radius-sm); overflow: hidden; height: 180px; isolation: isolate; z-index: 0; }
 .map-leaflet { width: 100%; height: 100%; }
 .map-overlay {
   position: absolute; bottom: 0; left: 0; right: 0;

@@ -3,14 +3,19 @@
     <!-- TOPBAR -->
     <header class="topbar">
       <div class="topbar-left">
-        <div class="logo-mark">BR</div>
-        <span class="topbar-title">BRDB Berhad</span>
+        <NuxtLink to="/" class="topbar-brand">
+          <div class="logo-mark">
+            <img v-if="settings.logoDataUrl" :src="settings.logoDataUrl" alt="logo" class="logo-img" />
+            <template v-else>{{ initials }}</template>
+          </div>
+          <span class="topbar-title">{{ settings.roomName }}</span>
+        </NuxtLink>
         <div class="topbar-divider"></div>
         <span class="topbar-sub">Deal Data Room</span>
       </div>
       <div class="topbar-right">
         <button class="btn-primary" @click="showAddDeal = true">+ New Deal</button>
-        <button class="btn-sm">Settings</button>
+        <button class="btn-sm" @click="showSettings = true">Settings</button>
         <button class="btn-sm btn-logout" :disabled="loggingOut" @click="logout">
           {{ loggingOut ? '…' : 'Logout' }}
         </button>
@@ -32,12 +37,20 @@
       @close="showAddDeal = false"
       @created="onDealCreated"
     />
+
+    <!-- Settings Modal -->
+    <SettingsModal
+      :show="showSettings"
+      @close="showSettings = false"
+      @updated="loadSettings"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 // Shared modal state — readable by any page via useState('showAddDeal')
-const showAddDeal = useState('showAddDeal', () => false)
+const showAddDeal  = useState('showAddDeal',  () => false)
+const showSettings = ref(false)
 
 const router = useRouter()
 async function onDealCreated(dealId: string) {
@@ -51,6 +64,22 @@ async function logout() {
   await $fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
   await navigateTo('/login')
 }
+
+// ── Settings / branding ──────────────────────────────────────────────────────
+const settings = reactive({ roomName: 'BRDB Berhad', logoDataUrl: '' })
+const initials  = computed(() =>
+  (settings.roomName || 'BR').split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
+)
+
+async function loadSettings() {
+  try {
+    const s = await $fetch('/api/settings') as any
+    settings.roomName    = s.roomName    || 'BRDB Berhad'
+    settings.logoDataUrl = s.logoDataUrl || ''
+  } catch {}
+}
+
+onMounted(loadSettings)
 </script>
 
 <style>
@@ -95,12 +124,20 @@ html { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   position: sticky; top: 0; z-index: 100;
 }
 .topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-brand {
+  display: flex; align-items: center; gap: 10px;
+  text-decoration: none; cursor: pointer;
+}
+.topbar-brand:hover .logo-mark { opacity: 0.85; }
+.topbar-brand:hover .topbar-title { opacity: 0.75; }
 .logo-mark {
   width: 30px; height: 30px;
   background: var(--text); border-radius: 7px;
   display: flex; align-items: center; justify-content: center;
   font-size: 11px; font-weight: 600; color: #fff; letter-spacing: 0.04em;
+  overflow: hidden; flex-shrink: 0;
 }
+.logo-img { width: 100%; height: 100%; object-fit: contain; }
 .topbar-title { font-size: 13px; font-weight: 600; color: var(--text); }
 .topbar-divider { width: 1px; height: 16px; background: var(--border2); }
 .topbar-sub { font-size: 12px; color: var(--muted); }

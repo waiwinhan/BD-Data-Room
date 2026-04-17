@@ -1,7 +1,7 @@
 [
   {
     "id": "JB-2026-04",
-    "name": "Permas Jaya Land Acquisition",
+    "name": "Permas Jaya Land Acquisition (Dummy)",
     "ref": "JB-2026-04",
     "location": "PTD 220475, Mukim Plentong, Johor Bahru",
     "lat": 1.556,
@@ -26,7 +26,7 @@
   },
   {
     "id": "JB-2026-07",
-    "name": "Iskandar Waterfront Parcel C",
+    "name": "Iskandar Waterfront Parcel C (Dummy)",
     "ref": "JB-2026-07",
     "location": "Lot 4821, Persiaran Danga, Iskandar Puteri, Johor",
     "lat": 1.4655,
@@ -51,7 +51,7 @@
   },
   {
     "id": "KL-2026-02",
-    "name": "Bukit Jalil Mixed Dev JV",
+    "name": "Bukit Jalil Mixed Dev JV (Dummy)",
     "ref": "KL-2026-02",
     "location": "Bukit Jalil, Kuala Lumpur",
     "lat": 3.0565,
@@ -76,7 +76,7 @@
   },
   {
     "id": "KL-2025-11",
-    "name": "Damansara Damai Residences",
+    "name": "Damansara Damai Residences (Dummy)",
     "ref": "KL-2025-11",
     "location": "Damansara Damai, Kuala Lumpur",
     "lat": 3.1726,
@@ -101,7 +101,7 @@
   },
   {
     "id": "SL-2026-01",
-    "name": "Rawang Township Phase 3",
+    "name": "Rawang Township Phase 3 (Dummy)",
     "ref": "SL-2026-01",
     "location": "Rawang, Selangor",
     "lat": 3.3222,
