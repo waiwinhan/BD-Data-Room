@@ -23,7 +23,8 @@
 | M10 | Deal Team Tab | 3 | ✅ | Day 5 |
 | M11 | Auth — NDA Password Gate | 4 | ✅ | Day 5–6 |
 | M12 | Multi-Deal Routing | 4 | ✅ | Day 6 |
-| M13 | Deployment (Railway / Vercel) | 4 | ⏳ | Day 6–7 |
+| M13 | Deployment (Netlify) | 4 | ⏳ | TBD |
+| M18 | Supabase DB + Storage Migration | 5 | ⏳ | Next |
 | M14 | Excel — BRDB Model Wiring | 2 | ✅ | Day 3 |
 | M15 | Sensitivity Table | 2 | ✅ | Day 3 |
 | M16 | Feasibility Model Upload (in-UI) | 3 | ✅ | Apr 17 |
@@ -572,6 +573,95 @@ Goal: NDA password gate, deal list page routing, shareable private URL.
 
 - [ ] Share Netlify URL + password with BRDB team
 - [ ] Commit: `git commit -m "M13: deployed to Netlify"`
+
+---
+
+## Phase 5 — Database & Persistent Storage
+
+Goal: Replace flat JSON files + local filesystem with Supabase (PostgreSQL + Storage) so all data survives deploys and the app is ready for real team use.
+
+---
+
+### M18 — Supabase DB + Storage Migration ⏳
+
+**Milestone:** All deal data lives in Supabase. Uploaded files go to Supabase Storage. App deploys to Netlify and nothing is ever lost on redeploy.
+
+**Why:** Netlify's filesystem is ephemeral — any deal created via UI or file uploaded is wiped on every redeploy. Supabase fixes this permanently.
+
+---
+
+**Step 1 — Create Supabase project (Wai does this, ~5 min)**
+- [ ] Go to [supabase.com](https://supabase.com) → New project
+- [ ] Name: `brdb-deal-data-room`, Region: `Southeast Asia (Singapore)`
+- [ ] Copy **Project URL** and **anon public key** from Settings → API
+- [ ] Add to `.env`:
+  ```
+  SUPABASE_URL=https://xxxx.supabase.co
+  SUPABASE_ANON_KEY=eyJ...
+  ```
+
+**Step 2 — Run SQL schema in Supabase SQL editor**
+- [ ] Create `deals` table (id, name, ref, location, lat, lng, stage, restricted, gdv, ndv, blended_psf, land_cost, construction_cost, ndp, ndp_margin, irr, hurdle_rate, land_acres, tenure, dd_progress, updated_at, stage_note)
+- [ ] Create `deal_meta` table (deal_id PK → FK to deals, data JSONB) — stores milestones, devMix, legalStatus, team, assumptions, swot, accessLog
+- [ ] Create `deal_risks` table (id UUID PK, deal_id FK, title, description, severity, created_at)
+- [ ] Create Storage bucket: `deal-files` (private) — stores `{dealId}/financials.xlsx` and `{dealId}/docs/{filename}`
+
+**Step 3 — Install Supabase client + update nuxt.config**
+- [ ] `npm install @supabase/supabase-js`
+- [ ] Create `server/utils/supabase.ts` — exports typed Supabase client using runtime config
+- [ ] Add `SUPABASE_URL` and `SUPABASE_ANON_KEY` to `nuxt.config.ts` runtimeConfig
+
+**Step 4 — Migrate seed data from JSON → Supabase**
+- [ ] Write one-off migration script: reads all `data/*.json` files, inserts into Supabase tables
+- [ ] Run script locally, verify all 5 deals appear in Supabase dashboard
+- [ ] Migrate existing `docs/` files to Supabase Storage
+
+**Step 5 — Rewrite server API routes (22 files)**
+
+*Deals:*
+- [ ] `deals.get.ts` — `SELECT * FROM deals` + compute portfolio aggregates
+- [ ] `deals.post.ts` — `INSERT INTO deals` + `INSERT INTO deal_meta`
+
+*Per-deal metadata:*
+- [ ] `[dealId]/meta.get.ts` — `SELECT data FROM deal_meta WHERE deal_id = ?`
+- [ ] `[dealId]/meta.put.ts` — `UPDATE deal_meta SET data = ?`
+- [ ] `[dealId]/deal.put.ts` — `UPDATE deals SET ... WHERE id = ?`
+
+*Risks:*
+- [ ] `[dealId]/risk.get.ts` — `SELECT * FROM deal_risks WHERE deal_id = ?`
+- [ ] `[dealId]/risk.post.ts` — `INSERT INTO deal_risks`
+- [ ] `[dealId]/risk/[id].put.ts` — `UPDATE deal_risks SET ...`
+- [ ] `[dealId]/risk/[id].delete.ts` — `DELETE FROM deal_risks WHERE id = ?`
+
+*File uploads → Supabase Storage:*
+- [ ] `[dealId]/upload.post.ts` — `supabase.storage.from('deal-files').upload(path, buffer)`
+- [ ] `[dealId]/documents.get.ts` — `supabase.storage.from('deal-files').list(dealId/docs/)`
+- [ ] `[dealId]/documents/[filename].get.ts` — `createSignedUrl()` or stream from Storage
+- [ ] `[dealId]/documents/[filename].delete.ts` — `supabase.storage.remove([path])`
+- [ ] `[dealId]/documents/[filename].patch.ts` — update metadata in `deal_meta` JSONB
+- [ ] `[dealId]/financials.get.ts` — download xlsx from Storage → parse with ExcelJS in memory
+- [ ] `[dealId]/financials.post.ts` — upload xlsx to `{dealId}/financials.xlsx` in Storage
+
+*Remaining:*
+- [ ] `[dealId]/trash.get.ts`, `[dealId]/trash/[filename].put.ts` — Storage-based trash logic
+- [ ] `[dealId]/doc-categories*.ts` — store custom categories in `deal_meta` JSONB
+- [ ] `server/utils/accessLog.ts` — append to `deal_meta.data.accessLog` via Supabase update
+
+**Step 6 — Deploy to Netlify with Supabase env vars**
+- [ ] Add to Netlify environment variables:
+  - `SUPABASE_URL`
+  - `SUPABASE_ANON_KEY`
+  - `DEAL_PASSWORD`
+  - `NUXT_SESSION_PASSWORD`
+- [ ] Remove `data/` directory dependency from production (keep in git as backup only)
+- [ ] Deploy + verify all 5 deals load from Supabase
+- [ ] Test: add a new deal via UI → still there after re-deploy ✓
+- [ ] Test: upload financials.xlsx → still there after re-deploy ✓
+
+**Step 7 — Cleanup**
+- [ ] Remove `fs.readFileSync` / `fs.writeFileSync` from all API routes
+- [ ] Remove `config.dataDir` from `nuxt.config.ts`
+- [ ] Update progress plan + commit: `git commit -m "feat(M18): Supabase DB + Storage migration"`
 
 ---
 
