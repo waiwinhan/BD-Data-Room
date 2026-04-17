@@ -93,15 +93,55 @@
       </div>
     </div>
 
-    <!-- ── DATA SOURCE NOTE ── -->
-    <div :class="fin.source === 'xlsx' ? 'data-note data-note-live' : 'data-note'">
-      <template v-if="fin.source === 'xlsx'">
-        ✓ Live figures — parsed from BRDB Feasibility Study (.xlsx)
-      </template>
-      <template v-else>
-        ⚠ Indicative estimates only. Upload the BRDB feasibility model (.xlsx) to replace with live figures.
-      </template>
+    <!-- ── MODEL UPLOAD BANNER ── -->
+    <div class="upload-banner" :class="fin.source === 'xlsx' ? 'upload-banner-live' : 'upload-banner-estimate'">
+      <div class="upload-banner-left">
+        <template v-if="fin.source === 'xlsx'">
+          <span class="upload-icon">✓</span>
+          <div>
+            <div class="upload-title">Live figures — BRDB Feasibility Study (.xlsx)</div>
+            <div class="upload-sub">Numbers parsed directly from your Excel model. Replace to update.</div>
+          </div>
+        </template>
+        <template v-else>
+          <span class="upload-icon warn">⚠</span>
+          <div>
+            <div class="upload-title">Indicative estimates only</div>
+            <div class="upload-sub">Upload your BRDB Feasibility Study (.xlsx) to replace with live figures.</div>
+          </div>
+        </template>
+      </div>
+
+      <div class="upload-banner-right">
+        <!-- Hidden file input -->
+        <input
+          ref="fileInputRef"
+          type="file"
+          accept=".xlsx"
+          class="file-input-hidden"
+          @change="handleFile"
+        />
+
+        <!-- Upload / Replace button -->
+        <button
+          class="btn-upload"
+          :class="{ 'btn-upload-live': fin.source === 'xlsx', uploading }"
+          :disabled="uploading"
+          @click="triggerUpload"
+        >
+          <span v-if="uploading" class="spinner"></span>
+          <span v-else>{{ fin.source === 'xlsx' ? '↑ Replace Model' : '↑ Upload .xlsx' }}</span>
+        </button>
+      </div>
     </div>
+
+    <!-- Error / Success messages -->
+    <Transition name="toast">
+      <div v-if="uploadError" class="upload-error">{{ uploadError }}</div>
+    </Transition>
+    <Transition name="toast">
+      <div v-if="uploadToast" class="upload-success">✓ Model uploaded — figures updated</div>
+    </Transition>
 
   </div>
 </template>
@@ -121,17 +161,57 @@ const props = defineProps<{
   deal?: any
   meta?: any
   fin?: any
+  dealId?: string
 }>()
+
+const emit = defineEmits<{ uploaded: [] }>()
 
 const fin = computed(() => props.fin ?? {})
 
+// ── Upload ──────────────────────────────────────────────────────────────────
+const fileInputRef = ref<HTMLInputElement | null>(null)
+const uploading    = ref(false)
+const uploadError  = ref('')
+const uploadToast  = ref(false)
+
+function triggerUpload() {
+  uploadError.value = ''
+  fileInputRef.value?.click()
+}
+
+async function handleFile(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  if (!file.name.toLowerCase().endsWith('.xlsx')) {
+    uploadError.value = 'Please select an .xlsx file'
+    return
+  }
+  uploading.value   = true
+  uploadError.value = ''
+  const form = new FormData()
+  form.append('file', file)
+  try {
+    await $fetch(`/api/${props.dealId}/financials`, { method: 'POST', body: form })
+    uploadToast.value = true
+    setTimeout(() => { uploadToast.value = false }, 3000)
+    emit('uploaded')
+  } catch (err: any) {
+    uploadError.value = err.data?.statusMessage || 'Upload failed — please try again.'
+    setTimeout(() => { uploadError.value = '' }, 4000)
+  } finally {
+    uploading.value = false
+    if (fileInputRef.value) fileInputRef.value.value = ''
+  }
+}
+
+// ── NDP colour ──────────────────────────────────────────────────────────────
 const ndpClass = computed(() => {
   const m = parseFloat(fin.value.ndpMargin)
   const hurdle = props.deal?.hurdleRate ?? 15
   return m >= hurdle ? 'val-green' : 'val-red'
 })
 
-// ── Cost items (6 categories) ───────────────────────────────────────
+// ── Cost items (6 categories) ───────────────────────────────────────────────
 const costItems = computed(() => [
   { label: 'Land',         value: fin.value.landCost,   color: '#5DCAA5' },
   { label: 'Construction', value: fin.value.constr,     color: '#85B7EB' },
@@ -141,7 +221,7 @@ const costItems = computed(() => [
   { label: 'Marketing',    value: fin.value.marketing,  color: '#C4A0E8' },
 ])
 
-// ── Doughnut chart ──────────────────────────────────────────────────
+// ── Doughnut ────────────────────────────────────────────────────────────────
 const doughnutData = computed(() => ({
   labels: costItems.value.map(c => c.label),
   datasets: [{
@@ -175,14 +255,14 @@ const doughnutOpts = computed(() => {
   }
 })
 
-// ── Cashflow chart (bars + net line) ────────────────────────────────
+// ── Cashflow chart ───────────────────────────────────────────────────────────
 const inflows  = [0,   42,  88,  96, 54]
 const outflows = [-58, -72, -55, -28, -10]
 const netFlow  = inflows.reduce<number[]>((acc, v, i) => {
   const period = v + outflows[i]
   acc.push((acc[acc.length - 1] ?? 0) + period)
   return acc
-}, [])  // cumulative: [-58, -88, -55, 13, 57]
+}, [])
 
 const barData = computed(() => ({
   labels: ['Y1', 'Y2', 'Y3', 'Y4', 'Y5'],
@@ -242,23 +322,19 @@ const barOpts = {
   }
 }
 
-// ── Sensitivity table — driven by Excel inputs when available ───────
+// ── Sensitivity table ────────────────────────────────────────────────────────
 const baseASPVal  = computed(() => fin.value.baseASP        ?? 680)
 const baseAbsVal  = computed(() => fin.value.baseAbsorption ?? 80)
 const hurdleVal   = computed(() => fin.value.hurdleIRR      ?? props.deal?.hurdleRate ?? 15)
 
-// Build ±3 ASP steps centred on baseASP, rounded to nearest 10
 const asps = computed(() => {
   const base = baseASPVal.value
-  const step = Math.round(base * 0.05 / 10) * 10 || 30  // ~5% step, min 30
+  const step = Math.round(base * 0.05 / 10) * 10 || 30
   return [-2, -1, 0, 1, 2].map(n => base + n * step)
 })
 
-// Absorption rows: 50% to 110% in steps of 15
 const absorptions = [50, 65, 80, 95, 110]
 
-// Proportional IRR estimate: IRR scales linearly with revenue (ASP × Abs).
-// Anchor: at base ASP + base absorption, IRR ≈ hurdle + 6% (typical feasibility target).
 function irrFor(abs: number, asp: number): number {
   const baseIRR = hurdleVal.value + 6
   const revenueRatio = (asp / baseASPVal.value) * (abs / baseAbsVal.value)
@@ -326,14 +402,81 @@ function cellClass(abs: number, asp: number): string {
 .sl-bad::before  { content: ''; display: inline-block; width: 10px; height: 10px; background: #FDECEC; border: 1px solid #A32D2D; border-radius: 2px; }
 .sl-base::before { content: ''; display: inline-block; width: 10px; height: 10px; background: #1A1916; border-radius: 2px; }
 
-/* Note */
-.data-note {
-  font-size: 11px; color: var(--amber); background: var(--amber-bg);
-  border: 1px solid rgba(133,79,11,0.15); border-radius: var(--radius-sm);
-  padding: 8px 12px;
+/* ── UPLOAD BANNER ── */
+.upload-banner {
+  border-radius: var(--radius);
+  padding: 12px 16px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  border: 1px solid transparent;
 }
-.data-note-live {
-  color: #0F6E56; background: #E9F8F1;
+.upload-banner-estimate {
+  background: var(--amber-bg);
+  border-color: rgba(133,79,11,0.18);
+}
+.upload-banner-live {
+  background: #E9F8F1;
   border-color: rgba(15,110,86,0.2);
 }
+.upload-banner-left {
+  display: flex; align-items: flex-start; gap: 10px; flex: 1; min-width: 0;
+}
+.upload-icon {
+  font-size: 14px; flex-shrink: 0;
+  color: var(--green-txt); margin-top: 1px;
+}
+.upload-icon.warn { color: var(--amber); }
+.upload-title {
+  font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 2px;
+}
+.upload-sub {
+  font-size: 11px; color: var(--muted);
+}
+.upload-banner-right { flex-shrink: 0; }
+
+/* Upload button */
+.btn-upload {
+  height: 30px; padding: 0 14px;
+  border-radius: var(--radius-sm);
+  font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all 0.15s;
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--text); color: #fff; border: none;
+}
+.btn-upload:hover:not(:disabled) { opacity: 0.85; }
+.btn-upload:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-upload-live {
+  background: transparent;
+  color: #0F6E56;
+  border: 1px solid rgba(15,110,86,0.35) !important;
+}
+.btn-upload-live:hover:not(:disabled) { background: rgba(15,110,86,0.08); }
+
+/* Spinner */
+.spinner {
+  width: 12px; height: 12px;
+  border: 2px solid currentColor; border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite; flex-shrink: 0;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Hidden file input */
+.file-input-hidden { display: none; }
+
+/* Feedback toasts */
+.upload-error {
+  font-size: 12px; color: var(--red); background: var(--red-bg);
+  border: 1px solid rgba(163,45,45,0.2); border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+.upload-success {
+  font-size: 12px; font-weight: 500; color: #0F6E56; background: #E9F8F1;
+  border: 1px solid rgba(15,110,86,0.2); border-radius: var(--radius-sm);
+  padding: 8px 12px;
+}
+
+/* Toast transition */
+.toast-enter-active, .toast-leave-active { transition: opacity 0.25s, transform 0.25s; }
+.toast-enter-from { opacity: 0; transform: translateY(-4px); }
+.toast-leave-to   { opacity: 0; transform: translateY(4px); }
 </style>

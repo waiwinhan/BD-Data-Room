@@ -1,36 +1,86 @@
 {
   "id": "SL-2026-01",
-  "name": "Rawang Township Phase 3",
+  "name": "Rawang Township Phase 3 (Dummy)",
   "ref": "SL-2026-01",
   "location": "Rawang, Selangor",
-  "coordinates": { "lat": 3.3320, "lng": 101.5740 },
+  "coordinates": {
+    "lat": 3.332,
+    "lng": 101.574
+  },
   "tenure": "Leasehold 99yr",
   "landArea": 7.35,
   "stage": "Rejected",
   "hurdleRate": 15,
   "proximities": [
-    { "label": "Rawang KTM Station", "distance": "2.5 km", "color": "blue" },
-    { "label": "AEON Rawang", "distance": "3.0 km", "color": "grey" }
+    {
+      "label": "Rawang KTM Station",
+      "distance": "2.5 km",
+      "color": "blue"
+    },
+    {
+      "label": "AEON Rawang",
+      "distance": "3.0 km",
+      "color": "grey"
+    }
   ],
   "milestones": [
-    { "label": "LOI Signed", "date": "5 Nov 2025", "status": "done" },
-    { "label": "Title Search", "date": "20 Nov 2025", "status": "done" },
-    { "label": "Vendor Price Negotiation", "date": "TBD", "status": "active" }
+    {
+      "label": "LOI Signed",
+      "date": "5 Nov 2025",
+      "status": "done"
+    },
+    {
+      "label": "Title Search",
+      "date": "20 Nov 2025",
+      "status": "done"
+    },
+    {
+      "label": "Vendor Price Negotiation",
+      "date": "TBD",
+      "status": "active"
+    }
   ],
   "devMix": [
-    { "type": "Linked Houses", "units": 400, "pct": 70 },
-    { "type": "Shophouses", "units": 60, "pct": 20 },
-    { "type": "Community Facilities", "units": 0, "pct": 10 }
+    {
+      "type": "Linked Houses",
+      "units": 400,
+      "pct": 70
+    },
+    {
+      "type": "Shophouses",
+      "units": 60,
+      "pct": 20
+    },
+    {
+      "type": "Community Facilities",
+      "units": 0,
+      "pct": 10
+    }
   ],
   "assumptions": [
-    { "label": "Plot Ratio", "value": "1.2x" },
-    { "label": "Build Cost PSF", "value": "RM 160" },
-    { "label": "Absorption", "value": "60% / yr" },
-    { "label": "Dev Period", "value": "4 years" }
+    {
+      "label": "Plot Ratio",
+      "value": "1.2x"
+    },
+    {
+      "label": "Build Cost PSF",
+      "value": "RM 160"
+    },
+    {
+      "label": "Absorption",
+      "value": "60% / yr"
+    },
+    {
+      "label": "Dev Period",
+      "value": "4 years"
+    }
   ],
   "legalStatus": {
     "titleType": "Pajakan Negeri",
-    "titleLandUse": { "value": "Residential", "status": "ok" },
+    "titleLandUse": {
+      "value": "Residential",
+      "status": "ok"
+    },
     "encumbrance": "Nil",
     "zoning": "Residential (R1)",
     "bumiQuota": "40%"
@@ -75,7 +125,11 @@
   },
   "team": {
     "internal": [
-      { "name": "Wai Win Han", "role": "Deal Lead", "email": "waiwin@brdb.com.my" }
+      {
+        "name": "Wai Win Han",
+        "role": "Deal Lead",
+        "email": "waiwin@brdb.com.my"
+      }
     ],
     "external": []
   }

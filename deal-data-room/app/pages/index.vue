@@ -41,11 +41,18 @@
       </div>
 
       <!-- add deal card -->
-      <div class="add-card" @click="alert('Add new deal — coming in Phase 4')">
+      <div class="add-card" @click="showAddDeal = true">
         <span class="add-icon">＋</span>
         Add new deal
       </div>
     </div>
+
+    <!-- Add Deal Modal -->
+    <AddDealModal
+      :show="showAddDeal"
+      @close="showAddDeal = false"
+      @created="onDealCreated"
+    />
 
     <!-- STATUS LEGEND -->
     <div class="legend-wrapper">
@@ -86,7 +93,14 @@ const allDeals = computed(() => (data.value as any)?.deals ?? [])
 const portfolio = computed(() => (data.value as any)?.portfolio ?? null)
 
 const activeFilter = ref('all')
-const searchQuery = ref('')
+const searchQuery  = ref('')
+const showAddDeal  = ref(false)
+
+const router = useRouter()
+async function onDealCreated(dealId: string) {
+  await refreshNuxtData()
+  router.push(`/${dealId}`)
+}
 
 const stageFilterMap: Record<string, string> = {
   dd:       'Active DD',

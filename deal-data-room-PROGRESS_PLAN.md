@@ -26,6 +26,8 @@
 | M13 | Deployment (Railway / Vercel) | 4 | ⏳ | Day 6–7 |
 | M14 | Excel — BRDB Model Wiring | 2 | ✅ | Day 3 |
 | M15 | Sensitivity Table | 2 | ✅ | Day 3 |
+| M16 | Feasibility Model Upload (in-UI) | 3 | ✅ | Apr 17 |
+| M17 | Add New Deal (modal + API) | 4 | ✅ | Apr 17 |
 | PL-01 | Supabase Auth (per-user) | Post | 📋 | Post-launch |
 | PL-02 | Document Comment Threads | Post | 📋 | Post-launch |
 | PL-03 | Email Notifications | Post | 📋 | Post-launch |
@@ -300,6 +302,60 @@ Goal: Financials tab renders live data from the actual BRDB `.xlsx` model.
 - [ ] Test: all charts render with real Excel data
 - [ ] Test: sensitivity colours correct relative to hurdle rate
 - [ ] Commit: `git commit -m "M06: financials tab with charts and sensitivity table"`
+
+---
+
+### M16 — Feasibility Model Upload (in-UI) ✅
+
+**Milestone:** Users can upload or replace `financials.xlsx` directly from the Financials tab — no manual file copying required.
+
+> **Apr 17 2026:** Added `POST /api/[dealId]/financials` endpoint and replaced the static data-source note banner with a full upload UI in `FinancialsTab.vue`. After upload, `refreshFin()` in the parent page re-fetches live figures and updates all KPI cards, charts, and sensitivity table without a page reload.
+
+- [x] Create `server/api/[dealId]/financials.post.ts`:
+  - [x] Parse multipart form upload via `readMultipartFormData`
+  - [x] Validate `.xlsx` extension; reject anything else
+  - [x] Path-traversal guard on `dealId`
+  - [x] Write file to `data/[dealId]/financials.xlsx`
+  - [x] Auto-create deal directory if missing
+- [x] Update `FinancialsTab.vue`:
+  - [x] Add `dealId` prop + `uploaded` emit
+  - [x] Replace static data-note with smart upload banner
+  - [x] Amber banner when estimates; green banner when live xlsx
+  - [x] Hidden `<input type="file" accept=".xlsx">` triggered by button
+  - [x] Upload spinner + success toast + error message (auto-dismiss)
+- [x] Update `pages/[dealId]/index.vue`:
+  - [x] Extract `refreshFin()` from `onMounted` so it's reusable
+  - [x] Wire `@uploaded="refreshFin"` on `<FinancialsTab>`
+  - [x] Pass `:deal-id="dealId"` to `<FinancialsTab>`
+- [x] Commit: `git commit -m "feat(M16): in-UI financials.xlsx upload"`
+
+**Also completed Apr 17:** Generated `BRDB_Feasibility_Study_Template.xlsx` with correct parser-compatible layout (3 sheets: `Feasibility Study`, `IRR & Sensitivity`, `Cashflow`). Added 3 parser-compatible sheets to the live Jalan Desa Sentosa feasibility study (`data/KL-2026-02/financials.xlsx`) — all 17 cell references auto-linked via cross-sheet formulas.
+
+---
+
+### M17 — Add New Deal (modal + API) ✅
+
+**Milestone:** Users can create a new deal entirely from the UI — no JSON editing or folder creation required.
+
+> **Apr 17 2026:** Replaced the placeholder alert on the "+ Add new deal" card with a fully functional modal. The API auto-generates the deal ID (`{PREFIX}-{YEAR}-{SEQ}`), creates the deal folder, writes `meta.json` with default milestone scaffold and `risk.json` as an empty array, and appends to `deals.json`. After creation the dashboard navigates directly to the new deal page.
+
+- [x] Create `server/api/deals.post.ts`:
+  - [x] Auto-generate `dealId` (`{PREFIX}-{YEAR}-{SEQ:02d}`) from existing deals
+  - [x] Validate required fields (name, location)
+  - [x] Append new deal to `deals.json`
+  - [x] Create `data/[dealId]/` directory
+  - [x] Write `meta.json` with default milestones, legalStatus, team, accessLog
+  - [x] Write `risk.json` as empty array `[]`
+- [x] Create `app/components/AddDealModal.vue`:
+  - [x] Fields: Deal Name, Location, State Code (KL/JB/SL/PG/NS/JH/MY), Stage, Tenure
+  - [x] Financials section: GDV, Land Cost, Land Area, Hurdle IRR
+  - [x] Stage Note + Confidential toggle
+  - [x] Inline spinner + error message on submit
+  - [x] Escape key closes modal; backdrop click closes
+- [x] Update `pages/index.vue`:
+  - [x] `showAddDeal` ref wired to "Add new deal" card
+  - [x] `onDealCreated(dealId)` refreshes data and navigates to new deal
+- [x] Commit: `git commit -m "feat(M17): add new deal modal + API"`
 
 ---
 

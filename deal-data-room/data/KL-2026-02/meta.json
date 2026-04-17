@@ -1,39 +1,103 @@
 {
   "id": "KL-2026-02",
-  "name": "Bukit Jalil Mixed Dev JV",
+  "name": "Bukit Jalil Mixed Dev JV (Dummy)",
   "ref": "KL-2026-02",
   "location": "Bukit Jalil, Kuala Lumpur",
-  "coordinates": { "lat": 3.0576, "lng": 101.6855 },
+  "coordinates": {
+    "lat": 3.0576,
+    "lng": 101.6855
+  },
   "tenure": "Freehold",
   "landArea": 12.4,
   "stage": "KIV",
   "hurdleRate": 15,
   "proximities": [
-    { "label": "Bukit Jalil LRT Station", "distance": "0.5 km", "color": "green" },
-    { "label": "Pavilion Bukit Jalil", "distance": "1.0 km", "color": "blue" },
-    { "label": "National Sports Complex", "distance": "1.5 km", "color": "grey" }
+    {
+      "label": "Bukit Jalil LRT Station",
+      "distance": "0.5 km",
+      "color": "green"
+    },
+    {
+      "label": "Pavilion Bukit Jalil",
+      "distance": "1.0 km",
+      "color": "blue"
+    },
+    {
+      "label": "National Sports Complex",
+      "distance": "1.5 km",
+      "color": "grey"
+    }
   ],
   "milestones": [
-    { "label": "LOI Signed", "date": "5 Jan 2026", "status": "done" },
-    { "label": "Title Search", "date": "20 Jan 2026", "status": "done" },
-    { "label": "Valuation Report", "date": "10 Feb 2026", "status": "done" },
-    { "label": "Board Paper", "date": "15 Apr 2026", "status": "active" },
-    { "label": "Board Approval", "date": "30 Apr 2026", "status": "pending" }
+    {
+      "label": "LOI Signed",
+      "date": "5 Jan 2026",
+      "status": "done"
+    },
+    {
+      "label": "Title Search",
+      "date": "20 Jan 2026",
+      "status": "done"
+    },
+    {
+      "label": "Valuation Report",
+      "date": "10 Feb 2026",
+      "status": "done"
+    },
+    {
+      "label": "Board Paper",
+      "date": "15 Apr 2026",
+      "status": "active"
+    },
+    {
+      "label": "Board Approval",
+      "date": "30 Apr 2026",
+      "status": "pending"
+    }
   ],
   "devMix": [
-    { "type": "Serviced Residences", "units": 800, "pct": 55 },
-    { "type": "Grade A Office", "units": 0, "sqft": 45000, "pct": 30 },
-    { "type": "Retail Podium", "units": 0, "sqft": 25000, "pct": 15 }
+    {
+      "type": "Serviced Residences",
+      "units": 800,
+      "pct": 55
+    },
+    {
+      "type": "Grade A Office",
+      "units": 0,
+      "sqft": 45000,
+      "pct": 30
+    },
+    {
+      "type": "Retail Podium",
+      "units": 0,
+      "sqft": 25000,
+      "pct": 15
+    }
   ],
   "assumptions": [
-    { "label": "Plot Ratio", "value": "5.0x" },
-    { "label": "Build Cost PSF", "value": "RM 260" },
-    { "label": "Absorption", "value": "75% / yr" },
-    { "label": "Dev Period", "value": "6 years" }
+    {
+      "label": "Plot Ratio",
+      "value": "5.0x"
+    },
+    {
+      "label": "Build Cost PSF",
+      "value": "RM 260"
+    },
+    {
+      "label": "Absorption",
+      "value": "75% / yr"
+    },
+    {
+      "label": "Dev Period",
+      "value": "6 years"
+    }
   ],
   "legalStatus": {
     "titleType": "Geran",
-    "titleLandUse": { "value": "Commercial", "status": "ok" },
+    "titleLandUse": {
+      "value": "Commercial",
+      "status": "ok"
+    },
     "encumbrance": "Nil",
     "zoning": "Commercial (C3)",
     "bumiQuota": "30%"
@@ -78,8 +142,20 @@
   },
   "team": {
     "internal": [
-      { "name": "Wai Win Han", "role": "Deal Lead", "email": "waiwin@brdb.com.my" }
+      {
+        "name": "Wai Win Han",
+        "role": "Deal Lead",
+        "email": "waiwin@brdb.com.my"
+      }
     ],
     "external": []
-  }
+  },
+  "accessLog": [
+    {
+      "user": "You",
+      "action": "uploaded",
+      "file": "Jalan Desa Sentosa Feasibility_Study_Template",
+      "timestamp": "2026-04-15T13:37:52.913Z"
+    }
+  ]
 }

@@ -101,7 +101,7 @@
           :deal-id="dealId"
         />
         <DocumentsTab  v-else-if="activeTab === 'documents'"  key="documents"  :deal-id="dealId" />
-        <FinancialsTab v-else-if="activeTab === 'financials'" key="financials" :deal="deal" :meta="meta" :fin="fin" />
+        <FinancialsTab v-else-if="activeTab === 'financials'" key="financials" :deal="deal" :meta="meta" :fin="fin" :deal-id="dealId" @uploaded="refreshFin" />
         <RiskTab       v-else-if="activeTab === 'risk'"       key="risk"       :deal-id="dealId" :meta="meta" :deal="deal" @meta-updated="refreshMeta" />
         <TeamTab       v-else-if="activeTab === 'team'"       key="team"       :deal-id="dealId" />
       </Transition>
@@ -129,13 +129,16 @@ const deal = computed(() => {
 // ── Excel-based financials (M05) — client-only, post-mount ──
 // Fetched after hydration so it never interferes with SSR or Suspense
 const xlsxFin = ref<Record<string, any> | null>(null)
-onMounted(async () => {
+
+async function refreshFin() {
   try {
     xlsxFin.value = await $fetch(`/api/${dealId}/financials`) as Record<string, any>
   } catch {
     // No financials.xlsx for this deal — fin falls back to deal-list estimates
   }
-})
+}
+
+onMounted(refreshFin)
 
 // ── Shared financials — Excel takes priority; falls back to deal-list estimates ──
 const fin = computed(() => {
