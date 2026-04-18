@@ -1,39 +1,31 @@
-import { readdirSync, existsSync, readFileSync, statSync } from 'fs'
-import { join, extname, basename } from 'path'
+import { extname } from 'path'
 
-export default defineEventHandler((event) => {
-  const dealId   = getRouterParam(event, 'dealId')!
-  const config   = useRuntimeConfig()
-  const trashDir = join(config.dataDir, dealId, 'docs', '.trash')
+export default defineEventHandler(async (event) => {
+  const dealId = getRouterParam(event, 'dealId')!
+  const sb = useSupabase()
 
-  if (!existsSync(trashDir)) return { docs: [], categories: [] }
-
-  const files = readdirSync(trashDir).filter(f => !f.endsWith('.meta.json') && !f.startsWith('.'))
+  const { data } = await sb
+    .from('deal_documents')
+    .select('*')
+    .eq('deal_id', dealId)
+    .eq('trashed', true)
+    .order('created_at', { ascending: false })
 
   const typeMap: Record<string, string> = {
     pdf: 'PDF', xlsx: 'XLS', xls: 'XLS',
     doc: 'DOC', docx: 'DOC', jpg: 'IMG', jpeg: 'IMG', png: 'IMG',
   }
 
-  const docs = files.map(filename => {
-    const metaPath = join(trashDir, filename + '.meta.json')
-    const stat     = statSync(join(trashDir, filename))
-    const meta     = existsSync(metaPath) ? JSON.parse(readFileSync(metaPath, 'utf-8')) : {}
-    const ext      = extname(filename).toLowerCase().replace('.', '')
+  const docs = (data ?? []).map((d: any) => {
+    const ext = extname(d.filename).toLowerCase().replace('.', '')
     return {
-      filename,
-      name:      meta.name     ?? basename(filename, extname(filename)),
-      type:      typeMap[ext]  ?? ext.toUpperCase(),
-      category:  meta.category ?? 'legal',
-      deletedAt: stat.mtime.toISOString(),
+      filename:  d.filename,
+      name:      d.name ?? d.filename,
+      type:      typeMap[ext] ?? ext.toUpperCase(),
+      category:  d.category ?? 'legal',
+      deletedAt: d.updated_at ?? d.created_at,
     }
   })
 
-  // Load trashed categories
-  const catTrashPath = join(config.dataDir, dealId, 'doc-categories-trash.json')
-  const categories   = existsSync(catTrashPath)
-    ? JSON.parse(readFileSync(catTrashPath, 'utf-8'))
-    : []
-
-  return { docs, categories }
+  return { docs, categories: [] }
 })

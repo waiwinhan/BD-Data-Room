@@ -1,29 +1,25 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { join } from 'path'
-
 export default defineEventHandler(async (event) => {
   const dealId = getRouterParam(event, 'dealId')!
   const body   = await readBody(event)
-  const config = useRuntimeConfig()
-  const riskPath = join(config.dataDir, dealId, 'risk.json')
+  const sb     = useSupabase()
 
-  const risks: any[] = existsSync(riskPath)
-    ? JSON.parse(readFileSync(riskPath, 'utf-8'))
-    : []
-
-  // Generate next ID: R01, R02, …
-  const nums = risks.map((r: any) => parseInt(String(r.id).replace(/\D/g, ''), 10)).filter(Number.isFinite)
-  const next = nums.length ? Math.max(...nums) + 1 : 1
-  const newRisk = {
-    id: `R${String(next).padStart(2, '0')}`,
-    category: body.category ?? 'General',
+  const { data, error } = await sb.from('deal_risks').insert({
+    deal_id:     dealId,
+    category:    body.category    ?? 'General',
     description: body.description ?? 'New risk item',
-    severity: body.severity ?? 'amber',
-    mitigation: body.mitigation ?? '',
-    owner: body.owner ?? '',
-  }
+    severity:    body.severity    ?? 'amber',
+    mitigation:  body.mitigation  ?? '',
+    owner:       body.owner       ?? '',
+  }).select().single()
 
-  risks.push(newRisk)
-  writeFileSync(riskPath, JSON.stringify(risks, null, 2))
-  return newRisk
+  if (error) throw createError({ statusCode: 500, statusMessage: error.message })
+  return {
+    id:          `R${String(data.id).padStart(2, '0')}`,
+    _dbId:       data.id,
+    category:    data.category,
+    description: data.description,
+    severity:    data.severity,
+    mitigation:  data.mitigation,
+    owner:       data.owner,
+  }
 })

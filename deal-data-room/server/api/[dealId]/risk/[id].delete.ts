@@ -1,18 +1,11 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { join } from 'path'
+export default defineEventHandler(async (event) => {
+  const id = getRouterParam(event, 'id')!
+  const sb = useSupabase()
 
-export default defineEventHandler((event) => {
-  const dealId = getRouterParam(event, 'dealId')!
-  const id     = getRouterParam(event, 'id')!
-  const config = useRuntimeConfig()
-  const riskPath = join(config.dataDir, dealId, 'risk.json')
+  const dbId = parseInt(id.replace(/\D/g, ''), 10)
+  if (isNaN(dbId)) throw createError({ statusCode: 400, statusMessage: 'Invalid risk id' })
 
-  if (!existsSync(riskPath)) throw createError({ statusCode: 404, statusMessage: 'risk.json not found' })
-
-  const risks = JSON.parse(readFileSync(riskPath, 'utf-8')) as any[]
-  const filtered = risks.filter((r: any) => r.id !== id)
-  if (filtered.length === risks.length) throw createError({ statusCode: 404, statusMessage: `Risk item ${id} not found` })
-
-  writeFileSync(riskPath, JSON.stringify(filtered, null, 2))
+  const { error } = await sb.from('deal_risks').delete().eq('id', dbId)
+  if (error) throw createError({ statusCode: 500, statusMessage: error.message })
   return { success: true }
 })

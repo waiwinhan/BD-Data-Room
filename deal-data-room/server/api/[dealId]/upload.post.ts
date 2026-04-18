@@ -1,6 +1,4 @@
-import { writeFileSync, mkdirSync, existsSync, copyFileSync } from 'fs'
-import { join, extname, basename } from 'path'
-import { readMultipartFormData } from 'h3'
+import { extname, basename } from 'path'
 
 const ALLOWED_EXT = new Set(['pdf', 'xlsx', 'xls', 'doc', 'docx', 'jpg', 'jpeg', 'png'])
 
@@ -10,47 +8,54 @@ function sanitize(name: string) {
 
 export default defineEventHandler(async (event) => {
   const dealId = getRouterParam(event, 'dealId')!
-  const config = useRuntimeConfig()
-  const docsDir = join(config.dataDir, dealId, 'docs')
-
-  if (!existsSync(docsDir)) mkdirSync(docsDir, { recursive: true })
+  if (!/^[A-Za-z0-9_-]+$/.test(dealId)) throw createError({ statusCode: 400, statusMessage: 'Invalid dealId' })
 
   const parts = await readMultipartFormData(event)
-  if (!parts || parts.length === 0) throw createError({ statusCode: 400, message: 'No file received' })
+  if (!parts?.length) throw createError({ statusCode: 400, statusMessage: 'No file received' })
 
   const filePart = parts.find(p => p.name === 'file')
-  if (!filePart || !filePart.filename) throw createError({ statusCode: 400, message: 'No file part' })
+  if (!filePart?.filename) throw createError({ statusCode: 400, statusMessage: 'No file part' })
 
   const ext = extname(filePart.filename).toLowerCase().replace('.', '')
-  if (!ALLOWED_EXT.has(ext)) throw createError({ statusCode: 400, message: `File type .${ext} not allowed` })
+  if (!ALLOWED_EXT.has(ext)) throw createError({ statusCode: 400, statusMessage: `File type .${ext} not allowed` })
 
   const category = parts.find(p => p.name === 'category')?.data?.toString() ?? 'legal'
+  const filename  = sanitize(filePart.filename)
+  const storagePath = `${dealId}/docs/${filename}`
 
-  const filename = sanitize(filePart.filename)
-  const filePath = join(docsDir, filename)
-  writeFileSync(filePath, filePart.data)
+  const sb = useSupabase()
 
-  // If xlsx, also copy as financials model
+  // Upload to Supabase Storage
+  const { error: uploadErr } = await sb.storage
+    .from('deal-files')
+    .upload(storagePath, filePart.data, {
+      contentType: filePart.type ?? 'application/octet-stream',
+      upsert: true,
+    })
+  if (uploadErr) throw createError({ statusCode: 500, statusMessage: uploadErr.message })
+
+  // If xlsx, also upload as financials model
   if (ext === 'xlsx') {
-    const finPath = join(config.dataDir, dealId, 'financials.xlsx')
-    copyFileSync(filePath, finPath)
+    await sb.storage.from('deal-files').upload(`${dealId}/financials.xlsx`, filePart.data, {
+      contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      upsert: true,
+    })
   }
 
-  // Write sidecar meta
-  const meta = {
-    name: basename(filename, extname(filename)),
+  // Save metadata to deal_documents table
+  await sb.from('deal_documents').upsert({
+    deal_id:    dealId,
+    filename,
+    name:       basename(filename, extname(filename)),
     category,
-    status: 'New',
-    uploader: '',
-    date: new Date().toISOString().slice(0, 10),
-  }
-  writeFileSync(filePath + '.meta.json', JSON.stringify(meta, null, 2))
+    status:     'New',
+    uploader:   '',
+    file_date:  new Date().toISOString().slice(0, 10),
+    size_bytes: filePart.data.length,
+    trashed:    false,
+  }, { onConflict: 'deal_id,filename' })
 
-  appendAccessLog(config.dataDir, dealId, {
-    user: 'You',
-    action: 'uploaded',
-    file: meta.name || filename,
-  })
+  appendAccessLog(useRuntimeConfig().dataDir, dealId, { user: 'You', action: 'uploaded', file: filename })
 
   return { success: true, filename }
 })

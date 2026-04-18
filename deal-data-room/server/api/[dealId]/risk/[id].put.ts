@@ -1,20 +1,20 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { join } from 'path'
-
 export default defineEventHandler(async (event) => {
-  const dealId = getRouterParam(event, 'dealId')!
-  const id     = getRouterParam(event, 'id')!
-  const body   = await readBody(event)   // partial risk fields to merge
-  const config = useRuntimeConfig()
-  const riskPath = join(config.dataDir, dealId, 'risk.json')
+  const id   = getRouterParam(event, 'id')!
+  const body = await readBody(event)
+  const sb   = useSupabase()
 
-  if (!existsSync(riskPath)) throw createError({ statusCode: 404, statusMessage: 'risk.json not found' })
+  // id may be "R01" format or raw numeric string
+  const dbId = parseInt(id.replace(/\D/g, ''), 10)
+  if (isNaN(dbId)) throw createError({ statusCode: 400, statusMessage: 'Invalid risk id' })
 
-  const risks = JSON.parse(readFileSync(riskPath, 'utf-8')) as any[]
-  const idx   = risks.findIndex((r: any) => r.id === id)
-  if (idx === -1) throw createError({ statusCode: 404, statusMessage: `Risk item ${id} not found` })
+  const update: Record<string, any> = {}
+  if (body.category    !== undefined) update.category    = body.category
+  if (body.description !== undefined) update.description = body.description
+  if (body.severity    !== undefined) update.severity    = body.severity
+  if (body.mitigation  !== undefined) update.mitigation  = body.mitigation
+  if (body.owner       !== undefined) update.owner       = body.owner
 
-  risks[idx] = { ...risks[idx], ...body }
-  writeFileSync(riskPath, JSON.stringify(risks, null, 2))
-  return risks[idx]
+  const { data, error } = await sb.from('deal_risks').update(update).eq('id', dbId).select().single()
+  if (error) throw createError({ statusCode: 500, statusMessage: error.message })
+  return { ...data, id: `R${String(data.id).padStart(2, '0')}` }
 })

@@ -1,20 +1,17 @@
 import Anthropic from '@anthropic-ai/sdk'
-import { readFileSync, writeFileSync, existsSync, readdirSync } from 'fs'
-import { join, extname, basename } from 'path'
+import { extname, basename } from 'path'
+import ExcelJS from 'exceljs'
 
-async function extractDocumentText(filePath: string, ext: string): Promise<string> {
+async function extractDocumentText(buffer: Buffer, ext: string): Promise<string> {
   try {
     if (ext === 'pdf') {
       const pdfParse = (await import('pdf-parse')).default
-      const buffer = readFileSync(filePath)
       const data = await pdfParse(buffer)
-      // Limit to first 3000 chars per doc to avoid token overflow
       return data.text.replace(/\s+/g, ' ').trim().slice(0, 3000)
     }
     if (ext === 'xlsx' || ext === 'xls') {
-      const ExcelJS = (await import('exceljs')).default
       const wb = new ExcelJS.Workbook()
-      await wb.xlsx.readFile(filePath)
+      await wb.xlsx.load(buffer)
       const lines: string[] = []
       wb.eachSheet(sheet => {
         sheet.eachRow(row => {
@@ -24,48 +21,45 @@ async function extractDocumentText(filePath: string, ext: string): Promise<strin
       })
       return lines.join('\n').slice(0, 3000)
     }
-  } catch {
-    // If parsing fails, just note the file exists
-  }
+  } catch {}
   return ''
 }
 
 export default defineEventHandler(async (event) => {
   const dealId = getRouterParam(event, 'dealId')!
   const config = useRuntimeConfig()
+  const sb     = useSupabase()
 
   if (!config.anthropicApiKey) {
     throw createError({ statusCode: 500, message: 'ANTHROPIC_API_KEY not configured in .env' })
   }
 
-  // ── Load structured deal data ──────────────────────────────────
-  const dealsPath = join(config.dataDir, 'deals.json')
-  const metaPath  = join(config.dataDir, dealId, 'meta.json')
-  const riskPath  = join(config.dataDir, dealId, 'risk.json')
-  const docsDir   = join(config.dataDir, dealId, 'docs')
+  // ── Load deal data from Supabase ────────────────────────────────────────
+  const [{ data: dealRow }, { data: metaRow }, { data: risks }] = await Promise.all([
+    sb.from('deals').select('*').eq('id', dealId).single(),
+    sb.from('deal_meta').select('data').eq('deal_id', dealId).single(),
+    sb.from('deal_risks').select('*').eq('deal_id', dealId),
+  ])
 
-  const deals = JSON.parse(readFileSync(dealsPath, 'utf-8'))
-  const deal  = deals.find((d: any) => d.id === dealId)
-  const meta  = existsSync(metaPath) ? JSON.parse(readFileSync(metaPath, 'utf-8')) : {}
-  const risks = existsSync(riskPath) ? JSON.parse(readFileSync(riskPath, 'utf-8')) : []
+  const deal = dealRow ?? {}
+  const meta = metaRow?.data ?? {}
 
-  // ── Extract text from uploaded documents ───────────────────────
+  // ── Extract text from documents in Supabase Storage ────────────────────
   const docSections: string[] = []
-  if (existsSync(docsDir)) {
-    const files = readdirSync(docsDir).filter(f => !f.endsWith('.meta.json') && !f.startsWith('.'))
-    for (const filename of files) {
-      const filePath = join(docsDir, filename)
-      const metaFile = join(docsDir, filename + '.meta.json')
-      const fileMeta = existsSync(metaFile) ? JSON.parse(readFileSync(metaFile, 'utf-8')) : {}
-      const ext = extname(filename).toLowerCase().replace('.', '')
-      const displayName = fileMeta.name ?? basename(filename, extname(filename))
-      const category = fileMeta.category ?? 'general'
+  const { data: docs } = await sb.from('deal_documents').select('*').eq('deal_id', dealId).eq('trashed', false)
 
-      const text = await extractDocumentText(filePath, ext)
+  for (const doc of (docs ?? [])) {
+    const ext = extname(doc.filename).toLowerCase().replace('.', '')
+    const storagePath = `${dealId}/docs/${doc.filename}`
+    const { data: fileData } = await sb.storage.from('deal-files').download(storagePath)
+    if (fileData) {
+      const buffer = Buffer.from(await fileData.arrayBuffer())
+      const text = await extractDocumentText(buffer, ext)
+      const displayName = doc.name ?? basename(doc.filename, extname(doc.filename))
       if (text) {
-        docSections.push(`[${category.toUpperCase()}] ${displayName}:\n${text}`)
+        docSections.push(`[${(doc.category ?? 'general').toUpperCase()}] ${displayName}:\n${text}`)
       } else {
-        docSections.push(`[${category.toUpperCase()}] ${displayName}: (binary/image file — referenced but not parsed)`)
+        docSections.push(`[${(doc.category ?? 'general').toUpperCase()}] ${displayName}: (binary/image — referenced but not parsed)`)
       }
     }
   }
@@ -74,26 +68,21 @@ export default defineEventHandler(async (event) => {
     ? `\nUPLOADED DOCUMENTS (${docSections.length} file${docSections.length > 1 ? 's' : ''}):\n${docSections.join('\n\n---\n\n')}`
     : '\nUPLOADED DOCUMENTS: None uploaded yet.'
 
-  // ── Build prompt ───────────────────────────────────────────────
-  const prompt = `You are a senior Malaysian property development analyst at BRDB Berhad. Analyse the following deal comprehensively — including structured dashboard data AND the content of all uploaded documents — then produce a SWOT analysis and a separate strategic recommendation.
+  const prompt = `You are a senior Malaysian property development analyst at BRDB Berhad. Analyse the following deal comprehensively and produce a SWOT analysis and strategic recommendation.
 
 === STRUCTURED DEAL DATA ===
 
 DEAL OVERVIEW:
 - Name: ${meta.name ?? dealId}
-- Location: ${deal?.location ?? meta.location}
-- Land Area: ${meta.landArea ?? deal?.landAcres} acres (${meta.tenure ?? deal?.tenure})
-- Stage: ${deal?.stage}
-- GDV: RM ${deal?.gdv}M
-- NDV: RM ${deal?.ndv ?? Math.round((deal?.gdv ?? 0) * 0.93)}M (After S&M, blended RM ${deal?.blendedPSF} psf)
-- Land Cost: RM ${deal?.landCost}M (RM ${deal?.landCostPSF} psf)
-- Est. Construction Cost: RM ${deal?.constructionCost ?? Math.round((deal?.gdv ?? 0) * 0.40)}M (hard cost)
-- Net Dev Profit: RM ${deal?.ndp ?? '—'}M | NDP Margin: ${deal?.ndpMargin ?? '—'}% on NDV
-- Projected IRR: ${deal?.irr}% vs ${deal?.hurdleRate}% hurdle rate
-- DD Progress: ${deal?.ddProgress}%
+- Location: ${deal.location ?? meta.location}
+- Land Area: ${meta.landArea ?? deal.land_acres} acres (${meta.tenure ?? deal.tenure})
+- Stage: ${deal.stage}
+- GDV: RM ${deal.gdv}M
+- Projected IRR: ${deal.irr}% vs ${deal.hurdle_rate}% hurdle rate
+- DD Progress: ${deal.dd_progress}%
 
 DEVELOPMENT MIX:
-${(meta.devMix ?? []).map((m: any) => `- ${m.type}: ${m.pct}%${m.units ? ` (${m.units} units)` : ''}${m.sqft ? ` (${m.sqft.toLocaleString()} sqft)` : ''}`).join('\n')}
+${(meta.devMix ?? []).map((m: any) => `- ${m.type}: ${m.pct}%${m.units ? ` (${m.units} units)` : ''}`).join('\n')}
 
 KEY ASSUMPTIONS:
 ${(meta.assumptions ?? []).map((a: any) => `- ${a.label}: ${a.value}`).join('\n')}
@@ -107,8 +96,8 @@ LEGAL STATUS:
 - Zoning: ${meta.legalStatus?.zoning}
 - Bumi Quota: ${meta.legalStatus?.bumiQuota}
 
-RISK REGISTER (${risks.length} items):
-${risks.map((r: any) => `- [${(r.severity ?? 'unknown').toUpperCase()}] ${r.title}: ${r.description ?? ''}`).join('\n')}
+RISK REGISTER (${(risks ?? []).length} items):
+${(risks ?? []).map((r: any) => `- [${(r.severity ?? 'unknown').toUpperCase()}] ${r.description ?? ''}`).join('\n')}
 
 DD MILESTONES:
 ${(meta.milestones ?? []).filter((m: any) => m.label).map((m: any) => `- ${m.label} (${m.date}): ${m.status}`).join('\n')}
@@ -116,7 +105,7 @@ ${(meta.milestones ?? []).filter((m: any) => m.label).map((m: any) => `- ${m.lab
 === UPLOADED DOCUMENTS ===${docsContext}
 
 === INSTRUCTIONS ===
-Based on ALL the above data (structured + documents), respond ONLY with valid JSON in this exact structure (no markdown, no explanation outside JSON):
+Respond ONLY with valid JSON (no markdown):
 {
   "swot": {
     "strengths": ["concise point", "concise point", "concise point", "concise point"],
@@ -127,8 +116,8 @@ Based on ALL the above data (structured + documents), respond ONLY with valid JS
   "recommendation": {
     "verdict": "Proceed" | "Proceed with Caution" | "Hold" | "Reject",
     "headline": "One sharp sentence summarising the verdict",
-    "rationale": "2-3 sentences of strategic reasoning citing specific data points from the deal",
-    "keyConditions": ["condition or action item 1", "condition or action item 2", "condition or action item 3"]
+    "rationale": "2-3 sentences of strategic reasoning citing specific data points",
+    "keyConditions": ["condition 1", "condition 2", "condition 3"]
   }
 }`
 
@@ -142,9 +131,9 @@ Based on ALL the above data (structured + documents), respond ONLY with valid JS
   const raw = (message.content[0] as any).text.trim()
   const result = JSON.parse(raw)
 
-  // Persist to meta.json
-  meta.swot = { ...result, generatedAt: new Date().toISOString(), docsAnalysed: docSections.length }
-  writeFileSync(metaPath, JSON.stringify(meta, null, 2))
+  // Persist SWOT back to deal_meta
+  const updatedMeta = { ...meta, swot: { ...result, generatedAt: new Date().toISOString(), docsAnalysed: docSections.length } }
+  await sb.from('deal_meta').update({ data: updatedMeta }).eq('deal_id', dealId)
 
-  return meta.swot
+  return updatedMeta.swot
 })

@@ -1,21 +1,14 @@
-import { existsSync, renameSync } from 'fs'
-import { join } from 'path'
-
-// Restore a document from trash back to docs/
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   const dealId   = getRouterParam(event, 'dealId')!
   const filename = getRouterParam(event, 'filename')!
-  const config   = useRuntimeConfig()
+  const sb = useSupabase()
 
-  const trashDir = join(config.dataDir, dealId, 'docs', '.trash')
-  const docsDir  = join(config.dataDir, dealId, 'docs')
+  const { error } = await sb
+    .from('deal_documents')
+    .update({ trashed: false })
+    .eq('deal_id', dealId)
+    .eq('filename', filename)
 
-  const srcFile = join(trashDir, filename)
-  const srcMeta = join(trashDir, filename + '.meta.json')
-  if (!existsSync(srcFile)) throw createError({ statusCode: 404, statusMessage: 'File not in trash' })
-
-  renameSync(srcFile, join(docsDir, filename))
-  if (existsSync(srcMeta)) renameSync(srcMeta, join(docsDir, filename + '.meta.json'))
-
+  if (error) throw createError({ statusCode: 500, statusMessage: error.message })
   return { ok: true }
 })

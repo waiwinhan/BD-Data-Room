@@ -1,5 +1,4 @@
-import { readFileSync, existsSync } from 'fs'
-import { join } from 'path'
+// Supabase-backed proximity suggester
 
 // Haversine formula — no external library needed
 function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -60,14 +59,12 @@ function getLabel(tags: Record<string, string>): string | null {
 
 export default defineEventHandler(async (event) => {
   const dealId = getRouterParam(event, 'dealId')!
-  const config = useRuntimeConfig()
-  const filePath = join(config.dataDir, dealId, 'meta.json')
+  const sb = useSupabase()
 
-  if (!existsSync(filePath)) {
-    throw createError({ statusCode: 404, statusMessage: `Deal ${dealId} not found` })
-  }
+  const { data: metaRow, error } = await sb.from('deal_meta').select('data').eq('deal_id', dealId).single()
+  if (error || !metaRow) throw createError({ statusCode: 404, statusMessage: `Deal ${dealId} not found` })
 
-  const meta = JSON.parse(readFileSync(filePath, 'utf-8'))
+  const meta = metaRow.data
   const { lat, lng } = meta.coordinates
 
   // Targeted query — only fetch meaningful POI categories

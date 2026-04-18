@@ -1,16 +1,8 @@
-import { readFileSync, writeFileSync, existsSync } from 'fs'
-import { join } from 'path'
-
 export default defineEventHandler(async (event) => {
   const dealId = getRouterParam(event, 'dealId')!
-  const config = useRuntimeConfig()
-  const filePath = join(config.dataDir, dealId, 'meta.json')
-
-  if (!existsSync(filePath)) {
-    throw createError({ statusCode: 404, statusMessage: `Deal ${dealId} not found` })
-  }
-
-  const body = await readBody(event)
-  writeFileSync(filePath, JSON.stringify(body, null, 2), 'utf-8')
+  const body   = await readBody(event)
+  const sb     = useSupabase()
+  const { error } = await sb.from('deal_meta').upsert({ deal_id: dealId, data: body })
+  if (error) throw createError({ statusCode: 500, statusMessage: error.message })
   return { success: true }
 })

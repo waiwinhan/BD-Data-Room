@@ -1,20 +1,13 @@
-import { existsSync, readFileSync, writeFileSync } from 'node:fs'
-import path from 'node:path'
-
 export default defineEventHandler(async (event) => {
   const body = await readBody(event)
-  const config = useRuntimeConfig()
-  const settingsPath = path.join(config.dataDir, 'settings.json')
+  const sb   = useSupabase()
 
-  const current = existsSync(settingsPath)
-    ? JSON.parse(readFileSync(settingsPath, 'utf-8'))
-    : { roomName: 'BRDB Berhad', logoDataUrl: '', defaultHurdleRate: 15, password: config.dealPassword }
+  const { data } = await sb.from('settings').select('value').eq('key', 'app').single()
+  const current = data?.value ?? { roomName: 'BRDB Developments Sdn Bhd', logoDataUrl: '', defaultHurdleRate: 15, password: 'ilovenazim' }
 
-  // ── Password change ────────────────────────────────────────────────────────
+  // ── Password change ───────────────────────────────────────────────────────
   if (body.newPassword !== undefined) {
-    // Verify current password before allowing change
-    const currentPassword = current.password ?? config.dealPassword
-    if (body.currentPassword !== currentPassword) {
+    if (body.currentPassword !== current.password) {
       throw createError({ statusCode: 403, statusMessage: 'Current password is incorrect' })
     }
     if (!body.newPassword || body.newPassword.length < 6) {
@@ -23,18 +16,19 @@ export default defineEventHandler(async (event) => {
     current.password = body.newPassword
   }
 
-  // ── Branding ───────────────────────────────────────────────────────────────
+  // ── Branding ──────────────────────────────────────────────────────────────
   if (body.roomName !== undefined) {
     if (!body.roomName.trim()) throw createError({ statusCode: 400, statusMessage: 'Room name cannot be empty' })
     current.roomName = body.roomName.trim()
   }
-  if (body.logoDataUrl !== undefined) current.logoDataUrl = body.logoDataUrl
+  if (body.logoDataUrl       !== undefined) current.logoDataUrl       = body.logoDataUrl
   if (body.defaultHurdleRate !== undefined) {
     const rate = parseFloat(body.defaultHurdleRate)
     if (isNaN(rate) || rate < 0 || rate > 100) throw createError({ statusCode: 400, statusMessage: 'Hurdle rate must be 0–100' })
     current.defaultHurdleRate = rate
   }
 
-  writeFileSync(settingsPath, JSON.stringify(current, null, 2))
+  const { error } = await sb.from('settings').upsert({ key: 'app', value: current })
+  if (error) throw createError({ statusCode: 500, statusMessage: error.message })
   return { ok: true }
 })

@@ -14,5 +14,7 @@ export default defineNuxtConfig({
     dealPassword: process.env.DEAL_PASSWORD || 'brdb2024',
     sessionPassword: process.env.NUXT_SESSION_PASSWORD || 'change-me-in-production-32chars!!',
     anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
+    supabaseUrl: process.env.SUPABASE_URL || '',
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY || '',
   },
 })
