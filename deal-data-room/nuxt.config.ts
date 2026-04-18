@@ -12,6 +12,11 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', 'nuxt-auth-utils'],
   nitro: {
     preset: isNetlify ? 'netlify' : 'node-server',
+    // Keep heavy server-only packages as external so they aren't inlined
+    // into the Nitro bundle (avoids CJS/ESM conflicts on Netlify)
+    externals: {
+      external: ['exceljs', 'pdf-parse'],
+    },
   },
   runtimeConfig: {
     // dataDir only used locally — on Netlify all data is in Supabase
