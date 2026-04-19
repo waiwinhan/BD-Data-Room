@@ -1,14 +1,9 @@
 [build]
   base    = "deal-data-room"
-  command = "npm install && npm run build"
+  command = "npm ci && npm run build"
   publish = ".output/public"
 
 [build.environment]
-  NODE_VERSION = "22"
+  NODE_VERSION = "22.14.0"
   NODE_OPTIONS = "--max-old-space-size=4096"
   NETLIFY      = "true"
-
-[[redirects]]
-  from   = "/*"
-  to     = "/.netlify/functions/server"
-  status = 200
