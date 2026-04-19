@@ -1,5 +1,6 @@
 <template>
-  <NuxtLink :to="`/${deal.id}`" class="deal-card" :style="`animation-delay:${delay}s`">
+  <div class="deal-card-wrap" :style="`animation-delay:${delay}s`">
+    <NuxtLink :to="`/${deal.id}`" class="deal-card">
     <!-- colour bar -->
     <div class="card-bar" :style="{ background: stageStyle.barGradient }"></div>
 
@@ -63,6 +64,14 @@
       <div class="card-footer-right">Updated {{ formatDate(deal.updatedAt) }}</div>
     </div>
   </NuxtLink>
+
+  <!-- trash button -->
+  <button class="trash-btn" title="Move to Trash" @click.stop="moveToTrash">
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+    </svg>
+  </button>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -87,6 +96,14 @@ const props = defineProps<{
   delay: number
 }>()
 
+const emit = defineEmits<{ trashed: [id: string] }>()
+
+async function moveToTrash() {
+  if (!confirm(`Move "${props.deal.name}" to Trash?`)) return
+  await $fetch(`/api/${props.deal.id}/trash`, { method: 'PUT' })
+  emit('trashed', props.deal.id)
+}
+
 const stageMap: Record<string, { barGradient: string; barColor: string; badge: string; dotColor: string }> = {
   'Active DD': { barGradient: 'linear-gradient(90deg,#60A5FA,#1D60C8)', barColor: '#60A5FA', badge: 'badge-blue',  dotColor: '#1D60C8' },
   'KIV':       { barGradient: 'linear-gradient(90deg,#F5C85A,#D48C0A)', barColor: '#F5C85A', badge: 'badge-amber', dotColor: '#D48C0A' },
@@ -104,6 +121,23 @@ function formatDate(dateStr: string): string {
 </script>
 
 <style scoped>
+.deal-card-wrap {
+  position: relative;
+  animation: fadeUp 0.3s ease both;
+}
+.deal-card-wrap:hover .trash-btn { opacity: 1; }
+
+.trash-btn {
+  position: absolute; top: 10px; right: 10px;
+  width: 26px; height: 26px;
+  border-radius: 6px; border: 1px solid var(--border2);
+  background: var(--surface); color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; opacity: 0; transition: opacity 0.15s, background 0.15s, color 0.15s;
+  z-index: 2;
+}
+.trash-btn:hover { background: var(--red-bg); color: var(--red); border-color: rgba(163,45,45,0.3); }
+
 .deal-card {
   background: var(--surface);
   border: 1px solid var(--border);
@@ -114,7 +148,6 @@ function formatDate(dateStr: string): string {
   overflow: hidden;
   display: flex; flex-direction: column;
   text-decoration: none; color: inherit;
-  animation: fadeUp 0.3s ease both;
 }
 .deal-card:hover {
   box-shadow: var(--shadow-md);

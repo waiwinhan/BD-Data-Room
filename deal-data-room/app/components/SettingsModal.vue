@@ -28,7 +28,7 @@
             <div v-if="activeTab === 'branding'">
               <div class="field">
                 <label class="field-label">Room Name</label>
-                <input v-model="form.roomName" class="field-input" placeholder="e.g. BRDB Berhad" />
+                <input v-model="form.roomName" class="field-input" placeholder="e.g. Wai Berhad" />
               </div>
 
               <div class="field" style="margin-top:14px">
@@ -65,15 +65,33 @@
               </div>
               <div class="field" style="margin-top:16px">
                 <label class="field-label">Current Password</label>
-                <input v-model="pwd.current" type="password" class="field-input" placeholder="Enter current password" autocomplete="current-password" />
+                <div class="pwd-wrap">
+                  <input v-model="pwd.current" :type="showPwd.current ? 'text' : 'password'" class="field-input" placeholder="Enter current password" autocomplete="current-password" />
+                  <button type="button" class="pwd-eye" @click="showPwd.current = !showPwd.current">
+                    <svg v-if="showPwd.current" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
               </div>
               <div class="field" style="margin-top:14px">
                 <label class="field-label">New Password</label>
-                <input v-model="pwd.next" type="password" class="field-input" placeholder="Min. 6 characters" autocomplete="new-password" />
+                <div class="pwd-wrap">
+                  <input v-model="pwd.next" :type="showPwd.next ? 'text' : 'password'" class="field-input" placeholder="Min. 6 characters" autocomplete="new-password" />
+                  <button type="button" class="pwd-eye" @click="showPwd.next = !showPwd.next">
+                    <svg v-if="showPwd.next" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
               </div>
               <div class="field" style="margin-top:14px">
                 <label class="field-label">Confirm New Password</label>
-                <input v-model="pwd.confirm" type="password" class="field-input" placeholder="Repeat new password" autocomplete="new-password" />
+                <div class="pwd-wrap">
+                  <input v-model="pwd.confirm" :type="showPwd.confirm ? 'text' : 'password'" class="field-input" placeholder="Repeat new password" autocomplete="new-password" />
+                  <button type="button" class="pwd-eye" @click="showPwd.confirm = !showPwd.confirm">
+                    <svg v-if="showPwd.confirm" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                    <svg v-else xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  </button>
+                </div>
               </div>
 
               <div v-if="pwdError" class="form-error" style="margin-top:14px">{{ pwdError }}</div>
@@ -138,8 +156,9 @@ const pwdSuccess     = ref(false)
 const defaultsError  = ref('')
 const defaultsSuccess = ref(false)
 
-const form = reactive({ roomName: '', logoDataUrl: '', defaultHurdleRate: 15 })
-const pwd  = reactive({ current: '', next: '', confirm: '' })
+const form    = reactive({ roomName: '', logoDataUrl: '', defaultHurdleRate: 15 })
+const pwd     = reactive({ current: '', next: '', confirm: '' })
+const showPwd = reactive({ current: false, next: false, confirm: false })
 
 const logoInput = ref<HTMLInputElement>()
 
@@ -325,6 +344,16 @@ async function saveDefaults() {
 }
 .btn-remove:hover { background: var(--red-bg); }
 .logo-hint { font-size: 11px; color: var(--faint); }
+
+/* Password toggle */
+.pwd-wrap { position: relative; }
+.pwd-wrap .field-input { padding-right: 36px; }
+.pwd-eye {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  border: none; background: transparent; padding: 0; cursor: pointer;
+  color: var(--muted); display: flex; align-items: center; transition: color 0.15s;
+}
+.pwd-eye:hover { color: var(--text); }
 
 /* Info box */
 .info-box {

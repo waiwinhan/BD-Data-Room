@@ -7,6 +7,12 @@
           <div class="page-title">Active Deals</div>
           <div class="page-subtitle">Property acquisitions &amp; joint ventures under due diligence or negotiation</div>
         </div>
+        <NuxtLink to="/trash" class="trash-link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+          Trash
+        </NuxtLink>
       </div>
     </div>
 
@@ -32,6 +38,7 @@
         :key="deal.id"
         :deal="deal"
         :delay="0.05 + i * 0.05"
+        @trashed="onTrashed"
       />
 
       <!-- empty state -->
@@ -80,10 +87,12 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default', middleware: 'auth' })
 
-const { data } = await useFetch('/api/deals')
+const { data, refresh } = await useFetch('/api/deals')
 
 const allDeals = computed(() => (data.value as any)?.deals ?? [])
 const portfolio = computed(() => (data.value as any)?.portfolio ?? null)
+
+function onTrashed(_id: string) { refresh() }
 
 const activeFilter = ref('all')
 const searchQuery  = ref('')
@@ -117,7 +126,16 @@ const filteredDeals = computed(() => {
   padding: 32px 28px 0;
   max-width: 1280px; margin: 0 auto; width: 100%;
 }
-.page-header-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; }
+.page-header-row { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 20px; gap: 12px; }
+
+.trash-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 500; color: var(--muted);
+  text-decoration: none; padding: 6px 12px;
+  border: 1px solid var(--border2); border-radius: var(--radius-sm);
+  background: var(--surface); transition: all 0.15s; flex-shrink: 0;
+}
+.trash-link:hover { color: var(--red); border-color: rgba(163,45,45,0.3); background: var(--red-bg); }
 .page-title { font-size: 22px; font-weight: 600; color: var(--text); letter-spacing: -0.4px; }
 .page-subtitle { font-size: 13px; color: var(--muted); margin-top: 3px; }
 

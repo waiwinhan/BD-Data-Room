@@ -11,12 +11,12 @@
       <div class="kpi-card">
         <div class="kpi-label">NET DEV VALUE (NDV)</div>
         <div class="kpi-value">RM {{ fin?.ndv }}M</div>
-        <div class="kpi-sub">After S&amp;M (RM {{ deal?.blendedPSF }} psf)</div>
+        <div class="kpi-sub">After S&amp;M (RM {{ fin?.blendedPSF ?? deal?.blendedPSF }} psf)</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">LAND COST</div>
-        <div class="kpi-value">RM {{ deal?.landCost }}M</div>
-        <div class="kpi-sub">RM {{ deal?.landCostPSF }} psf land</div>
+        <div class="kpi-value">RM {{ fin?.landCost ?? deal?.landCost }}M</div>
+        <div class="kpi-sub">RM {{ fin?.landPSF ?? deal?.landCostPSF }} psf land</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">CONSTRUCTION COST</div>

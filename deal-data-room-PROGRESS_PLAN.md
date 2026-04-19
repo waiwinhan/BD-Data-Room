@@ -24,12 +24,13 @@
 | M11 | Auth — NDA Password Gate | 4 | ✅ | Day 5–6 |
 | M12 | Multi-Deal Routing | 4 | ✅ | Day 6 |
 | M13 | Deployment (Netlify) | 4 | ⏳ | TBD |
-| M18 | Supabase DB + Storage Migration | 5 | ⏳ | Next |
+| M18 | Supabase DB + Storage Migration | 5 | ✅ | Apr 18 |
 | M14 | Excel — BRDB Model Wiring | 2 | ✅ | Day 3 |
 | M15 | Sensitivity Table | 2 | ✅ | Day 3 |
 | M16 | Feasibility Model Upload (in-UI) | 3 | ✅ | Apr 17 |
 | M17 | Add New Deal (modal + API) | 4 | ✅ | Apr 17 |
-| M19 | Settings Modal (branding, security, defaults) | 4 | ✅ | Apr 17 |
+| M19 | Settings Modal (branding, security, defaults) | 4 | ✅ | Apr 18 |
+| M20 | Trash & Permanent Delete | 4 | ✅ | Apr 19 |
 | PL-01 | Supabase Auth (per-user) | Post | 📋 | Post-launch |
 | PL-02 | Document Comment Threads | Post | 📋 | Post-launch |
 | PL-03 | Email Notifications | Post | 📋 | Post-launch |
@@ -366,6 +367,14 @@ Goal: Financials tab renders live data from the actual BRDB `.xlsx` model.
 **Milestone:** Admins can update room branding, change the shared password, and set default deal parameters entirely from the UI — no file editing required.
 
 > **Apr 17 2026:** Built a full Settings modal (3 tabs) accessible from the topbar Settings button. Settings persisted in `data/settings.json`. Login route updated to read password from settings.json first. Logo + room name update live in the topbar on save. Fixed Leaflet map z-index overlap issue across all modals.
+>
+> **Apr 18–19 2026 enhancements:**
+> - Room name placeholder updated to "e.g. Wai Berhad"
+> - Security tab: show/hide password toggle (eye icon) added to all 3 password fields
+> - Login page: room name + initials now loaded dynamically from `/api/settings` (no longer hardcoded to "BRDB Berhad")
+> - Login page: show/hide toggle added to the Access Password field
+> - Login page footer: removed "BRDB" → now reads "Contact your deal team administrator"
+> - Login page NDA notice: company name now dynamic (uses room name from settings)
 
 - [x] Create `data/settings.json` with defaults (roomName, logoDataUrl, defaultHurdleRate, password)
 - [x] Create `server/api/settings.get.ts` — returns settings without exposing password to client
@@ -373,15 +382,35 @@ Goal: Financials tab renders live data from the actual BRDB `.xlsx` model.
 - [x] Update `server/api/auth/login.post.ts` — reads password from settings.json, falls back to .env
 - [x] Create `app/components/SettingsModal.vue` — 3-tab modal:
   - [x] Branding tab: room name field + logo upload (PNG/JPG/SVG, up to 2 MB, base64 stored)
-  - [x] Security tab: current password verification + new password (min 6 chars)
+  - [x] Security tab: current password verification + new password (min 6 chars) + show/hide toggles
   - [x] Defaults tab: default hurdle IRR % pre-fills Add New Deal form
 - [x] Update `app/layouts/default.vue`:
   - [x] Settings button wired to open SettingsModal
   - [x] Topbar logo + room name read dynamically from settings API
   - [x] Logo/name wrapped in `<NuxtLink to="/">` — clicking navigates back to deal list
+- [x] Login page loads room name from `/api/settings` — logo initials + NDA text + header all dynamic
 - [x] Fix Leaflet z-index bleed — raised all modal backdrops to `z-index: 1000`, added `isolation: isolate` to map containers
 - [x] Fix deal title sync — `saveChanges()` now writes name to both `meta.json` and `deals.json`
 - [x] Commit: `git commit -m "feat(M19): settings modal — branding, password, defaults"`
+
+---
+
+### M20 — Trash & Permanent Delete ✅
+
+**Milestone:** Deals can be moved to trash from the deal list and permanently deleted (with Supabase cleanup) from a dedicated Trash page.
+
+> **Apr 19 2026:** Added soft-delete (trash) and hard-delete flows. Trashed deals disappear from the active deal list immediately. The `/trash` page lists all trashed deals with Restore and Delete Forever actions. Permanent delete cascades to `deal_meta`, `deal_documents`, and `deal_risk` tables in Supabase.
+
+- [x] Supabase migration: add `trashed boolean DEFAULT false` and `trashed_at timestamptz` to `deals` table
+- [x] `PUT /api/[dealId]/trash` — sets `trashed: true`, records `trashed_at` timestamp
+- [x] `PUT /api/[dealId]/restore` — sets `trashed: false`, clears `trashed_at`
+- [x] `DELETE /api/[dealId]` — hard delete: removes from `deal_documents`, `deal_meta`, `deal_risk`, then `deals`
+- [x] `GET /api/deals/trashed` — returns all deals where `trashed = true`, ordered by `trashed_at` desc
+- [x] Update `deals.get.ts` — filters out trashed deals (`.eq('trashed', false)`)
+- [x] `DealCard.vue` — trash icon appears on hover (top-right); click confirms and emits `trashed` event
+- [x] `pages/index.vue` — handles `@trashed` event by refreshing deal list; added "Trash" link button in page header
+- [x] `pages/trash.vue` — lists trashed deals with Restore and Delete Forever buttons; empty state when clean
+- [x] Commit: `git commit -m "feat(M20): trash and permanent delete with Supabase cleanup"`
 
 ---
 
@@ -607,7 +636,7 @@ Goal: Replace flat JSON files + local filesystem with Supabase (PostgreSQL + Sto
 
 ---
 
-### M18 — Supabase DB + Storage Migration ⏳
+### M18 — Supabase DB + Storage Migration ✅
 
 **Milestone:** All deal data lives in Supabase. Uploaded files go to Supabase Storage. App deploys to Netlify and nothing is ever lost on redeploy.
 
@@ -687,6 +716,8 @@ Goal: Replace flat JSON files + local filesystem with Supabase (PostgreSQL + Sto
 - [ ] Remove `fs.readFileSync` / `fs.writeFileSync` from all API routes
 - [ ] Remove `config.dataDir` from `nuxt.config.ts`
 - [ ] Update progress plan + commit: `git commit -m "feat(M18): Supabase DB + Storage migration"`
+
+> **Apr 18 2026:** Migration completed. All deal data (deals, deal_meta, deal_risk, deal_documents) live in Supabase. File uploads go to `deal-files` Storage bucket. Storage RLS policies added (SELECT/INSERT/UPDATE/DELETE for anon + authenticated roles) to unblock `.xlsx` and document uploads. Overview tab KPI cards fixed — Land Cost and NDV subtitle now read from `fin` (Excel) first, falling back to deal-list values.
 
 ---
 

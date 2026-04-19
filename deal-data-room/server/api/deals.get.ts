@@ -1,6 +1,6 @@
 export default defineEventHandler(async () => {
   const sb = useSupabase()
-  const { data, error } = await sb.from('deals').select('*').order('created_at', { ascending: true })
+  const { data, error } = await sb.from('deals').select('*').eq('trashed', false).order('created_at', { ascending: true })
   if (error) throw createError({ statusCode: 500, statusMessage: error.message })
 
   const deals = (data ?? []).map((d: any) => ({
