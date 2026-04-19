@@ -1,11 +1,10 @@
 [build]
-  command = "node --version && npm --version && npm ci && npm run build"
+  command = "npm install && npm run build"
   publish = ".output/public"
 
 [build.environment]
-  NODE_VERSION  = "20"
-  NETLIFY       = "true"
-  NODE_OPTIONS  = "--max-old-space-size=4096"
+  NODE_VERSION = "20"
+  NODE_OPTIONS = "--max-old-space-size=4096"
 
 [[redirects]]
   from   = "/*"

@@ -1,13 +1,10 @@
-const isNetlify = process.env.NETLIFY === 'true'
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: !isNetlify },
+  devtools: { enabled: true },
   experimental: { appManifest: false },
-  modules: ['@nuxtjs/tailwindcss', 'nuxt-auth-utils'],
+  modules: ['@netlify/nuxt', '@nuxtjs/tailwindcss', 'nuxt-auth-utils'],
   nitro: {
-    preset: isNetlify ? 'netlify' : 'node-server',
     externals: {
       external: ['exceljs', 'pdf-parse'],
     },
