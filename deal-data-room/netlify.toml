@@ -1,11 +1,2 @@
-[build]
-  command = "echo 'Using pre-built output'"
-  publish = ".output/public"
-
-[build.environment]
-  NODE_VERSION = "22"
-
-[[redirects]]
-  from   = "/*"
-  to     = "/.netlify/functions/server"
-  status = 200
+# This file is kept for local reference only.
+# The authoritative netlify.toml is at the REPO ROOT (../).

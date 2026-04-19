@@ -1,7 +1,9 @@
+const isNetlify = process.env.NETLIFY === 'true'
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
+  devtools: { enabled: !isNetlify },
   experimental: { appManifest: false },
   modules: ['@netlify/nuxt', '@nuxtjs/tailwindcss', 'nuxt-auth-utils'],
   nitro: {
