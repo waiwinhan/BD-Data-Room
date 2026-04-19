@@ -116,7 +116,7 @@
                   <input v-model="form.defaultHurdleRate" type="number" min="0" max="100" step="0.5" class="field-input" />
                   <span class="unit-label">%</span>
                 </div>
-                <div class="field-hint">New deals will default to this hurdle rate. BRDB standard is 15%.</div>
+                <div class="field-hint">New deals will default to this hurdle rate. Standard is 15%.</div>
               </div>
 
               <div v-if="defaultsError" class="form-error" style="margin-top:14px">{{ defaultsError }}</div>
@@ -176,7 +176,7 @@ watch(() => props.show, async (v) => {
   pwd.current = ''; pwd.next = ''; pwd.confirm = ''
   try {
     const s = await $fetch('/api/settings') as any
-    form.roomName         = s.roomName         ?? 'BRDB Berhad'
+    form.roomName         = s.roomName         ?? 'Deal Data Room'
     form.logoDataUrl      = s.logoDataUrl       ?? ''
     form.defaultHurdleRate = s.defaultHurdleRate ?? 15
   } catch {}

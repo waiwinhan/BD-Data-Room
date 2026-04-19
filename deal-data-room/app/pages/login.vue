@@ -68,7 +68,7 @@ const loading      = ref(false)
 const showPassword = ref(false)
 const inputRef     = ref<HTMLInputElement | null>(null)
 
-const roomName = ref('BRDB Berhad')
+const roomName = ref('Deal Data Room')
 const initials = computed(() =>
   roomName.value.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
 )

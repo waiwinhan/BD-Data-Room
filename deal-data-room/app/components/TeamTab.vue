@@ -1,12 +1,12 @@
 <template>
   <div class="team-tab">
 
-    <!-- Two-column: BRDB team + External advisors -->
+    <!-- Two-column: Internal team + External advisors -->
     <div class="team-grid">
 
-      <!-- BRDB Deal Team -->
+      <!-- Internal Deal Team -->
       <div class="card">
-        <div class="card-label">BRDB Deal Team</div>
+        <div class="card-label">Deal Team</div>
         <div v-if="!internal.length" class="empty-msg">No internal team members listed.</div>
         <div
           v-for="(member, i) in internal"

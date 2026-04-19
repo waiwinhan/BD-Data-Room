@@ -25,7 +25,7 @@
     <!-- NDA STRIP -->
     <div class="nda-strip">
       <span>⚠</span>
-      Confidential — under NDA. Access restricted to authorised BRDB personnel only.
+      Confidential — under NDA. Access restricted to authorised personnel only.
     </div>
 
     <!-- PAGE CONTENT -->
@@ -66,7 +66,7 @@ async function logout() {
 }
 
 // ── Settings / branding ──────────────────────────────────────────────────────
-const settings = reactive({ roomName: 'BRDB Berhad', logoDataUrl: '' })
+const settings = reactive({ roomName: 'Deal Data Room', logoDataUrl: '' })
 const initials  = computed(() =>
   (settings.roomName || 'BR').split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
 )
@@ -74,7 +74,7 @@ const initials  = computed(() =>
 async function loadSettings() {
   try {
     const s = await $fetch('/api/settings') as any
-    settings.roomName    = s.roomName    || 'BRDB Berhad'
+    settings.roomName    = s.roomName    || 'Deal Data Room'
     settings.logoDataUrl = s.logoDataUrl || ''
   } catch {}
 }

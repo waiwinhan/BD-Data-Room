@@ -99,7 +99,7 @@
         <template v-if="fin.source === 'xlsx'">
           <span class="upload-icon">✓</span>
           <div>
-            <div class="upload-title">Live figures — BRDB Feasibility Study (.xlsx)</div>
+            <div class="upload-title">Live figures — Feasibility Study (.xlsx)</div>
             <div class="upload-sub">Numbers parsed directly from your Excel model. Replace to update.</div>
           </div>
         </template>
@@ -107,7 +107,7 @@
           <span class="upload-icon warn">⚠</span>
           <div>
             <div class="upload-title">Indicative estimates only</div>
-            <div class="upload-sub">Upload your BRDB Feasibility Study (.xlsx) to replace with live figures.</div>
+            <div class="upload-sub">Upload your Feasibility Study (.xlsx) to replace with live figures.</div>
           </div>
         </template>
       </div>

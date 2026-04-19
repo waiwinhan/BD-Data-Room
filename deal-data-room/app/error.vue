@@ -2,10 +2,10 @@
   <div class="error-wrap">
     <div class="error-card">
       <div class="error-logo">
-        <div class="logo-mark">BR</div>
+        <div class="logo-mark">DR</div>
         <div class="error-brand">
-          <div class="error-brand-name">BRDB Berhad</div>
-          <div class="error-brand-sub">Deal Data Room</div>
+          <div class="error-brand-name">Deal Data Room</div>
+          <div class="error-brand-sub">Property Investments</div>
         </div>
       </div>
 

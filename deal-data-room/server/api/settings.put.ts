@@ -3,7 +3,7 @@ export default defineEventHandler(async (event) => {
   const sb   = useSupabase()
 
   const { data } = await sb.from('settings').select('value').eq('key', 'app').single()
-  const current = data?.value ?? { roomName: 'BRDB Developments Sdn Bhd', logoDataUrl: '', defaultHurdleRate: 15, password: 'ilovenazim' }
+  const current = data?.value ?? { roomName: 'Deal Data Room', logoDataUrl: '', defaultHurdleRate: 15, password: 'brdb2024' }
 
   // ── Password change ───────────────────────────────────────────────────────
   if (body.newPassword !== undefined) {

@@ -68,7 +68,7 @@ export default defineEventHandler(async (event) => {
     ? `\nUPLOADED DOCUMENTS (${docSections.length} file${docSections.length > 1 ? 's' : ''}):\n${docSections.join('\n\n---\n\n')}`
     : '\nUPLOADED DOCUMENTS: None uploaded yet.'
 
-  const prompt = `You are a senior Malaysian property development analyst at BRDB Berhad. Analyse the following deal comprehensively and produce a SWOT analysis and strategic recommendation.
+  const prompt = `You are a senior Malaysian property development analyst. Analyse the following deal comprehensively and produce a SWOT analysis and strategic recommendation.
 
 === STRUCTURED DEAL DATA ===
 
