@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
   const sb     = useSupabase()
 
   if (!config.anthropicApiKey) {
-    throw createError({ statusCode: 500, message: 'ANTHROPIC_API_KEY not configured in .env' })
+    throw createError({ statusCode: 500, statusMessage: 'ANTHROPIC_API_KEY not configured in .env' })
   }
 
   // ── Load deal data from Supabase ────────────────────────────────────────
@@ -123,7 +123,7 @@ Respond ONLY with valid JSON (no markdown):
 
   const client = new Anthropic({ apiKey: config.anthropicApiKey })
   const message = await client.messages.create({
-    model: 'claude-opus-4-5',
+    model: 'claude-sonnet-4-6',
     max_tokens: 1500,
     messages: [{ role: 'user', content: prompt }],
   })
