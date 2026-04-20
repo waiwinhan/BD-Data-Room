@@ -1,6 +1,6 @@
 [build]
   base    = "deal-data-room"
-  command = "npm ci && npm run build"
+  command = "node --version && npm --version && echo '=== STARTING NPM INSTALL ===' && npm install --legacy-peer-deps 2>&1 && echo '=== NPM INSTALL DONE ===' && npm run build 2>&1 && echo '=== BUILD DONE ==='"
   publish = ".output/public"
 
 [build.environment]
