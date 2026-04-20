@@ -1,6 +1,6 @@
 [build]
   command = "cd deal-data-room && npm install --legacy-peer-deps && npm run build"
-  publish = "deal-data-room/.netlify/static"
+  publish = "deal-data-room/dist"
 
 [build.environment]
   NODE_VERSION = "22.14.0"
