@@ -1,6 +1,6 @@
 [build]
   base    = "deal-data-room"
-  command = "npm run build"
+  command = "rm -rf node_modules && npm install --legacy-peer-deps && npm run build"
   publish = ".output/public"
 
 [build.environment]
