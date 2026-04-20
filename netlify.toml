@@ -1,6 +1,6 @@
 [build]
   base    = "deal-data-room"
-  command = "node --version && npm --version && echo '=== STARTING NPM INSTALL ===' && npm install --legacy-peer-deps 2>&1 && echo '=== NPM INSTALL DONE ===' && npm run build 2>&1 && echo '=== BUILD DONE ==='"
+  command = "npm install --legacy-peer-deps 2>&1 && npm run build 2>&1 && echo '=== LISTING OUTPUT ===' && ls -la .output/ && echo '--- .output/public ---' && ls -la .output/public/ 2>&1 || echo 'NO .output/public' && echo '--- .netlify ---' && ls -la .netlify/ 2>&1"
   publish = ".output/public"
 
 [build.environment]
