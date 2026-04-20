@@ -98,30 +98,5 @@
     "ddProgress": 100,
     "updatedAt": "2026-02-14",
     "stageNote": "SPA signed, deposit paid"
-  },
-  {
-    "id": "SL-2026-01",
-    "name": "Rawang Township Phase 3 (Dummy)",
-    "ref": "SL-2026-01",
-    "location": "Rawang, Selangor",
-    "lat": 3.3222,
-    "lng": 101.5731,
-    "stage": "Rejected",
-    "restricted": false,
-    "gdv": 82,
-    "ndv": 74,
-    "blendedPSF": 380,
-    "landCost": 22,
-    "landCostPSF": 69,
-    "constructionCost": 38,
-    "ndp": 10,
-    "ndpMargin": 13.5,
-    "irr": 14.3,
-    "hurdleRate": 15,
-    "landAcres": 7.35,
-    "tenure": "Leasehold 99yr",
-    "ddProgress": 55,
-    "updatedAt": "2026-01-30",
-    "stageNote": "Pending vendor price revision"
   }
 ]

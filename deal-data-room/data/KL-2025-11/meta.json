@@ -1,37 +1,91 @@
 {
   "id": "KL-2025-11",
-  "name": "Damansara Damai Residences",
+  "name": "Damansara Damai Residences (Dummy)",
   "ref": "KL-2025-11",
   "location": "Damansara Damai, Kuala Lumpur",
-  "coordinates": { "lat": 3.1835, "lng": 101.5855 },
+  "coordinates": {
+    "lat": 3.1835,
+    "lng": 101.5855
+  },
   "tenure": "Freehold",
   "landArea": 14.8,
   "stage": "Approved",
   "hurdleRate": 15,
   "proximities": [
-    { "label": "Damansara Damai MRT", "distance": "0.3 km", "color": "green" },
-    { "label": "Giant Hypermarket", "distance": "1.2 km", "color": "blue" }
+    {
+      "label": "Damansara Damai MRT",
+      "distance": "0.3 km",
+      "color": "green"
+    },
+    {
+      "label": "Giant Hypermarket",
+      "distance": "1.2 km",
+      "color": "blue"
+    }
   ],
   "milestones": [
-    { "label": "LOI Signed", "date": "1 Oct 2025", "status": "done" },
-    { "label": "Due Diligence", "date": "30 Nov 2025", "status": "done" },
-    { "label": "Board Approval", "date": "15 Dec 2025", "status": "done" },
-    { "label": "SPA Execution", "date": "14 Feb 2026", "status": "done" }
+    {
+      "label": "LOI Signed",
+      "date": "1 Oct 2025",
+      "status": "done"
+    },
+    {
+      "label": "Due Diligence",
+      "date": "30 Nov 2025",
+      "status": "done"
+    },
+    {
+      "label": "Board Approval",
+      "date": "15 Dec 2025",
+      "status": "done"
+    },
+    {
+      "label": "SPA Execution",
+      "date": "14 Feb 2026",
+      "status": "done"
+    }
   ],
   "devMix": [
-    { "type": "Landed Terraces", "units": 320, "pct": 70 },
-    { "type": "Semi-D", "units": 80, "pct": 20 },
-    { "type": "Bungalows", "units": 20, "pct": 10 }
+    {
+      "type": "Landed Terraces",
+      "units": 320,
+      "pct": 70
+    },
+    {
+      "type": "Semi-D",
+      "units": 80,
+      "pct": 20
+    },
+    {
+      "type": "Bungalows",
+      "units": 20,
+      "pct": 10
+    }
   ],
   "assumptions": [
-    { "label": "Plot Ratio", "value": "1.5x" },
-    { "label": "Build Cost PSF", "value": "RM 180" },
-    { "label": "Absorption", "value": "80% / yr" },
-    { "label": "Dev Period", "value": "3 years" }
+    {
+      "label": "Plot Ratio",
+      "value": "1.5x"
+    },
+    {
+      "label": "Build Cost PSF",
+      "value": "RM 180"
+    },
+    {
+      "label": "Absorption",
+      "value": "80% / yr"
+    },
+    {
+      "label": "Dev Period",
+      "value": "3 years"
+    }
   ],
   "legalStatus": {
     "titleType": "Geran",
-    "titleLandUse": { "value": "Residential", "status": "ok" },
+    "titleLandUse": {
+      "value": "Residential",
+      "status": "ok"
+    },
     "encumbrance": "Nil",
     "zoning": "Residential (R2)",
     "bumiQuota": "30%"
@@ -76,7 +130,11 @@
   },
   "team": {
     "internal": [
-      { "name": "Wai Win Han", "role": "Deal Lead", "email": "waiwin@brdb.com.my" }
+      {
+        "name": "Wai Win Han",
+        "role": "Deal Lead",
+        "email": "waiwin@brdb.com.my"
+      }
     ],
     "external": []
   }
