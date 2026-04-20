@@ -1,13 +1,14 @@
 [build]
-  base    = "deal-data-room"
-  command = "npm run build"
-  publish = ".output/public"
+  command = "cd deal-data-room && npm install --legacy-peer-deps && npm run build"
+  publish = "deal-data-room/.output/public"
 
 [build.environment]
   NODE_VERSION = "22.14.0"
-  NODE_OPTIONS = "--max-old-space-size=4096"
-  NETLIFY      = "true"
-  NPM_FLAGS    = "--legacy-peer-deps"
+  NODE_OPTIONS  = "--max-old-space-size=4096"
+  NETLIFY       = "true"
+
+[functions]
+  directory = "deal-data-room/.netlify/functions-internal"
 
 [[redirects]]
   from   = "/*"
