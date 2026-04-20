@@ -7,3 +7,8 @@
   NODE_VERSION = "22.14.0"
   NODE_OPTIONS = "--max-old-space-size=4096"
   NETLIFY      = "true"
+
+[[redirects]]
+  from   = "/*"
+  to     = "/.netlify/functions/server"
+  status = 200

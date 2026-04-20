@@ -5,8 +5,9 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: !isNetlify },
   experimental: { appManifest: false },
-  modules: ['@netlify/nuxt', '@nuxtjs/tailwindcss', 'nuxt-auth-utils'],
+  modules: ['@nuxtjs/tailwindcss', 'nuxt-auth-utils'],
   nitro: {
+    preset: isNetlify ? 'netlify' : undefined,
     externals: {
       external: ['exceljs', 'pdf-parse'],
     },
