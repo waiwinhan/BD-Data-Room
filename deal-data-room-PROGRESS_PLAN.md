@@ -42,6 +42,8 @@
 | M21 | Multi-Password + Login Access Log | 4 | ✅ | Apr 21 |
 | M22 | Logo Editor (drag + resize) | 4 | ✅ | Apr 21 |
 | M23 | Editable Deal Team + Activity Log | 4 | ✅ | Apr 21 |
+| M24 | Excel Parser Multi-Template + KPI Auto-Sync | 5 | ✅ | Apr 21 |
+| M25 | Documents Trash Permanent Delete + Rename Fix | 3 | ✅ | Apr 21 |
 
 **Prototype files (visual spec — open in browser before coding each module)**
 - `deal-data-room-list.html` → M02 DealCard, FilterBar, PortfolioSummary
@@ -752,6 +754,36 @@ Goal: Replace flat JSON files + local filesystem with Supabase (PostgreSQL + Sto
 - [x] External advisor fields: Name, Role, Firm, Email
 - [x] Document Access Log now fetches from `/api/[dealId]/activity-log` — real-time, per deal
 - [x] Log entries show: icon (coloured by action), user label, action, target name, type badge, timestamp
+
+---
+
+---
+
+### M24 — Excel Parser Multi-Template + KPI Auto-Sync ✅
+
+**Milestone:** Excel parser handles both the old single-phase template and the new multi-phase BRDB template. Uploading a feasibility model auto-updates the deal card (NDV, NDP margin, blended PSF, land acres) without manual editing.
+
+> **Apr 21 2026:** Refactored `financials.get.ts` into a shared utility `server/utils/parseFinancials.ts`. Parser now auto-detects template version (old vs new 2025+ multi-phase) by checking the row 61 label. New template has NDP at row 159, construction at row 78, land at row 68, etc. (all shifted from old). NDV detection now checks both rows 61 and 60 as a fallback. After upload via `financials.post.ts`, key KPIs (ndv, gdv, ndpMargin, blendedPSF, landAcres) are parsed and written back to the `deals` Supabase table — so the deal list card reflects live figures immediately without manual editing. Financials upload also auto-saves the file to Documents > Financial category.
+
+- [x] Extract parser into `server/utils/parseFinancials.ts` shared utility
+- [x] Auto-detect template version by row 61 col 1 label
+- [x] NDV: check row 61 first, fall back to row 60
+- [x] New template row mappings: NDP→159, devMgn→160, land→68, construction→78, authority→111/114/117, consultancy→130, siteAdmin→137, finance→152, GDC→145
+- [x] `financials.post.ts`: parse buffer after upload, sync ndv/gdv/ndpMargin/blendedPSF/landAcres to `deals` table
+- [x] `financials.post.ts`: auto-save copy to `deal_documents` with `category: 'financial'`
+
+---
+
+### M25 — Documents Trash Permanent Delete + Rename Fix ✅
+
+**Milestone:** Trashed documents can be permanently deleted (with warning dialog) or restored. Renaming a document now persists correctly.
+
+> **Apr 21 2026:** Added `DELETE /api/[dealId]/trash/[filename]` endpoint that removes the file from both Supabase Storage and `deal_documents` table. Trash section in DocumentsTab now always visible (shows "Trash is empty" when clean). Each trashed file has a red "Delete forever" button that opens a destructive warning dialog. Rename was broken — `documents/[filename].put.ts` was writing to a local `.meta.json` file while `documents.get.ts` reads from Supabase; rewrote the PUT handler to update the `deal_documents` Supabase table.
+
+- [x] `DELETE /api/[dealId]/trash/[filename]` — removes from Supabase Storage + `deal_documents` table
+- [x] Trash section always visible in DocumentsTab (not conditional on item count)
+- [x] "Delete forever" button per trashed file → red warning dialog → permanent removal
+- [x] Fix `documents/[filename].put.ts` — rewritten to update `deal_documents` in Supabase (was writing to dead local `.meta.json`)
 
 ---
 

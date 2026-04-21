@@ -1,20 +1,23 @@
-import { existsSync, readFileSync, writeFileSync } from 'fs'
-import { join } from 'path'
-
 export default defineEventHandler(async (event) => {
   const dealId   = getRouterParam(event, 'dealId')!
   const filename = getRouterParam(event, 'filename')!
   const body     = await readBody(event)
+  const sb       = useSupabase()
 
-  const config   = useRuntimeConfig()
-  const metaPath = join(config.dataDir, dealId, 'docs', filename + '.meta.json')
+  const update: Record<string, any> = {}
+  if (body.name     !== undefined) update.name     = body.name
+  if (body.category !== undefined) update.category = body.category
+  if (body.status   !== undefined) update.status   = body.status
 
-  const existing = existsSync(metaPath)
-    ? JSON.parse(readFileSync(metaPath, 'utf-8'))
-    : {}
+  if (Object.keys(update).length === 0) return { ok: true }
 
-  const updated = { ...existing, ...body }
-  writeFileSync(metaPath, JSON.stringify(updated, null, 2))
+  const { error } = await sb
+    .from('deal_documents')
+    .update(update)
+    .eq('deal_id', dealId)
+    .eq('filename', filename)
+
+  if (error) throw createError({ statusCode: 500, statusMessage: error.message })
 
   return { ok: true }
 })

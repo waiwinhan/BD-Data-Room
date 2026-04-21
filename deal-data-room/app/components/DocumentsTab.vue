@@ -131,13 +131,17 @@
     </div>
 
     <!-- ── TRASH BIN ── -->
-    <div v-if="trashDocCount > 0 || trashCatCount > 0" class="trash-section">
+    <div class="trash-section">
       <button class="trash-toggle" @click="trashOpen = !trashOpen">
         <span>🗑 Trash</span>
-        <span class="trash-count">{{ trashDocCount + trashCatCount }}</span>
+        <span v-if="trashDocCount + trashCatCount > 0" class="trash-count">{{ trashDocCount + trashCatCount }}</span>
         <span class="trash-chevron">{{ trashOpen ? '▲' : '▼' }}</span>
       </button>
       <div v-if="trashOpen" class="trash-body">
+
+        <div v-if="trashDocCount === 0 && trashCatCount === 0" class="trash-empty">
+          Trash is empty
+        </div>
 
         <!-- Trashed categories -->
         <template v-if="trashCatCount > 0">
@@ -145,7 +149,7 @@
           <div v-for="cat in trashedCategories" :key="cat.id" class="trash-row">
             <span class="trash-icon">📁</span>
             <span class="trash-name">{{ cat.label }}</span>
-            <button class="restore-btn" @click="restoreCategory(cat)">Restore</button>
+            <button class="restore-btn" @click="restoreCategory(cat)">↩ Restore</button>
           </div>
         </template>
 
@@ -157,12 +161,30 @@
             <span class="trash-name">{{ doc.name }}</span>
             <span class="trash-cat">{{ categoryLabel(doc.category) }}</span>
             <span class="trash-date">{{ formatDate(doc.deletedAt) }}</span>
-            <button class="restore-btn" @click="restoreDoc(doc)">Restore</button>
+            <button class="restore-btn" @click="restoreDoc(doc)">↩ Restore</button>
+            <button class="perm-delete-btn" @click="askPermDelete(doc)">Delete forever</button>
           </div>
         </template>
 
       </div>
     </div>
+
+    <!-- ── PERMANENT DELETE DIALOG ── -->
+    <Teleport to="body">
+      <div v-if="permDeleteTarget" class="confirm-overlay" @click.self="permDeleteTarget = null">
+        <div class="confirm-box perm-box">
+          <div class="perm-icon">⚠</div>
+          <div class="perm-title">Delete forever?</div>
+          <div class="perm-msg">
+            <strong>{{ permDeleteTarget.name }}</strong> will be permanently removed and cannot be recovered.
+          </div>
+          <div class="confirm-actions">
+            <button class="confirm-cancel" @click="permDeleteTarget = null">Cancel</button>
+            <button class="perm-confirm-btn" @click="runPermDelete">Delete forever</button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
 
   </div>
 </template>
@@ -225,6 +247,21 @@ function askDeleteDoc(doc: any) {
 async function restoreDoc(doc: any) {
   await $fetch(`/api/${props.dealId}/trash/${encodeURIComponent(doc.filename)}`, { method: 'PUT' })
   await Promise.all([refresh(), refreshTrash()])
+}
+
+// ── Permanent delete ──
+const permDeleteTarget = ref<any | null>(null)
+
+function askPermDelete(doc: any) {
+  permDeleteTarget.value = doc
+}
+
+async function runPermDelete() {
+  if (!permDeleteTarget.value) return
+  const doc = permDeleteTarget.value
+  permDeleteTarget.value = null
+  await $fetch(`/api/${props.dealId}/trash/${encodeURIComponent(doc.filename)}`, { method: 'DELETE' })
+  await refreshTrash()
 }
 
 // ── Delete category ──
@@ -610,6 +647,9 @@ async function cycleStatus(doc: any) {
 .trash-name { flex: 1; font-size: 13px; color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .trash-cat  { font-size: 11px; color: var(--faint); flex-shrink: 0; }
 .trash-date { font-size: 11px; color: var(--faint); flex-shrink: 0; }
+.trash-empty {
+  font-size: 12px; color: var(--faint); padding: 16px 0; text-align: center;
+}
 .restore-btn {
   flex-shrink: 0; padding: 4px 12px; border-radius: var(--radius-sm);
   border: 1px solid var(--border2); background: transparent;
@@ -617,4 +657,29 @@ async function cycleStatus(doc: any) {
   cursor: pointer; transition: all 0.15s;
 }
 .restore-btn:hover { background: var(--surface2); border-color: var(--text); }
+
+.perm-delete-btn {
+  flex-shrink: 0; padding: 4px 12px; border-radius: var(--radius-sm);
+  border: 1px solid #FECACA; background: transparent;
+  font-family: 'DM Sans', sans-serif; font-size: 11px; color: #DC2626;
+  cursor: pointer; transition: all 0.15s;
+}
+.perm-delete-btn:hover { background: #FEE2E2; border-color: #DC2626; }
+
+/* Permanent delete dialog */
+.perm-box { border-top: 3px solid #DC2626; }
+.perm-icon { font-size: 28px; margin-bottom: 8px; }
+.perm-title {
+  font-size: 15px; font-weight: 600; color: #DC2626; margin-bottom: 10px;
+}
+.perm-msg {
+  font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px;
+}
+.perm-confirm-btn {
+  padding: 8px 20px; border-radius: var(--radius-sm);
+  border: none; background: #DC2626; color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: opacity 0.15s;
+}
+.perm-confirm-btn:hover { opacity: 0.85; }
 </style>
