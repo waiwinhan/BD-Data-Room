@@ -57,8 +57,13 @@
                         ref="editorImgRef"
                         :src="rawImageSrc"
                         class="logo-editor-img"
-                        :style="{ transform: `translate(calc(-50% + ${imgX}px), calc(-50% + ${imgY}px)) scale(${imgScale})` }"
+                        :style="{
+                          width:  imgBaseW ? imgBaseW + 'px' : 'auto',
+                          height: imgBaseH ? imgBaseH + 'px' : 'auto',
+                          transform: `translate(calc(-50% + ${imgX}px), calc(-50% + ${imgY}px)) scale(${imgScale})`
+                        }"
                         draggable="false"
+                        @load="onImageLoad"
                       />
                     </div>
 
@@ -234,7 +239,7 @@
             <!-- ── ACCESS LOG ── -->
             <div v-if="activeTab === 'access-log'">
               <div class="log-toolbar">
-                <span class="field-label" style="margin:0">Last 100 login attempts</span>
+                <span class="field-label" style="margin:0">Last 10 login attempts</span>
                 <button class="btn-ghost" @click="loadLog">↻ Refresh</button>
               </div>
               <div v-if="logLoading" class="log-empty">Loading…</div>
@@ -349,6 +354,8 @@ const rawImageSrc  = ref('')          // original file data URL (before crop)
 const imgX         = ref(0)           // drag offset X in box coords
 const imgY         = ref(0)           // drag offset Y in box coords
 const imgScale     = ref(1)           // zoom scale
+const imgBaseW     = ref(0)           // CSS width of img inside editor (contain-fit)
+const imgBaseH     = ref(0)           // CSS height of img inside editor (contain-fit)
 const editorBoxRef = ref<HTMLElement>()
 const editorImgRef = ref<HTMLImageElement>()
 
@@ -384,7 +391,7 @@ function resetMessages() {
   addError.value = ''; editError.value = ''
   adminConfirmPwd.value = ''; showAdminPwd.value = false
   showAddPwd.value = false; showEditPwd.value = false
-  rawImageSrc.value = ''; imgX.value = 0; imgY.value = 0; imgScale.value = 1
+  rawImageSrc.value = ''; imgX.value = 0; imgY.value = 0; imgScale.value = 1; imgBaseW.value = 0; imgBaseH.value = 0
 }
 
 async function loadSettings() {
@@ -421,17 +428,28 @@ function handleLogoFile(e: Event) {
   if (file.size > 2 * 1024 * 1024) { brandError.value = 'Logo must be under 2 MB.'; return }
   const reader = new FileReader()
   reader.onload = () => {
-    rawImageSrc.value = reader.result as string
     imgX.value = 0; imgY.value = 0; imgScale.value = 1
+    imgBaseW.value = 0; imgBaseH.value = 0
+    rawImageSrc.value = reader.result as string
   }
   reader.readAsDataURL(file)
   if (logoInput.value) logoInput.value.value = ''
 }
 
+// Called when the <img> inside the editor finishes loading — computes its contained size
+function onImageLoad() {
+  const img = editorImgRef.value
+  if (!img) return
+  const ratio = Math.min(EDITOR_BOX / img.naturalWidth, EDITOR_BOX / img.naturalHeight)
+  imgBaseW.value = Math.round(img.naturalWidth  * ratio)
+  imgBaseH.value = Math.round(img.naturalHeight * ratio)
+}
+
 // "Edit Position" on existing logo — re-open editor with current logo
 function openLogoEdit() {
-  rawImageSrc.value = form.logoDataUrl
   imgX.value = 0; imgY.value = 0; imgScale.value = 1
+  imgBaseW.value = 0; imgBaseH.value = 0
+  rawImageSrc.value = form.logoDataUrl
 }
 
 function resetLogoEditor() {
@@ -440,6 +458,7 @@ function resetLogoEditor() {
 
 function cancelLogoEdit() {
   rawImageSrc.value = ''
+  imgBaseW.value = 0; imgBaseH.value = 0
 }
 
 // Drag handlers
@@ -463,12 +482,11 @@ function endDrag() { isDragging = false }
 // Apply — render to canvas and save
 function applyLogoEdit() {
   const imgEl = editorImgRef.value
-  if (!imgEl) return
+  if (!imgEl || !imgBaseW.value || !imgBaseH.value) return
 
-  // Base rendered size (contained within editor box)
-  const ratio = Math.min(EDITOR_BOX / imgEl.naturalWidth, EDITOR_BOX / imgEl.naturalHeight)
-  const baseW = imgEl.naturalWidth  * ratio
-  const baseH = imgEl.naturalHeight * ratio
+  // Use the same base dimensions that CSS is displaying (set by onImageLoad)
+  const baseW = imgBaseW.value
+  const baseH = imgBaseH.value
 
   const canvas = document.createElement('canvas')
   canvas.width  = OUTPUT_PX
@@ -479,13 +497,14 @@ function applyLogoEdit() {
   ctx.scale(OUTPUT_PX / EDITOR_BOX, OUTPUT_PX / EDITOR_BOX)
 
   // Image center in box: (BOX/2 + imgX, BOX/2 + imgY)
-  // Scaled size: baseW * imgScale x baseH * imgScale
+  // Scaled draw size: baseW * imgScale x baseH * imgScale
   const drawX = EDITOR_BOX / 2 + imgX.value - (baseW * imgScale.value) / 2
   const drawY = EDITOR_BOX / 2 + imgY.value - (baseH * imgScale.value) / 2
   ctx.drawImage(imgEl, drawX, drawY, baseW * imgScale.value, baseH * imgScale.value)
 
   form.logoDataUrl = canvas.toDataURL('image/png')
   rawImageSrc.value = ''
+  imgBaseW.value = 0; imgBaseH.value = 0
 }
 
 // ── Save branding ────────────────────────────────────────────────────────────

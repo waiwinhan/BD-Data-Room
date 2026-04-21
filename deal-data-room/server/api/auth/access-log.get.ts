@@ -4,7 +4,7 @@ export default defineEventHandler(async () => {
     .from('access_log')
     .select('id, created_at, label, ip, user_agent, success')
     .order('created_at', { ascending: false })
-    .limit(100)
+    .limit(10)
 
   if (error) throw createError({ statusCode: 500, statusMessage: error.message })
   return data ?? []
