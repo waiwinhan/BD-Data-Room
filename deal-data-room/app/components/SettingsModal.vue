@@ -39,16 +39,60 @@
 
                 <div class="field" style="margin-top:14px">
                   <label class="field-label">Logo</label>
-                  <div class="logo-area">
+
+                  <!-- ── Logo editor (shown after upload) ── -->
+                  <div v-if="rawImageSrc" class="logo-editor">
+                    <div class="logo-editor-hint">Drag to reposition · Slider to resize</div>
+
+                    <!-- Viewport box -->
+                    <div
+                      ref="editorBoxRef"
+                      class="logo-editor-box"
+                      @pointerdown="startDrag"
+                      @pointermove="onDrag"
+                      @pointerup="endDrag"
+                      @pointercancel="endDrag"
+                    >
+                      <img
+                        ref="editorImgRef"
+                        :src="rawImageSrc"
+                        class="logo-editor-img"
+                        :style="{ transform: `translate(calc(-50% + ${imgX}px), calc(-50% + ${imgY}px)) scale(${imgScale})` }"
+                        draggable="false"
+                      />
+                    </div>
+
+                    <!-- Size slider -->
+                    <div class="logo-editor-scale-row">
+                      <span class="logo-editor-icon">🔍</span>
+                      <input
+                        type="range" v-model.number="imgScale"
+                        min="0.2" max="4" step="0.02"
+                        class="logo-slider"
+                      />
+                      <span class="logo-scale-val">{{ Math.round(imgScale * 100) }}%</span>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="logo-editor-actions">
+                      <button class="btn-ghost" @click="resetLogoEditor">Reset</button>
+                      <button class="btn-ghost" @click="cancelLogoEdit">Cancel</button>
+                      <button class="btn-submit" style="height:30px;font-size:12px;padding:0 14px" @click="applyLogoEdit">Apply</button>
+                    </div>
+                  </div>
+
+                  <!-- ── Normal logo area (shown when no editor open) ── -->
+                  <div v-else class="logo-area">
                     <div class="logo-preview">
                       <img v-if="form.logoDataUrl" :src="form.logoDataUrl" alt="logo" class="logo-img" />
                       <div v-else class="logo-placeholder">{{ initials }}</div>
                     </div>
                     <div class="logo-actions">
-                      <button class="btn-upload" @click="triggerLogoUpload">Upload Logo</button>
+                      <button class="btn-upload" @click="triggerLogoUpload">{{ form.logoDataUrl ? 'Replace Logo' : 'Upload Logo' }}</button>
+                      <button v-if="form.logoDataUrl" class="btn-ghost" style="height:26px;font-size:11px" @click="openLogoEdit">Edit Position</button>
                       <button v-if="form.logoDataUrl" class="btn-remove" @click="form.logoDataUrl = ''">Remove</button>
                       <input ref="logoInput" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none" @change="handleLogoFile" />
-                      <div class="logo-hint">PNG, JPG or SVG · Max 2 MB · Displayed at 30×30 px</div>
+                      <div class="logo-hint">PNG, JPG or SVG · Max 2 MB</div>
                     </div>
                   </div>
                 </div>
@@ -294,8 +338,26 @@ const showEditPwd    = ref(false)
 const accessLog  = ref<any[]>([])
 const logLoading = ref(false)
 
-const form    = reactive({ roomName: '', logoDataUrl: '', defaultHurdleRate: 15 })
+const form      = reactive({ roomName: '', logoDataUrl: '', defaultHurdleRate: 15 })
 const logoInput = ref<HTMLInputElement>()
+
+// ── Logo editor state ────────────────────────────────────────────────────────
+const EDITOR_BOX = 180   // CSS px of the editor viewport
+const OUTPUT_PX  = 160   // px of the final saved logo
+
+const rawImageSrc  = ref('')          // original file data URL (before crop)
+const imgX         = ref(0)           // drag offset X in box coords
+const imgY         = ref(0)           // drag offset Y in box coords
+const imgScale     = ref(1)           // zoom scale
+const editorBoxRef = ref<HTMLElement>()
+const editorImgRef = ref<HTMLImageElement>()
+
+// Drag state
+let isDragging  = false
+let dragStartX  = 0
+let dragStartY  = 0
+let dragOriginX = 0
+let dragOriginY = 0
 
 const initials = computed(() =>
   (form.roomName || 'BR').split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
@@ -322,6 +384,7 @@ function resetMessages() {
   addError.value = ''; editError.value = ''
   adminConfirmPwd.value = ''; showAdminPwd.value = false
   showAddPwd.value = false; showEditPwd.value = false
+  rawImageSrc.value = ''; imgX.value = 0; imgY.value = 0; imgScale.value = 1
 }
 
 async function loadSettings() {
@@ -349,7 +412,7 @@ onMounted(() => {
   onUnmounted(() => window.removeEventListener('keydown', handler))
 })
 
-// ── Logo upload ──────────────────────────────────────────────────────────────
+// ── Logo upload & editor ─────────────────────────────────────────────────────
 function triggerLogoUpload() { logoInput.value?.click() }
 
 function handleLogoFile(e: Event) {
@@ -357,9 +420,72 @@ function handleLogoFile(e: Event) {
   if (!file) return
   if (file.size > 2 * 1024 * 1024) { brandError.value = 'Logo must be under 2 MB.'; return }
   const reader = new FileReader()
-  reader.onload = () => { form.logoDataUrl = reader.result as string }
+  reader.onload = () => {
+    rawImageSrc.value = reader.result as string
+    imgX.value = 0; imgY.value = 0; imgScale.value = 1
+  }
   reader.readAsDataURL(file)
   if (logoInput.value) logoInput.value.value = ''
+}
+
+// "Edit Position" on existing logo — re-open editor with current logo
+function openLogoEdit() {
+  rawImageSrc.value = form.logoDataUrl
+  imgX.value = 0; imgY.value = 0; imgScale.value = 1
+}
+
+function resetLogoEditor() {
+  imgX.value = 0; imgY.value = 0; imgScale.value = 1
+}
+
+function cancelLogoEdit() {
+  rawImageSrc.value = ''
+}
+
+// Drag handlers
+function startDrag(e: PointerEvent) {
+  isDragging = true
+  dragStartX = e.clientX
+  dragStartY = e.clientY
+  dragOriginX = imgX.value
+  dragOriginY = imgY.value
+  ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+}
+
+function onDrag(e: PointerEvent) {
+  if (!isDragging) return
+  imgX.value = dragOriginX + (e.clientX - dragStartX)
+  imgY.value = dragOriginY + (e.clientY - dragStartY)
+}
+
+function endDrag() { isDragging = false }
+
+// Apply — render to canvas and save
+function applyLogoEdit() {
+  const imgEl = editorImgRef.value
+  if (!imgEl) return
+
+  // Base rendered size (contained within editor box)
+  const ratio = Math.min(EDITOR_BOX / imgEl.naturalWidth, EDITOR_BOX / imgEl.naturalHeight)
+  const baseW = imgEl.naturalWidth  * ratio
+  const baseH = imgEl.naturalHeight * ratio
+
+  const canvas = document.createElement('canvas')
+  canvas.width  = OUTPUT_PX
+  canvas.height = OUTPUT_PX
+  const ctx = canvas.getContext('2d')!
+
+  // Map box coords → canvas coords
+  ctx.scale(OUTPUT_PX / EDITOR_BOX, OUTPUT_PX / EDITOR_BOX)
+
+  // Image center in box: (BOX/2 + imgX, BOX/2 + imgY)
+  // Scaled size: baseW * imgScale x baseH * imgScale
+  const drawX = EDITOR_BOX / 2 + imgX.value - (baseW * imgScale.value) / 2
+  const drawY = EDITOR_BOX / 2 + imgY.value - (baseH * imgScale.value) / 2
+  ctx.drawImage(imgEl, drawX, drawY, baseW * imgScale.value, baseH * imgScale.value)
+
+  form.logoDataUrl = canvas.toDataURL('image/png')
+  rawImageSrc.value = ''
 }
 
 // ── Save branding ────────────────────────────────────────────────────────────
@@ -572,6 +698,47 @@ function parseUA(ua: string) {
 }
 .btn-remove:hover { background: var(--red-bg); }
 .logo-hint { font-size: 11px; color: var(--faint); }
+
+/* Logo editor */
+.logo-editor {
+  margin-top: 8px;
+  border: 1.5px solid var(--border2); border-radius: 10px;
+  padding: 14px; background: var(--surface2);
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.logo-editor-hint { font-size: 11px; color: var(--faint); text-align: center; }
+
+.logo-editor-box {
+  width: 180px; height: 180px;
+  border: 1.5px dashed var(--border2); border-radius: 8px;
+  background: #f0f0ee;
+  overflow: hidden; position: relative; cursor: grab; user-select: none;
+  flex-shrink: 0;
+}
+.logo-editor-box:active { cursor: grabbing; }
+
+.logo-editor-img {
+  position: absolute; top: 50%; left: 50%;
+  transform-origin: center center;
+  max-width: none; max-height: none;
+  pointer-events: none;
+}
+
+.logo-editor-scale-row {
+  display: flex; align-items: center; gap: 8px; width: 100%; max-width: 280px;
+}
+.logo-editor-icon { font-size: 13px; }
+.logo-slider {
+  flex: 1; height: 4px; accent-color: var(--text);
+  cursor: pointer;
+}
+.logo-scale-val {
+  font-size: 11px; color: var(--muted); width: 38px; text-align: right; font-variant-numeric: tabular-nums;
+}
+
+.logo-editor-actions {
+  display: flex; gap: 6px; width: 100%; justify-content: flex-end; max-width: 280px;
+}
 
 /* Info box */
 .info-box {
