@@ -536,6 +536,9 @@ async function initSiteMap() {
     `<b style="font-family:DM Sans,sans-serif;font-size:12px;">${props.meta?.name ?? ''}</b>
      <div style="font-size:10px;color:#888;margin-top:2px;">${props.meta?.location ?? ''}</div>`
   )
+
+  // Force tile refresh in case container was not fully laid out yet
+  setTimeout(() => siteMap?.invalidateSize(), 100)
 }
 
 onMounted(async () => {
@@ -546,6 +549,18 @@ onMounted(async () => {
 onBeforeUnmount(() => {
   if (siteMap) { siteMap.remove(); siteMap = null }
 })
+
+// Re-init map when coordinates arrive (Supabase data loads after mount)
+watch(
+  () => props.meta?.coordinates,
+  async (coords) => {
+    if (!coords?.lat || !coords?.lng || props.editMode) return
+    if (siteMap) { siteMap.remove(); siteMap = null }
+    await nextTick()
+    await initSiteMap()
+  },
+  { deep: true }
+)
 
 watch(() => props.editMode, async (isEditing) => {
   if (!isEditing) {
