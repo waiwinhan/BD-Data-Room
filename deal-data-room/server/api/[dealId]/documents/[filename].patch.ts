@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
 
   const { data: existing } = await sb
     .from('deal_documents')
-    .select('status')
+    .select('status, name')
     .eq('deal_id', dealId)
     .eq('filename', filename)
     .single()
@@ -26,6 +26,10 @@ export default defineEventHandler(async (event) => {
     .update({ status: newStatus })
     .eq('deal_id', dealId)
     .eq('filename', filename)
+
+  // Log status change
+  const displayName = existing?.name || filename
+  await logActivity(event, dealId, `status → ${newStatus}`, 'document', displayName)
 
   return { success: true, status: newStatus }
 })

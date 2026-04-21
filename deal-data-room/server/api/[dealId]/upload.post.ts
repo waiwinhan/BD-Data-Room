@@ -55,7 +55,8 @@ export default defineEventHandler(async (event) => {
     trashed:    false,
   }, { onConflict: 'deal_id,filename' })
 
-  appendAccessLog(useRuntimeConfig().dataDir, dealId, { user: 'You', action: 'uploaded', file: filename })
+  // Log activity
+  await logActivity(event, dealId, 'uploaded', 'document', filename)
 
   return { success: true, filename }
 })

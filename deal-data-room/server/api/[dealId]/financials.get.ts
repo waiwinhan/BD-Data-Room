@@ -44,26 +44,31 @@ export default defineEventHandler(async (event) => {
     if (num(fs, 61, c) > 0) { phaseCol = c; break }
   }
 
+  // Detect template version: old template has NDV label at row 61 col 1;
+  // new multi-phase template (2025+) shifted NDP to row 159, land to 68, construction to 78, etc.
+  const row61Label = fs.getRow(61).getCell(1).value
+  const isNewTemplate = typeof row61Label !== 'string' || !(row61Label as string).includes('NET DEVELOPMENT VALUE')
+
   const M = 1_000_000
 
-  const ndv         = num(fs, 61, phaseCol)
-  const gdv         = num(fs, 38, phaseCol)
-  const ndp         = num(fs, 25, phaseCol)
-  const devMgnRaw   = num(fs, 26, phaseCol)
-  const landTotal   = Math.abs(num(fs, 69, phaseCol))
-  const gcc         = Math.abs(num(fs, 79, phaseCol))
-  const strataFees  = Math.abs(num(fs, 103, phaseCol))
-  const planningFees    = Math.abs(num(fs, 106, phaseCol))
-  const authorityContr  = Math.abs(num(fs, 109, phaseCol))
-  const consultancy     = Math.abs(num(fs, 122, phaseCol))
-  const otherConstr     = Math.abs(num(fs, 125, phaseCol))
-  const siteAdmin       = Math.abs(num(fs, 129, phaseCol))
-  const financeCharges  = Math.abs(num(fs, 144, phaseCol))
-  const gdcBeforeFinance = Math.abs(num(fs, 137, phaseCol))
-  const blendedPSF  = num(fs, 64, phaseCol)
-  const landPSF     = num(fs, 71, phaseCol)
-  const nfa         = num(fs, 16, phaseCol)
-  const landAcres   = num(fs, 8,  phaseCol)
+  const ndv        = num(fs, 61, phaseCol)
+  const gdv        = num(fs, 38, phaseCol)
+  const ndp        = isNewTemplate ? num(fs, 159, phaseCol) : num(fs, 25, phaseCol)
+  const devMgnRaw  = isNewTemplate ? num(fs, 160, phaseCol) : num(fs, 26, phaseCol)
+  const landTotal      = Math.abs(isNewTemplate ? num(fs, 68,  phaseCol) : num(fs, 69,  phaseCol))
+  const gcc            = Math.abs(isNewTemplate ? num(fs, 78,  phaseCol) : num(fs, 79,  phaseCol))
+  const strataFees     = Math.abs(isNewTemplate ? num(fs, 111, phaseCol) : num(fs, 103, phaseCol))
+  const planningFees   = Math.abs(isNewTemplate ? num(fs, 114, phaseCol) : num(fs, 106, phaseCol))
+  const authorityContr = Math.abs(isNewTemplate ? num(fs, 117, phaseCol) : num(fs, 109, phaseCol))
+  const consultancy    = Math.abs(isNewTemplate ? num(fs, 130, phaseCol) : num(fs, 122, phaseCol))
+  const otherConstr    = Math.abs(isNewTemplate ? num(fs, 133, phaseCol) : num(fs, 125, phaseCol))
+  const siteAdmin      = Math.abs(isNewTemplate ? num(fs, 137, phaseCol) : num(fs, 129, phaseCol))
+  const financeCharges = Math.abs(isNewTemplate ? num(fs, 152, phaseCol) : num(fs, 144, phaseCol))
+  const gdcBeforeFinance = Math.abs(isNewTemplate ? num(fs, 145, phaseCol) : num(fs, 137, phaseCol))
+  const blendedPSF = isNewTemplate ? num(fs, 63, phaseCol) : num(fs, 64, phaseCol)
+  const landPSF    = isNewTemplate ? num(fs, 67, phaseCol) : num(fs, 71, phaseCol)
+  const nfa        = num(fs, 16, phaseCol)
+  const landAcres  = num(fs, 8,  phaseCol)
 
   const baseASP        = irr ? num(irr, 5, 2) : 680
   const baseAbsorption = irr ? num(irr, 6, 2) : 0.8
