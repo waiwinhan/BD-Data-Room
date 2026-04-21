@@ -3,11 +3,23 @@ export default defineEventHandler(async () => {
   const { data, error } = await sb.from('deals').select('*').eq('trashed', false).order('created_at', { ascending: true })
   if (error) throw createError({ statusCode: 500, statusMessage: error.message })
 
+  // Fetch coordinates from deal_meta in one query
+  const { data: metaRows } = await sb
+    .from('deal_meta')
+    .select('deal_id, data')
+  const coordMap: Record<string, { lat: number; lng: number }> = {}
+  for (const row of (metaRows ?? [])) {
+    const coords = row.data?.coordinates
+    if (coords?.lat && coords?.lng) coordMap[row.deal_id] = coords
+  }
+
   const deals = (data ?? []).map((d: any) => ({
     id:          d.id,
     name:        d.name,
     ref:         d.ref,
     location:    d.location,
+    lat:         d.lat ?? coordMap[d.id]?.lat ?? null,
+    lng:         d.lng ?? coordMap[d.id]?.lng ?? null,
     stage:       d.stage,
     gdv:         d.gdv,
     ndv:         d.ndv ?? Math.round((d.gdv ?? 0) * 0.9),
