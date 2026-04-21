@@ -1,7 +1,37 @@
 {
   "permissions": {
     "allow": [
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "Bash(powershell -Command \"\\(Get-Content 'C:\\\\Users\\\\whwai\\\\Desktop\\\\BD\\\\BD Data Room\\\\deal-data-room-PROGRESS_PLAN.md'\\) -replace '\\\\\\\\| M08 \\\\\\\\| Document Upload \\\\\\\\| 3 \\\\\\\\| ⏳ \\\\\\\\| Day 4 \\\\\\\\|', '| M08 | Document Upload | 3 | ✅ | Day 4 |' | Set-Content 'C:\\\\Users\\\\whwai\\\\Desktop\\\\BD\\\\BD Data Room\\\\deal-data-room-PROGRESS_PLAN.md'\")",
+      "Bash(npm install:*)",
+      "Bash(ls \"/c/Users/whwai/Desktop/BD/BD Data Room/~\"*)",
+      "Bash(export PATH=\"/usr/local/bin:$PATH\")",
+      "Bash(npm run:*)",
+      "Read(//tmp/**)",
+      "Bash(curl -s http://localhost:3001/JB-2026-04)",
+      "Bash(pkill -f \"nuxt dev\")",
+      "Bash(pkill -f \"nuxt.mjs dev\")",
+      "Bash(curl -s http://localhost:3000/JB-2026-04)",
+      "Bash(pkill -f \"nuxt\")",
+      "Bash(start cmd:*)",
+      "Bash(curl -s http://localhost:3002/api/JB-2026-04/meta)",
+      "Bash(curl -s http://localhost:3002/api/JB-2026-04/risk)",
+      "Bash(curl -s \"http://localhost:3002/api/JB-2026-04/meta\")",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d.get\\('legalStatus','MISSING'\\), indent=2\\)\\)\")",
+      "Bash(npx nuxt:*)",
+      "Bash(curl -s -X POST http://localhost:3002/api/auth/login -H \"Content-Type: application/json\" -d '{\"password\":\"brdb2024\"}')",
+      "Bash(curl -s http://localhost:3002/api/deals)",
+      "Bash(curl -s http://localhost:3002/api/FAKE-999/meta)",
+      "Bash(curl -s http://localhost:3002/KL-2025-11 -o /dev/null -w \"%{http_code}\")",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "mcp__6a626641-60dd-4886-8a3b-2e8c105114b1__tavily_extract",
+      "mcp__cb19d501-2688-4712-a9a3-ac2d4b8a3b16__list_projects",
+      "mcp__cb19d501-2688-4712-a9a3-ac2d4b8a3b16__apply_migration",
+      "Bash(jobs)",
+      "mcp__cb19d501-2688-4712-a9a3-ac2d4b8a3b16__execute_sql",
+      "Bash(git pull *)",
+      "mcp__cb19d501-2688-4712-a9a3-ac2d4b8a3b16__list_tables",
+      "Bash(node -e ' *)"
     ]
   }
 }
