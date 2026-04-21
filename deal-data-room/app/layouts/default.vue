@@ -14,6 +14,7 @@
         <span class="topbar-sub">Deal Data Room</span>
       </div>
       <div class="topbar-right">
+        <span v-if="sessionLabel" class="topbar-user">{{ sessionLabel }}</span>
         <button class="btn-primary" @click="showAddDeal = true">+ New Deal</button>
         <button class="btn-sm" @click="showSettings = true">Settings</button>
         <button class="btn-sm btn-logout" :disabled="loggingOut" @click="logout">
@@ -25,8 +26,7 @@
     <!-- NDA STRIP -->
     <div class="nda-strip">
       <span>⚠</span>
-      <span>Confidential — under NDA. Access restricted to authorised personnel only.</span>
-      <span class="nda-user" v-if="sessionLabel">Logged in as <strong>{{ sessionLabel }}</strong></span>
+      Confidential — under NDA. Access restricted to authorised personnel only.
     </div>
 
     <!-- PAGE CONTENT -->
@@ -169,8 +169,9 @@ html { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   display: flex; align-items: center; gap: 8px;
   font-size: 11.5px; color: var(--amber); font-weight: 500;
 }
-.nda-user {
-  margin-left: auto;
-  font-size: 11px; font-weight: 400; color: var(--amber); opacity: 0.8;
+.topbar-user {
+  font-size: 11.5px; font-weight: 500; color: var(--muted);
+  padding: 0 10px; border-right: 1px solid var(--border2);
+  margin-right: 2px;
 }
 </style>
