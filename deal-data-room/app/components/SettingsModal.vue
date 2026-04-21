@@ -61,78 +61,111 @@
             <!-- ── SECURITY ── -->
             <div v-if="activeTab === 'security'">
               <div class="info-box">
-                Each password slot grants full access to the data room. You can have multiple passwords for different users.
+                Each password slot grants full access to the data room. Only the <strong>Admin</strong> account can manage passwords.
               </div>
 
-              <!-- Password slots list -->
-              <div class="slots-header">
-                <span class="field-label">Access Passwords</span>
-                <button class="btn-add-slot" @click="showAddForm = !showAddForm">
-                  {{ showAddForm ? 'Cancel' : '+ Add Password' }}
-                </button>
+              <!-- Non-admin lock message -->
+              <div v-if="sessionLabel !== 'Admin'" class="lock-notice">
+                🔒 You are logged in as <strong>{{ sessionLabel }}</strong>. Password management is restricted to Admin only.
               </div>
 
-              <!-- Add password form -->
-              <div v-if="showAddForm" class="slot-form">
-                <div class="slot-form-row">
-                  <div class="field" style="flex:1">
-                    <label class="field-label">Label</label>
-                    <input v-model="addForm.label" class="field-input" placeholder="e.g. Investor, Partner" />
-                  </div>
-                  <div class="field" style="flex:1.5">
-                    <label class="field-label">Password</label>
-                    <input v-model="addForm.password" type="password" class="field-input" placeholder="Min. 6 characters" />
-                  </div>
-                </div>
-                <div v-if="addError" class="form-error" style="margin-top:8px">{{ addError }}</div>
-                <div class="slot-form-actions">
-                  <button class="btn-submit" :disabled="saving" style="height:30px;font-size:12px;padding:0 14px" @click="addPasswordSlot">
-                    <span v-if="saving" class="spinner"></span>
-                    <span v-else>Save</span>
-                  </button>
-                </div>
-              </div>
-
-              <!-- Slots list -->
-              <div class="slots-list">
-                <div v-for="slot in passwordSlots" :key="slot.label" class="slot-row">
-                  <template v-if="editingSlot === slot.label">
-                    <!-- Edit mode -->
-                    <div class="slot-edit-row">
-                      <div class="field" style="flex:1">
-                        <label class="field-label">Label</label>
-                        <input v-model="editForm.newLabel" class="field-input field-input-sm" />
-                      </div>
-                      <div class="field" style="flex:1.5">
-                        <label class="field-label">New Password <span style="font-weight:400;text-transform:none">(leave blank to keep)</span></label>
-                        <input v-model="editForm.newPassword" type="password" class="field-input field-input-sm" placeholder="New password (optional)" />
-                      </div>
-                    </div>
-                    <div v-if="editError" class="form-error" style="margin-top:6px;font-size:11px">{{ editError }}</div>
-                    <div class="slot-edit-actions">
-                      <button class="btn-ghost" @click="cancelEdit">Cancel</button>
-                      <button class="btn-submit" :disabled="saving" style="height:28px;font-size:12px;padding:0 12px" @click="saveSlotEdit(slot.label)">
-                        <span v-if="saving" class="spinner"></span>
-                        <span v-else>Save</span>
+              <!-- Admin-only section -->
+              <template v-else>
+                <!-- Admin password verification -->
+                <div class="verify-box">
+                  <div class="field">
+                    <label class="field-label">Confirm Admin Password</label>
+                    <div class="pwd-wrap">
+                      <input
+                        v-model="adminConfirmPwd"
+                        :type="showAdminPwd ? 'text' : 'password'"
+                        class="field-input"
+                        placeholder="Enter your Admin password to make changes"
+                      />
+                      <button type="button" class="pwd-eye" @click="showAdminPwd = !showAdminPwd">
+                        <svg v-if="showAdminPwd" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        <svg v-else xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                       </button>
                     </div>
-                  </template>
-                  <template v-else>
-                    <!-- View mode -->
-                    <div class="slot-info">
-                      <span class="slot-label">{{ slot.label }}</span>
-                      <span class="slot-pwd">••••••••</span>
-                    </div>
-                    <div class="slot-actions">
-                      <button class="btn-ghost" @click="startEdit(slot.label)">Edit</button>
-                      <button class="btn-danger-ghost" :disabled="passwordSlots.length <= 1" @click="removeSlot(slot.label)">Remove</button>
-                    </div>
-                  </template>
+                    <div class="field-hint">Required before adding, editing, or removing any password.</div>
+                  </div>
                 </div>
-              </div>
 
-              <div v-if="securitySuccess" class="form-success" style="margin-top:14px">{{ securitySuccess }}</div>
-              <div v-if="securityError"  class="form-error"   style="margin-top:14px">{{ securityError }}</div>
+                <!-- Password slots list -->
+                <div class="slots-header">
+                  <span class="field-label">Access Passwords</span>
+                  <button class="btn-add-slot" @click="showAddForm = !showAddForm">
+                    {{ showAddForm ? 'Cancel' : '+ Add Password' }}
+                  </button>
+                </div>
+
+                <!-- Add password form -->
+                <div v-if="showAddForm" class="slot-form">
+                  <div class="slot-form-row">
+                    <div class="field" style="flex:1">
+                      <label class="field-label">Label</label>
+                      <input v-model="addForm.label" class="field-input" placeholder="e.g. Investor, Partner" />
+                    </div>
+                    <div class="field" style="flex:1.5">
+                      <label class="field-label">New Password</label>
+                      <input v-model="addForm.password" type="password" class="field-input" placeholder="Min. 6 characters" />
+                    </div>
+                  </div>
+                  <div v-if="addError" class="form-error" style="margin-top:8px">{{ addError }}</div>
+                  <div class="slot-form-actions">
+                    <button class="btn-submit" :disabled="saving" style="height:30px;font-size:12px;padding:0 14px" @click="addPasswordSlot">
+                      <span v-if="saving" class="spinner"></span>
+                      <span v-else>Save</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Slots list -->
+                <div class="slots-list">
+                  <div v-for="slot in passwordSlots" :key="slot.label" class="slot-row">
+                    <template v-if="editingSlot === slot.label">
+                      <!-- Edit mode -->
+                      <div class="slot-edit-row">
+                        <div class="field" style="flex:1">
+                          <label class="field-label">Label</label>
+                          <input v-model="editForm.newLabel" class="field-input field-input-sm" :disabled="slot.label === 'Admin'" />
+                        </div>
+                        <div class="field" style="flex:1.5">
+                          <label class="field-label">New Password <span style="font-weight:400;text-transform:none">(leave blank to keep)</span></label>
+                          <input v-model="editForm.newPassword" type="password" class="field-input field-input-sm" placeholder="New password (optional)" />
+                        </div>
+                      </div>
+                      <div v-if="editError" class="form-error" style="margin-top:6px;font-size:11px">{{ editError }}</div>
+                      <div class="slot-edit-actions">
+                        <button class="btn-ghost" @click="cancelEdit">Cancel</button>
+                        <button class="btn-submit" :disabled="saving" style="height:28px;font-size:12px;padding:0 12px" @click="saveSlotEdit(slot.label)">
+                          <span v-if="saving" class="spinner"></span>
+                          <span v-else>Save</span>
+                        </button>
+                      </div>
+                    </template>
+                    <template v-else>
+                      <!-- View mode -->
+                      <div class="slot-info">
+                        <span class="slot-label">{{ slot.label }}</span>
+                        <span v-if="slot.label === 'Admin'" class="slot-admin-badge">Admin</span>
+                        <span class="slot-pwd">••••••••</span>
+                      </div>
+                      <div class="slot-actions">
+                        <button class="btn-ghost" @click="startEdit(slot.label)">Edit</button>
+                        <button
+                          v-if="slot.label !== 'Admin'"
+                          class="btn-danger-ghost"
+                          @click="removeSlot(slot.label)"
+                        >Remove</button>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+
+                <div v-if="securitySuccess" class="form-success" style="margin-top:14px">{{ securitySuccess }}</div>
+                <div v-if="securityError"  class="form-error"   style="margin-top:14px">{{ securityError }}</div>
+              </template>
             </div>
 
             <!-- ── ACCESS LOG ── -->
@@ -222,6 +255,8 @@ const defaultsError  = ref('')
 const defaultsSuccess = ref(false)
 
 // Security
+const { session }    = useUserSession()
+const sessionLabel   = computed(() => (session.value as any)?.user?.label ?? '')
 const passwordSlots  = ref<{ label: string }[]>([])
 const securityError  = ref('')
 const securitySuccess = ref('')
@@ -231,6 +266,8 @@ const addError       = ref('')
 const editingSlot    = ref('')
 const editForm       = reactive({ newLabel: '', newPassword: '' })
 const editError      = ref('')
+const adminConfirmPwd = ref('')
+const showAdminPwd   = ref(false)
 
 // Access log
 const accessLog  = ref<any[]>([])
@@ -262,6 +299,7 @@ function resetMessages() {
   showAddForm.value = false; editingSlot.value = ''
   addForm.label = ''; addForm.password = ''
   addError.value = ''; editError.value = ''
+  adminConfirmPwd.value = ''; showAdminPwd.value = false
 }
 
 async function loadSettings() {
@@ -320,11 +358,15 @@ async function saveBranding() {
 // ── Password slot management ─────────────────────────────────────────────────
 async function addPasswordSlot() {
   addError.value = ''
-  if (!addForm.label.trim())    { addError.value = 'Label is required.'; return }
+  if (!adminConfirmPwd.value) { addError.value = 'Enter your Admin password above to confirm.'; return }
+  if (!addForm.label.trim())  { addError.value = 'Label is required.'; return }
   if (addForm.password.length < 6) { addError.value = 'Password must be at least 6 characters.'; return }
   saving.value = true
   try {
-    await $fetch('/api/settings', { method: 'PUT', body: { addPassword: { label: addForm.label.trim(), password: addForm.password } } })
+    await $fetch('/api/settings', { method: 'PUT', body: {
+      adminPassword: adminConfirmPwd.value,
+      addPassword: { label: addForm.label.trim(), password: addForm.password },
+    }})
     await loadSettings()
     showAddForm.value = false
     addForm.label = ''; addForm.password = ''
@@ -349,13 +391,17 @@ function cancelEdit() {
 
 async function saveSlotEdit(label: string) {
   editError.value = ''
+  if (!adminConfirmPwd.value) { editError.value = 'Enter your Admin password above to confirm.'; return }
   if (!editForm.newLabel.trim()) { editError.value = 'Label cannot be empty.'; return }
   if (editForm.newPassword && editForm.newPassword.length < 6) { editError.value = 'Password must be at least 6 characters.'; return }
   saving.value = true
   try {
     await $fetch('/api/settings', {
       method: 'PUT',
-      body: { updatePassword: { label, newLabel: editForm.newLabel, newPassword: editForm.newPassword || undefined } },
+      body: {
+        adminPassword: adminConfirmPwd.value,
+        updatePassword: { label, newLabel: editForm.newLabel, newPassword: editForm.newPassword || undefined },
+      },
     })
     await loadSettings()
     editingSlot.value = ''
@@ -367,11 +413,12 @@ async function saveSlotEdit(label: string) {
 }
 
 async function removeSlot(label: string) {
+  if (!adminConfirmPwd.value) { securityError.value = 'Enter your Admin password above to confirm.'; return }
   if (!confirm(`Remove "${label}" password? Users with this password will be locked out.`)) return
   securityError.value = ''
   saving.value = true
   try {
-    await $fetch('/api/settings', { method: 'PUT', body: { removePassword: label } })
+    await $fetch('/api/settings', { method: 'PUT', body: { adminPassword: adminConfirmPwd.value, removePassword: label } })
     await loadSettings()
     securitySuccess.value = `"${label}" removed.`
     setTimeout(() => { securitySuccess.value = '' }, 3000)
@@ -508,6 +555,37 @@ function parseUA(ua: string) {
   background: var(--surface2); border: 1px solid var(--border);
   border-radius: var(--radius-sm); padding: 10px 12px;
   font-size: 12px; color: var(--muted); line-height: 1.5;
+}
+
+/* Lock notice */
+.lock-notice {
+  margin-top: 14px; padding: 12px 14px;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-size: 13px; color: var(--muted); line-height: 1.5;
+}
+
+/* Admin verify box */
+.verify-box {
+  margin-top: 14px; padding: 12px 14px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+}
+
+/* Password toggle */
+.pwd-wrap { position: relative; }
+.pwd-wrap .field-input { padding-right: 36px; }
+.pwd-eye {
+  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+  border: none; background: transparent; padding: 0; cursor: pointer;
+  color: var(--muted); display: flex; align-items: center; transition: color 0.15s;
+}
+.pwd-eye:hover { color: var(--text); }
+
+/* Admin badge */
+.slot-admin-badge {
+  display: inline-block; padding: 1px 6px; border-radius: 20px;
+  background: #1a1a1a; color: #fff;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.04em;
 }
 
 /* Slots */

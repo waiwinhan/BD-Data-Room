@@ -13,19 +13,39 @@ export default defineEventHandler(async (event) => {
     delete current.password
   }
 
+  // ── Guard: password management requires Admin session + Admin password ────
+  const isPasswordOp = body.addPassword !== undefined
+    || body.removePassword !== undefined
+    || body.updatePassword !== undefined
+
+  if (isPasswordOp) {
+    // 1. Must be logged in as Admin
+    const session = await getUserSession(event)
+    if (session?.user?.label !== 'Admin') {
+      throw createError({ statusCode: 403, statusMessage: 'Only the Admin account can manage passwords' })
+    }
+    // 2. Must supply correct Admin password to confirm the action
+    const adminSlot = current.passwords.find((p: any) => p.label === 'Admin')
+    if (!adminSlot || body.adminPassword !== adminSlot.password) {
+      throw createError({ statusCode: 403, statusMessage: 'Admin password is incorrect' })
+    }
+  }
+
   // ── Add a new password slot ───────────────────────────────────────────────
   if (body.addPassword !== undefined) {
     const { label, password: pwd } = body.addPassword
-    if (!label?.trim())      throw createError({ statusCode: 400, statusMessage: 'Label is required' })
+    if (!label?.trim())         throw createError({ statusCode: 400, statusMessage: 'Label is required' })
     if (!pwd || pwd.length < 6) throw createError({ statusCode: 400, statusMessage: 'Password must be at least 6 characters' })
+    if (label.trim().toLowerCase() === 'admin') throw createError({ statusCode: 400, statusMessage: 'Cannot create another slot named Admin' })
     const duplicate = current.passwords.find((p: any) => p.label.toLowerCase() === label.trim().toLowerCase())
-    if (duplicate)           throw createError({ statusCode: 409, statusMessage: 'A password with that label already exists' })
+    if (duplicate)              throw createError({ statusCode: 409, statusMessage: 'A password with that label already exists' })
     current.passwords.push({ label: label.trim(), password: pwd })
   }
 
   // ── Remove a password slot ────────────────────────────────────────────────
   if (body.removePassword !== undefined) {
-    if (current.passwords.length <= 1) throw createError({ statusCode: 400, statusMessage: 'Cannot remove the last password' })
+    if (body.removePassword === 'Admin') throw createError({ statusCode: 400, statusMessage: 'Cannot remove the Admin slot' })
+    if (current.passwords.length <= 1)  throw createError({ statusCode: 400, statusMessage: 'Cannot remove the last password' })
     current.passwords = current.passwords.filter((p: any) => p.label !== body.removePassword)
   }
 
@@ -34,8 +54,15 @@ export default defineEventHandler(async (event) => {
     const { label, newLabel, newPassword } = body.updatePassword
     const slot = current.passwords.find((p: any) => p.label === label)
     if (!slot) throw createError({ statusCode: 404, statusMessage: 'Password slot not found' })
-    if (newLabel?.trim())   slot.label    = newLabel.trim()
-    if (newPassword)        slot.password = newPassword
+    if (newLabel?.trim() && newLabel.trim() !== label) {
+      if (newLabel.trim().toLowerCase() === 'admin' && label !== 'Admin')
+        throw createError({ statusCode: 400, statusMessage: 'Cannot rename a slot to Admin' })
+      slot.label = newLabel.trim()
+    }
+    if (newPassword) {
+      if (newPassword.length < 6) throw createError({ statusCode: 400, statusMessage: 'Password must be at least 6 characters' })
+      slot.password = newPassword
+    }
   }
 
   // ── Branding ──────────────────────────────────────────────────────────────
