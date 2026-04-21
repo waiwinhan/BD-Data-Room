@@ -26,36 +26,43 @@
 
             <!-- ── BRANDING ── -->
             <div v-if="activeTab === 'branding'">
-              <div class="field">
-                <label class="field-label">Room Name</label>
-                <input v-model="form.roomName" class="field-input" placeholder="e.g. Wai Berhad" />
+              <!-- Non-admin lock -->
+              <div v-if="sessionLabel !== 'Admin'" class="lock-notice">
+                🔒 You are logged in as <strong>{{ sessionLabel }}</strong>. Only Admin can change branding.
               </div>
 
-              <div class="field" style="margin-top:14px">
-                <label class="field-label">Logo</label>
-                <div class="logo-area">
-                  <div class="logo-preview">
-                    <img v-if="form.logoDataUrl" :src="form.logoDataUrl" alt="logo" class="logo-img" />
-                    <div v-else class="logo-placeholder">{{ initials }}</div>
-                  </div>
-                  <div class="logo-actions">
-                    <button class="btn-upload" @click="triggerLogoUpload">Upload Logo</button>
-                    <button v-if="form.logoDataUrl" class="btn-remove" @click="form.logoDataUrl = ''">Remove</button>
-                    <input ref="logoInput" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none" @change="handleLogoFile" />
-                    <div class="logo-hint">PNG, JPG or SVG · Max 2 MB · Displayed at 30×30 px</div>
+              <template v-else>
+                <div class="field">
+                  <label class="field-label">Room Name</label>
+                  <input v-model="form.roomName" class="field-input" placeholder="e.g. Wai Berhad" />
+                </div>
+
+                <div class="field" style="margin-top:14px">
+                  <label class="field-label">Logo</label>
+                  <div class="logo-area">
+                    <div class="logo-preview">
+                      <img v-if="form.logoDataUrl" :src="form.logoDataUrl" alt="logo" class="logo-img" />
+                      <div v-else class="logo-placeholder">{{ initials }}</div>
+                    </div>
+                    <div class="logo-actions">
+                      <button class="btn-upload" @click="triggerLogoUpload">Upload Logo</button>
+                      <button v-if="form.logoDataUrl" class="btn-remove" @click="form.logoDataUrl = ''">Remove</button>
+                      <input ref="logoInput" type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" style="display:none" @change="handleLogoFile" />
+                      <div class="logo-hint">PNG, JPG or SVG · Max 2 MB · Displayed at 30×30 px</div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div v-if="brandError" class="form-error" style="margin-top:14px">{{ brandError }}</div>
-              <div v-if="brandSuccess" class="form-success" style="margin-top:14px">Branding saved.</div>
+                <div v-if="brandError" class="form-error" style="margin-top:14px">{{ brandError }}</div>
+                <div v-if="brandSuccess" class="form-success" style="margin-top:14px">Branding saved.</div>
 
-              <div class="section-actions">
-                <button class="btn-submit" :disabled="saving" @click="saveBranding">
-                  <span v-if="saving" class="spinner"></span>
-                  <span v-else>Save Branding</span>
-                </button>
-              </div>
+                <div class="section-actions">
+                  <button class="btn-submit" :disabled="saving" @click="saveBranding">
+                    <span v-if="saving" class="spinner"></span>
+                    <span v-else>Save Branding</span>
+                  </button>
+                </div>
+              </template>
             </div>
 
             <!-- ── SECURITY ── -->
@@ -108,7 +115,13 @@
                     </div>
                     <div class="field" style="flex:1.5">
                       <label class="field-label">New Password</label>
-                      <input v-model="addForm.password" type="password" class="field-input" placeholder="Min. 6 characters" />
+                      <div class="pwd-wrap">
+                        <input v-model="addForm.password" :type="showAddPwd ? 'text' : 'password'" class="field-input" placeholder="Min. 6 characters" />
+                        <button type="button" class="pwd-eye" @click="showAddPwd = !showAddPwd">
+                          <svg v-if="showAddPwd" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                          <svg v-else xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <div v-if="addError" class="form-error" style="margin-top:8px">{{ addError }}</div>
@@ -132,7 +145,13 @@
                         </div>
                         <div class="field" style="flex:1.5">
                           <label class="field-label">New Password <span style="font-weight:400;text-transform:none">(leave blank to keep)</span></label>
-                          <input v-model="editForm.newPassword" type="password" class="field-input field-input-sm" placeholder="New password (optional)" />
+                          <div class="pwd-wrap">
+                            <input v-model="editForm.newPassword" :type="showEditPwd ? 'text' : 'password'" class="field-input field-input-sm" placeholder="New password (optional)" />
+                            <button type="button" class="pwd-eye" @click="showEditPwd = !showEditPwd">
+                              <svg v-if="showEditPwd" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                              <svg v-else xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            </button>
+                          </div>
                         </div>
                       </div>
                       <div v-if="editError" class="form-error" style="margin-top:6px;font-size:11px">{{ editError }}</div>
@@ -268,6 +287,8 @@ const editForm       = reactive({ newLabel: '', newPassword: '' })
 const editError      = ref('')
 const adminConfirmPwd = ref('')
 const showAdminPwd   = ref(false)
+const showAddPwd     = ref(false)
+const showEditPwd    = ref(false)
 
 // Access log
 const accessLog  = ref<any[]>([])
@@ -300,6 +321,7 @@ function resetMessages() {
   addForm.label = ''; addForm.password = ''
   addError.value = ''; editError.value = ''
   adminConfirmPwd.value = ''; showAdminPwd.value = false
+  showAddPwd.value = false; showEditPwd.value = false
 }
 
 async function loadSettings() {
@@ -382,6 +404,7 @@ function startEdit(label: string) {
   editForm.newLabel = label
   editForm.newPassword = ''
   editError.value = ''
+  showEditPwd.value = false
 }
 
 function cancelEdit() {

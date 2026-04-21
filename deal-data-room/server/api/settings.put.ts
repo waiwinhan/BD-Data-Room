@@ -65,6 +65,15 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // ── Guard: branding changes require Admin session ─────────────────────────
+  const isBrandingOp = body.roomName !== undefined || body.logoDataUrl !== undefined
+  if (isBrandingOp) {
+    const session = await getUserSession(event)
+    if (session?.user?.label !== 'Admin') {
+      throw createError({ statusCode: 403, statusMessage: 'Only the Admin account can change branding' })
+    }
+  }
+
   // ── Branding ──────────────────────────────────────────────────────────────
   if (body.roomName !== undefined) {
     if (!body.roomName.trim()) throw createError({ statusCode: 400, statusMessage: 'Room name cannot be empty' })
