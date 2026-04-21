@@ -23,7 +23,7 @@
 | M10 | Deal Team Tab | 3 | ✅ | Day 5 |
 | M11 | Auth — NDA Password Gate | 4 | ✅ | Day 5–6 |
 | M12 | Multi-Deal Routing | 4 | ✅ | Day 6 |
-| M13 | Deployment (Netlify) | 4 | ⏳ | TBD |
+| M13 | Deployment (Netlify) | 4 | ✅ | Apr 21 |
 | M18 | Supabase DB + Storage Migration | 5 | ✅ | Apr 18 |
 | M14 | Excel — BRDB Model Wiring | 2 | ✅ | Day 3 |
 | M15 | Sensitivity Table | 2 | ✅ | Day 3 |
@@ -38,7 +38,10 @@
 | PL-05 | Deal Comparison View | Post | 📋 | Post-launch |
 | PL-06 | Auto-refresh on Excel Change | Post | 📋 | Post-launch |
 | PL-07 | Print / PDF Export | Post | 📋 | Post-launch |
-| PL-08 | Persistent Audit Log | Post | 📋 | Post-launch |
+| PL-08 | Persistent Audit Log | Post | ✅ | Apr 21 |
+| M21 | Multi-Password + Login Access Log | 4 | ✅ | Apr 21 |
+| M22 | Logo Editor (drag + resize) | 4 | ✅ | Apr 21 |
+| M23 | Editable Deal Team + Activity Log | 4 | ✅ | Apr 21 |
 
 **Prototype files (visual spec — open in browser before coding each module)**
 - `deal-data-room-list.html` → M02 DealCard, FilterBar, PortfolioSummary
@@ -587,46 +590,19 @@ Goal: NDA password gate, deal list page routing, shareable private URL.
 
 ---
 
-### M13 — Deployment (Netlify) ⏳
+### M13 — Deployment (Netlify) ✅
 
 **Milestone:** App is running on a private HTTPS Netlify URL. Shareable with BRDB teammates.
 
-> **Platform chosen: Netlify** — supports Nuxt 3 SSR via Netlify Functions, free tier available, connects directly to GitHub for auto-deploy on every push.
+> **Apr 21 2026:** Deployed to [https://bd-data-room.netlify.app](https://bd-data-room.netlify.app). Auto-deploy connected to GitHub — every push to `main` triggers a Netlify build. Environment variables (`NUXT_SESSION_PASSWORD`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`) set in Netlify dashboard. `DEAL_PASSWORD` removed from env — password now managed exclusively through Supabase settings table. Login confirmed working with session cookie auth.
 
-**Step 1 — Prepare Nuxt for Netlify**
-- [ ] Install Netlify adapter: `npm install -D @netlify/nuxt`
-- [ ] Add `@netlify/nuxt` to modules in `nuxt.config.ts`
-- [ ] Ensure SSR stays on (do NOT add `ssr: false`) — server API routes require it
-
-**Step 2 — Connect GitHub to Netlify**
-- [ ] Log in to [app.netlify.com](https://app.netlify.com)
-- [ ] Click **Add new site → Import an existing project → GitHub**
-- [ ] Select repo: `waiwinhan/BD-Data-Room`
-- [ ] Set **Base directory**: `deal-data-room`
-- [ ] Set **Build command**: `npm run build`
-- [ ] Set **Publish directory**: `deal-data-room/.output/public`
-
-**Step 3 — Set Environment Variables in Netlify Dashboard**
-- [ ] Site settings → Environment variables → Add:
-  - `DEAL_PASSWORD` = strong password (change from `brdb2024` before sharing)
-  - `NUXT_SESSION_PASSWORD` = random 32+ character string
-  - `ANTHROPIC_API_KEY` = your Claude API key
-
-**Step 4 — Deploy & Test**
-- [ ] Trigger first deploy from Netlify dashboard
-- [ ] Visit the Netlify URL (e.g. `https://brdb-data-room.netlify.app`)
-- [ ] Test: unauthenticated visit redirects to `/login`
-- [ ] Test: correct password grants access
-- [ ] Test: all 5 deals load with correct data
-- [ ] Test: Documents, Financials, Risk & Legal, Deal Team tabs all work
-
-**Data persistence note**
-- Netlify has an ephemeral filesystem — uploaded documents will NOT persist across redeploys
-- For v1: `data/` folder is committed to git — all seed data is version-controlled and safe
-- For v2 (post-launch): migrate file uploads to Supabase Storage or Netlify Blobs
-
-- [ ] Share Netlify URL + password with BRDB team
-- [ ] Commit: `git commit -m "M13: deployed to Netlify"`
+- [x] Install Netlify adapter: `npm install -D @netlify/nuxt`
+- [x] Add `@netlify/nuxt` to modules in `nuxt.config.ts`
+- [x] Connect GitHub repo → Netlify, base directory: `deal-data-room`
+- [x] Set env vars in Netlify: `NUXT_SESSION_PASSWORD`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`
+- [x] Deploy confirmed working at `https://bd-data-room.netlify.app`
+- [x] Login, session auth, all tabs verified
+- [x] Commit: `git commit -m "M13: deployed to Netlify"`
 
 ---
 
@@ -721,6 +697,64 @@ Goal: Replace flat JSON files + local filesystem with Supabase (PostgreSQL + Sto
 
 ---
 
+---
+
+### M21 — Multi-Password Slots + Login Access Log ✅
+
+**Milestone:** Admin can create multiple named password slots (e.g. Admin, Investor, Partner) and view a real-time log of all login attempts.
+
+> **Apr 21 2026:** Replaced single shared password with a named password slots system stored in Supabase `settings` table. Each slot has a label and password. Login checks against all active slots, logs every attempt (success/fail) to a new `access_log` Supabase table. Settings → Security tab redesigned for slot management. Settings → Access Log tab shows last 100 login attempts with user label, IP, browser, and status.
+
+- [x] Supabase migration: create `access_log` table (id, created_at, label, ip, user_agent, success)
+- [x] Migrate settings from single `password` field to `passwords: [{label, password}]` array in Supabase
+- [x] `login.post.ts` — checks against all password slots, logs every attempt with IP + user-agent
+- [x] `GET /api/auth/access-log` — returns last 100 login attempts
+- [x] `settings.put.ts` — addPassword, removePassword, updatePassword operations (Admin-only, requires admin password confirmation)
+- [x] `settings.get.ts` — returns password slot labels only (never exposes actual passwords to client)
+- [x] Settings → Security tab: add/edit/remove slots, show/hide password toggles, Admin password confirmation required for all changes
+- [x] Settings → Access Log tab: table with date/time, label, IP, browser, success/fail badge
+- [x] Non-Admin users see locked view on Security tab
+- [x] Admin slot cannot be removed or renamed
+- [x] Session stores `user.label` (which password slot was used to login)
+
+---
+
+### M22 — Logo Editor (Drag + Resize) ✅
+
+**Milestone:** After uploading a logo, Admin can drag to reposition and use a slider to resize the image before saving.
+
+> **Apr 21 2026:** Built an inline canvas-based logo editor in the Settings → Branding tab. After selecting an image file, an 180×180 editor viewport opens. The user can drag the image to reposition it and use a range slider (20%–400%) to scale. Apply renders the result to a 160×160 canvas and saves as base64. An "Edit Position" button re-opens the editor on an existing logo.
+
+- [x] `rawImageSrc` state — holds original uploaded file before crop
+- [x] 180×180 editor box with pointer drag (mouse + touch via Pointer Events API)
+- [x] Scale range slider (0.2× – 4×, step 0.02)
+- [x] Reset button centers and resets scale to 1×
+- [x] Apply renders image to `<canvas>` at OUTPUT_PX × OUTPUT_PX using correct transform math, saves as PNG data URL
+- [x] "Edit Position" on existing logo re-opens editor
+- [x] Admin-only — non-Admin users see lock notice on Branding tab (backend also guards)
+
+---
+
+### M23 — Editable Deal Team + Deal Activity Log ✅
+
+**Milestone:** Admin can add/edit/remove internal team members and external advisors from the Deal Team tab. All document and team actions are logged in a persistent per-deal activity log.
+
+> **Apr 21 2026:** Added Edit buttons to Deal Team and External Advisors cards (Admin only). Inline editing with add/remove rows. New `deal_activity_log` Supabase table tracks all user actions per deal. `logActivity.ts` server utility non-blockingly logs to Supabase using session label. Document Access Log now shows real data from Supabase instead of static meta.json entries.
+
+- [x] Supabase migration: create `deal_activity_log` table (id, created_at, deal_id, user_label, action, target_type, target_name)
+- [x] `server/utils/logActivity.ts` — non-blocking helper, reads session label, inserts to Supabase
+- [x] `PUT /api/[dealId]/team` — dedicated endpoint for team updates, logs to activity log
+- [x] `GET /api/[dealId]/activity-log` — returns last 100 entries for a deal
+- [x] Logging wired into: `upload.post.ts` (uploaded), `[filename].delete.ts` (deleted), `[filename].patch.ts` (status changed), `team.put.ts` (team updated)
+- [x] `TeamTab.vue` — Edit button on Deal Team + External Advisors cards (Admin only)
+- [x] Inline edit mode: add/remove/update rows, field validation, save/cancel
+- [x] Internal member fields: Name, Role, Email
+- [x] External advisor fields: Name, Role, Firm, Email
+- [x] Document Access Log now fetches from `/api/[dealId]/activity-log` — real-time, per deal
+- [x] Log entries show: icon (coloured by action), user label, action, target name, type badge, timestamp
+
+---
+
 ## Post-Launch Roadmap
 
 ---
@@ -809,11 +843,14 @@ Goal: Replace flat JSON files + local filesystem with Supabase (PostgreSQL + Sto
 
 ---
 
-### PL-08 — Persistent Audit Log 📋
+### PL-08 — Persistent Audit Log ✅
 
 **Trigger:** Compliance, tracking who accessed sensitive deal info.
 
-- [ ] Create `deal_access_log` Supabase table: `(deal_id, user_id, action, resource, timestamp, ip)`
-- [ ] Log on: deal viewed, document opened, Excel model downloaded, login
-- [ ] Admin view: filterable access log per deal
-- [ ] Export access log to CSV for compliance reporting
+> **Apr 21 2026:** Implemented as two separate Supabase tables. `access_log` tracks all login attempts (label, IP, user-agent, success/fail) — viewable in Settings → Access Log. `deal_activity_log` tracks per-deal document and team actions (upload, delete, status change, team update) — viewable in Deal Team → Document Access Log. Both use session `user.label` as the user identifier.
+
+- [x] Create `access_log` Supabase table — logs every login attempt with IP, browser, label, success
+- [x] Create `deal_activity_log` Supabase table — logs per-deal document + team actions
+- [x] Login attempt log visible to Admin in Settings → Access Log tab
+- [x] Per-deal activity log visible in Deal Team tab → Document Access Log
+- [ ] Export logs to CSV — post-launch
