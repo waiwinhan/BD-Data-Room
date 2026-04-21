@@ -25,7 +25,8 @@
     <!-- NDA STRIP -->
     <div class="nda-strip">
       <span>⚠</span>
-      Confidential — under NDA. Access restricted to authorised personnel only.
+      <span>Confidential — under NDA. Access restricted to authorised personnel only.</span>
+      <span class="nda-user" v-if="sessionLabel">Logged in as <strong>{{ sessionLabel }}</strong></span>
     </div>
 
     <!-- PAGE CONTENT -->
@@ -51,6 +52,9 @@
 // Shared modal state — readable by any page via useState('showAddDeal')
 const showAddDeal  = useState('showAddDeal',  () => false)
 const showSettings = ref(false)
+
+const { session } = useUserSession()
+const sessionLabel = computed(() => (session.value as any)?.user?.label ?? '')
 
 const router = useRouter()
 async function onDealCreated(dealId: string) {
@@ -164,5 +168,9 @@ html { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   padding: 8px 28px;
   display: flex; align-items: center; gap: 8px;
   font-size: 11.5px; color: var(--amber); font-weight: 500;
+}
+.nda-user {
+  margin-left: auto;
+  font-size: 11px; font-weight: 400; color: var(--amber); opacity: 0.8;
 }
 </style>
