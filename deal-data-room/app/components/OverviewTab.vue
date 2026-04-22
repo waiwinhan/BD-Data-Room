@@ -482,7 +482,13 @@ async function autoSuggest() {
   suggesting.value  = true
   suggestError.value = ''
   try {
-    const results = await $fetch<any[]>(`/api/${props.dealId}/proximities/suggest`, { method: 'POST' })
+    const results = await $fetch<any[]>(`/api/${props.dealId}/proximities/suggest`, {
+      method: 'POST',
+      body: {
+        lat: props.meta?.coordinates?.lat,
+        lng: props.meta?.coordinates?.lng,
+      },
+    })
     // Append suggestions — skip duplicates by label
     const existing = new Set((props.meta.proximities ?? []).map((p: any) => p.label.toLowerCase()))
     for (const r of results) {

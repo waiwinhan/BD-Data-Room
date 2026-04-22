@@ -65,7 +65,10 @@ export default defineEventHandler(async (event) => {
   if (error || !metaRow) throw createError({ statusCode: 404, statusMessage: `Deal ${dealId} not found` })
 
   const meta = metaRow.data
-  const { lat, lng } = meta.coordinates
+  const body = await readBody(event).catch(() => ({}))
+  const lat = body?.lat ?? meta.coordinates?.lat
+  const lng = body?.lng ?? meta.coordinates?.lng
+  if (!lat || !lng) throw createError({ statusCode: 400, statusMessage: 'Coordinates not set. Save the deal location first.' })
 
   // Targeted query — only fetch meaningful POI categories
   const query = `
