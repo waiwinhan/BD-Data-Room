@@ -114,6 +114,63 @@
               </template>
             </div>
 
+            <!-- ── WELCOME ── -->
+            <div v-if="activeTab === 'welcome'">
+              <div v-if="sessionLabel !== 'Admin'" class="lock-notice">
+                🔒 You are logged in as <strong>{{ sessionLabel }}</strong>. Only Admin can change the welcome popup.
+              </div>
+
+              <template v-else>
+                <div class="info-box">
+                  Customise the popup shown to users right after login. Upload a GIF and optionally add a message beneath it.
+                </div>
+
+                <!-- GIF upload -->
+                <div class="field" style="margin-top:16px">
+                  <label class="field-label">Welcome GIF</label>
+
+                  <div v-if="form.welcomeGifDataUrl" class="welcome-gif-preview">
+                    <img :src="form.welcomeGifDataUrl" alt="Welcome GIF preview" class="welcome-gif-img" />
+                    <div class="welcome-gif-actions">
+                      <button class="btn-upload" @click="triggerGifUpload">Replace GIF</button>
+                      <button class="btn-remove" @click="form.welcomeGifDataUrl = ''">Remove</button>
+                    </div>
+                  </div>
+
+                  <div v-else class="welcome-gif-empty">
+                    <div class="gif-empty-icon">🎬</div>
+                    <div class="gif-empty-text">No custom GIF — default file is used</div>
+                    <button class="btn-upload" style="margin-top:8px" @click="triggerGifUpload">Upload GIF</button>
+                  </div>
+
+                  <input ref="welcomeGifInput" type="file" accept="image/gif,image/webp,image/png,image/jpeg" style="display:none" @change="handleGifFile" />
+                  <div class="field-hint" style="margin-top:6px">GIF, WebP, PNG or JPG · Max 10 MB</div>
+                </div>
+
+                <!-- Message -->
+                <div class="field" style="margin-top:16px">
+                  <label class="field-label">Welcome Message <span style="font-weight:400;text-transform:none">(optional)</span></label>
+                  <textarea
+                    v-model="form.welcomeMessage"
+                    class="field-input welcome-textarea"
+                    placeholder="e.g. Welcome to the Deal Data Room. All information is strictly confidential."
+                    rows="3"
+                  ></textarea>
+                  <div class="field-hint">Shown below the GIF in the popup. Leave blank to hide.</div>
+                </div>
+
+                <div v-if="welcomeError"   class="form-error"   style="margin-top:14px">{{ welcomeError }}</div>
+                <div v-if="welcomeSuccess" class="form-success" style="margin-top:14px">Welcome popup saved.</div>
+
+                <div class="section-actions">
+                  <button class="btn-submit" :disabled="saving" @click="saveWelcome">
+                    <span v-if="saving" class="spinner"></span>
+                    <span v-else>Save Welcome Popup</span>
+                  </button>
+                </div>
+              </template>
+            </div>
+
             <!-- ── SECURITY ── -->
             <div v-if="activeTab === 'security'">
               <div class="info-box">
@@ -310,17 +367,21 @@ const emit  = defineEmits<{ close: [], updated: [] }>()
 
 const tabs = [
   { id: 'branding',   label: 'Branding'   },
+  { id: 'welcome',    label: 'Welcome'    },
   { id: 'security',   label: 'Security'   },
   { id: 'access-log', label: 'Access Log' },
   { id: 'defaults',   label: 'Defaults'   },
 ]
 const activeTab = ref('branding')
 
-const saving         = ref(false)
-const brandError     = ref('')
-const brandSuccess   = ref(false)
-const defaultsError  = ref('')
+const saving          = ref(false)
+const brandError      = ref('')
+const brandSuccess    = ref(false)
+const welcomeError    = ref('')
+const welcomeSuccess  = ref(false)
+const defaultsError   = ref('')
 const defaultsSuccess = ref(false)
+const welcomeGifInput = ref<HTMLInputElement>()
 
 // Security
 const { session }    = useUserSession()
@@ -343,7 +404,7 @@ const showEditPwd    = ref(false)
 const accessLog  = ref<any[]>([])
 const logLoading = ref(false)
 
-const form      = reactive({ roomName: '', logoDataUrl: '', defaultHurdleRate: 15 })
+const form      = reactive({ roomName: '', logoDataUrl: '', defaultHurdleRate: 15, welcomeGifDataUrl: '', welcomeMessage: '' })
 const logoInput = ref<HTMLInputElement>()
 
 // ── Logo editor state ────────────────────────────────────────────────────────
@@ -384,6 +445,7 @@ watch(activeTab, async (tab) => {
 
 function resetMessages() {
   brandError.value = ''; brandSuccess.value = false
+  welcomeError.value = ''; welcomeSuccess.value = false
   defaultsError.value = ''; defaultsSuccess.value = false
   securityError.value = ''; securitySuccess.value = ''
   showAddForm.value = false; editingSlot.value = ''
@@ -397,9 +459,11 @@ function resetMessages() {
 async function loadSettings() {
   try {
     const s = await $fetch('/api/settings') as any
-    form.roomName          = s.roomName         ?? 'Deal Data Room'
+    form.roomName          = s.roomName          ?? 'Deal Data Room'
     form.logoDataUrl       = s.logoDataUrl       ?? ''
     form.defaultHurdleRate = s.defaultHurdleRate ?? 15
+    form.welcomeGifDataUrl = s.welcomeGifDataUrl ?? ''
+    form.welcomeMessage    = s.welcomeMessage    ?? ''
     passwordSlots.value    = s.passwordSlots     ?? [{ label: 'Admin' }]
   } catch {}
 }
@@ -595,6 +659,35 @@ async function removeSlot(label: string) {
   } finally { saving.value = false }
 }
 
+// ── Welcome popup ────────────────────────────────────────────────────────────
+function triggerGifUpload() { welcomeGifInput.value?.click() }
+
+function handleGifFile(e: Event) {
+  const file = (e.target as HTMLInputElement).files?.[0]
+  if (!file) return
+  if (file.size > 10 * 1024 * 1024) { welcomeError.value = 'GIF must be under 10 MB.'; return }
+  const reader = new FileReader()
+  reader.onload = () => { form.welcomeGifDataUrl = reader.result as string }
+  reader.readAsDataURL(file)
+  if (welcomeGifInput.value) welcomeGifInput.value.value = ''
+}
+
+async function saveWelcome() {
+  welcomeError.value = ''; welcomeSuccess.value = false
+  saving.value = true
+  try {
+    await $fetch('/api/settings', { method: 'PUT', body: {
+      welcomeGifDataUrl: form.welcomeGifDataUrl,
+      welcomeMessage:    form.welcomeMessage,
+    }})
+    welcomeSuccess.value = true
+    emit('updated')
+    setTimeout(() => { welcomeSuccess.value = false }, 3000)
+  } catch (err: any) {
+    welcomeError.value = err.data?.statusMessage || err.message || 'Failed to save.'
+  } finally { saving.value = false }
+}
+
 // ── Save defaults ────────────────────────────────────────────────────────────
 async function saveDefaults() {
   defaultsError.value = ''; defaultsSuccess.value = false
@@ -757,6 +850,26 @@ function parseUA(ua: string) {
 
 .logo-editor-actions {
   display: flex; gap: 6px; width: 100%; justify-content: flex-end; max-width: 280px;
+}
+
+/* Welcome GIF */
+.welcome-gif-preview {
+  display: flex; flex-direction: column; gap: 10px; margin-top: 8px;
+}
+.welcome-gif-img {
+  width: 100%; max-height: 220px; object-fit: contain;
+  border: 1.5px solid var(--border2); border-radius: 8px; background: #000;
+}
+.welcome-gif-actions { display: flex; gap: 8px; align-items: center; }
+.welcome-gif-empty {
+  margin-top: 8px; border: 1.5px dashed var(--border2); border-radius: 8px;
+  padding: 24px; text-align: center; background: var(--surface2);
+  display: flex; flex-direction: column; align-items: center;
+}
+.gif-empty-icon { font-size: 28px; margin-bottom: 6px; }
+.gif-empty-text { font-size: 12px; color: var(--faint); }
+.welcome-textarea {
+  height: auto; padding: 8px 10px; resize: vertical; line-height: 1.5;
 }
 
 /* Info box */

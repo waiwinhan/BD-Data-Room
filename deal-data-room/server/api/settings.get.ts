@@ -12,9 +12,11 @@ export default defineEventHandler(async () => {
   }
 
   return {
-    roomName:          s.roomName          ?? 'Deal Data Room',
-    logoDataUrl:       s.logoDataUrl       ?? '',
-    defaultHurdleRate: s.defaultHurdleRate ?? 15,
+    roomName:           s.roomName           ?? 'Deal Data Room',
+    logoDataUrl:        s.logoDataUrl        ?? '',
+    defaultHurdleRate:  s.defaultHurdleRate  ?? 15,
+    welcomeGifDataUrl:  s.welcomeGifDataUrl  ?? '',
+    welcomeMessage:     s.welcomeMessage     ?? '',
     passwordSlots,   // labels only — actual passwords never sent to client
   }
 })

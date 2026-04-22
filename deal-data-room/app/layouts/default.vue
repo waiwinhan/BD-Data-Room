@@ -45,6 +45,9 @@
       @close="showSettings = false"
       @updated="loadSettings"
     />
+
+    <!-- Welcome Popup (shown once per session after login) -->
+    <WelcomePopup />
   </div>
 </template>
 

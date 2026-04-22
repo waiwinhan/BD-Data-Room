@@ -4,7 +4,10 @@
 
       <!-- Logo -->
       <div class="login-logo">
-        <div class="logo-mark">{{ initials }}</div>
+        <div class="logo-mark">
+          <img v-if="logoDataUrl" :src="logoDataUrl" alt="logo" class="logo-img" />
+          <template v-else>{{ initials }}</template>
+        </div>
         <div class="login-brand">
           <div class="login-brand-name">{{ roomName }}</div>
           <div class="login-brand-sub">Deal Data Room</div>
@@ -68,7 +71,8 @@ const loading      = ref(false)
 const showPassword = ref(false)
 const inputRef     = ref<HTMLInputElement | null>(null)
 
-const roomName = ref('Deal Data Room')
+const roomName   = ref('Deal Data Room')
+const logoDataUrl = ref('')
 const initials = computed(() =>
   roomName.value.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()
 )
@@ -79,7 +83,8 @@ onMounted(async () => {
   inputRef.value?.focus()
   try {
     const s = await $fetch('/api/settings') as any
-    if (s.roomName) roomName.value = s.roomName
+    if (s.roomName)    roomName.value    = s.roomName
+    if (s.logoDataUrl) logoDataUrl.value = s.logoDataUrl
   } catch {}
 })
 
@@ -91,6 +96,7 @@ async function submit() {
     await $fetch('/api/auth/login', { method: 'POST', body: { password: password.value } })
     // Refresh session state client-side before navigating so middleware sees it
     await refreshSession()
+    sessionStorage.setItem('show_welcome', '1')
     await navigateTo('/')
   } catch (err: any) {
     error.value = err?.data?.message ?? 'Incorrect password. Please try again.'
@@ -127,8 +133,9 @@ async function submit() {
   background: #1A1916; border-radius: 9px;
   display: flex; align-items: center; justify-content: center;
   font-size: 12px; font-weight: 700; color: #fff; letter-spacing: 0.04em;
-  flex-shrink: 0;
+  flex-shrink: 0; overflow: hidden;
 }
+.logo-img { width: 100%; height: 100%; object-fit: contain; }
 .login-brand-name { font-size: 15px; font-weight: 700; color: #1A1916; }
 .login-brand-sub  { font-size: 12px; color: #7A7770; }
 

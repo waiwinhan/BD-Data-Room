@@ -9,7 +9,7 @@ export default defineEventHandler(async (event) => {
 
   // ── Migrate legacy single password → passwords array ─────────────────────
   if (!Array.isArray(current.passwords)) {
-    current.passwords = [{ label: 'Admin', password: current.password ?? 'brdb2024' }]
+    current.passwords = [{ label: 'Admin', password: current.password ?? 'admin2024' }]
     delete current.password
   }
 
@@ -65,8 +65,9 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // ── Guard: branding changes require Admin session ─────────────────────────
+  // ── Guard: branding/welcome changes require Admin session ────────────────
   const isBrandingOp = body.roomName !== undefined || body.logoDataUrl !== undefined
+    || body.welcomeGifDataUrl !== undefined || body.welcomeMessage !== undefined
   if (isBrandingOp) {
     const session = await getUserSession(event)
     if (session?.user?.label !== 'Admin') {
@@ -79,8 +80,10 @@ export default defineEventHandler(async (event) => {
     if (!body.roomName.trim()) throw createError({ statusCode: 400, statusMessage: 'Room name cannot be empty' })
     current.roomName = body.roomName.trim()
   }
-  if (body.logoDataUrl       !== undefined) current.logoDataUrl       = body.logoDataUrl
-  if (body.defaultHurdleRate !== undefined) {
+  if (body.logoDataUrl        !== undefined) current.logoDataUrl        = body.logoDataUrl
+  if (body.welcomeGifDataUrl  !== undefined) current.welcomeGifDataUrl  = body.welcomeGifDataUrl
+  if (body.welcomeMessage     !== undefined) current.welcomeMessage     = body.welcomeMessage
+  if (body.defaultHurdleRate  !== undefined) {
     const rate = parseFloat(body.defaultHurdleRate)
     if (isNaN(rate) || rate < 0 || rate > 100) throw createError({ statusCode: 400, statusMessage: 'Hurdle rate must be 0–100' })
     current.defaultHurdleRate = rate
