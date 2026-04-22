@@ -85,19 +85,27 @@ export default defineEventHandler(async (event) => {
 out center 40;
 `
 
+  const OVERPASS_MIRRORS = [
+    'https://overpass-api.de/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter',
+  ]
+
   let data: any
-  try {
-    // Overpass API requires form-encoded `data=` parameter
-    const body = 'data=' + encodeURIComponent(query)
-    const res = await fetch('https://overpass-api.de/api/interpreter', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body,
-      signal: AbortSignal.timeout(20000),
-    })
-    if (!res.ok) throw new Error(`Overpass HTTP ${res.status}`)
-    data = await res.json()
-  } catch {
+  const body = 'data=' + encodeURIComponent(query)
+  for (const endpoint of OVERPASS_MIRRORS) {
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body,
+        signal: AbortSignal.timeout(20000),
+      })
+      if (!res.ok) throw new Error(`Overpass HTTP ${res.status}`)
+      data = await res.json()
+      break
+    } catch { /* try next mirror */ }
+  }
+  if (!data) {
     throw createError({ statusCode: 503, statusMessage: 'Could not reach map service. Add manually.' })
   }
 
