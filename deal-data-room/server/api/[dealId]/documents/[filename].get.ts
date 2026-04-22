@@ -6,6 +6,8 @@ const MIME: Record<string, string> = {
   xls:  'application/vnd.ms-excel',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   doc:  'application/msword',
+  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  ppt:  'application/vnd.ms-powerpoint',
   jpg:  'image/jpeg', jpeg: 'image/jpeg', png: 'image/png',
 }
 const INLINE_TYPES = new Set(['pdf', 'jpg', 'jpeg', 'png'])

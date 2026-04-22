@@ -1,6 +1,8 @@
 import { extname, basename } from 'path'
 
-const ALLOWED_EXT = new Set(['pdf', 'xlsx', 'xls', 'doc', 'docx', 'jpg', 'jpeg', 'png'])
+const ALLOWED_EXT = new Set(['pdf', 'xlsx', 'xls', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'ppt', 'pptx'])
+
+
 
 function sanitize(name: string) {
   return name.replace(/[^a-zA-Z0-9._\- ]/g, '_').trim()

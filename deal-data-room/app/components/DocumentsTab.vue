@@ -105,7 +105,7 @@
 
     </div>
 
-    <input ref="fileInput" type="file" accept=".pdf,.xlsx,.xls,.doc,.docx,.jpg,.jpeg,.png" style="display:none" @change="onFileChosen" />
+    <input ref="fileInput" type="file" accept=".pdf,.xlsx,.xls,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png" style="display:none" @change="onFileChosen" />
 
     <!-- ── SUMMARY STRIP ── -->
     <div class="doc-summary">
@@ -411,9 +411,9 @@ async function onFileChosen(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0]
   if (!file) return
 
-  const ALLOWED = /\.(pdf|xlsx|xls|doc|docx|jpg|jpeg|png)$/i
+  const ALLOWED = /\.(pdf|xlsx|xls|doc|docx|ppt|pptx|jpg|jpeg|png)$/i
   if (!ALLOWED.test(file.name)) {
-    alert(`File type not allowed. Please upload PDF, Excel, Word, or image files.`)
+    alert(`File type not allowed. Please upload PDF, Excel, Word, PowerPoint, or image files.`)
     ;(event.target as HTMLInputElement).value = ''
     return
   }

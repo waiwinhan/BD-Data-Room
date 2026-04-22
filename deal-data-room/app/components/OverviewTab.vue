@@ -301,17 +301,27 @@
             <span v-if="swot.docsAnalysed" class="swot-docs-badge">{{ swot.docsAnalysed }} doc{{ swot.docsAnalysed > 1 ? 's' : '' }} analysed</span>
           </span>
         </div>
-        <button class="btn-generate" :disabled="generating" @click="generateSwot">
-          <span v-if="generating" class="gen-spinner"></span>
-          <span v-else>✦</span>
-          {{ generating ? 'Analysing…' : swot ? 'Regenerate' : 'Generate AI Analysis' }}
-        </button>
+        <div class="swot-actions">
+          <template v-if="editingSwot">
+            <button class="btn-swot-action btn-save" :disabled="swotSaving" @click="saveSwot">{{ swotSaving ? 'Saving…' : 'Save' }}</button>
+            <button class="btn-swot-action btn-cancel" @click="cancelEditSwot">Cancel</button>
+          </template>
+          <template v-else>
+            <button class="btn-swot-action btn-edit" @click="startEditSwot">{{ swot ? 'Edit' : 'Add Manually' }}</button>
+            <button class="btn-generate" :disabled="generating" @click="generateSwot">
+              <span v-if="generating" class="gen-spinner"></span>
+              <span v-else>✦</span>
+              {{ generating ? 'Analysing…' : swot ? 'Regenerate' : 'Generate AI Analysis' }}
+            </button>
+          </template>
+        </div>
       </div>
       <div class="ai-disclaimer">⚠ AI can make mistakes. Please double-check the responses.</div>
 
       <div v-if="swotError" class="swot-error">{{ swotError }}</div>
 
-      <div v-if="swot" class="swot-grid">
+      <!-- View mode -->
+      <div v-if="swot && !editingSwot" class="swot-grid">
         <div class="swot-card swot-s">
           <div class="swot-card-label">💪 Strengths</div>
           <ul class="swot-list">
@@ -338,6 +348,26 @@
         </div>
       </div>
 
+      <!-- Edit mode -->
+      <div v-else-if="editingSwot" class="swot-grid">
+        <div class="swot-card swot-s">
+          <div class="swot-card-label">💪 Strengths</div>
+          <textarea class="swot-edit-area" v-model="draftSwot.strengths" placeholder="One bullet per line…" rows="5"></textarea>
+        </div>
+        <div class="swot-card swot-w">
+          <div class="swot-card-label">⚠ Weaknesses</div>
+          <textarea class="swot-edit-area" v-model="draftSwot.weaknesses" placeholder="One bullet per line…" rows="5"></textarea>
+        </div>
+        <div class="swot-card swot-o">
+          <div class="swot-card-label">🚀 Opportunities</div>
+          <textarea class="swot-edit-area" v-model="draftSwot.opportunities" placeholder="One bullet per line…" rows="5"></textarea>
+        </div>
+        <div class="swot-card swot-t">
+          <div class="swot-card-label">⚡ Threats</div>
+          <textarea class="swot-edit-area" v-model="draftSwot.threats" placeholder="One bullet per line…" rows="5"></textarea>
+        </div>
+      </div>
+
       <div v-else-if="!generating" class="swot-empty">
         <span class="swot-empty-icon">✦</span>
         <span>Click "Generate AI Analysis" to run a SWOT analysis using Claude AI — including all uploaded documents.</span>
@@ -348,11 +378,16 @@
     <div class="rec-section">
       <div class="rec-section-header">
         <span class="swot-title">AI Recommendation</span>
-        <span class="rec-powered">Powered by Claude AI</span>
+        <div class="swot-actions">
+          <template v-if="editingSwot">
+            <!-- edit controls shown above in SWOT header -->
+          </template>
+          <span v-else class="rec-powered">Powered by Claude AI</span>
+        </div>
       </div>
 
-      <!-- Populated -->
-      <div v-if="swot?.recommendation" class="rec-body" :class="`rec-${verdictClass}`">
+      <!-- View mode — Populated -->
+      <div v-if="swot?.recommendation && !editingSwot" class="rec-body" :class="`rec-${verdictClass}`">
         <div class="rec-verdict-block">
           <div class="rec-label">Verdict</div>
           <div class="rec-verdict" :class="`rec-verdict-${verdictClass}`">{{ swot.recommendation?.verdict }}</div>
@@ -367,6 +402,31 @@
               <li v-for="(c, i) in swot.recommendation.keyConditions" :key="i">{{ c }}</li>
             </ul>
           </div>
+        </div>
+      </div>
+
+      <!-- Edit mode — Recommendation -->
+      <div v-else-if="editingSwot" class="rec-edit-body">
+        <div class="rec-edit-row">
+          <label class="rec-edit-label">Verdict</label>
+          <select class="rec-edit-select" v-model="draftRec.verdict">
+            <option>Proceed</option>
+            <option>Proceed with Caution</option>
+            <option>Hold</option>
+            <option>Reject</option>
+          </select>
+        </div>
+        <div class="rec-edit-row">
+          <label class="rec-edit-label">Headline</label>
+          <input class="rec-edit-input" v-model="draftRec.headline" placeholder="One sharp sentence summarising the verdict" />
+        </div>
+        <div class="rec-edit-row">
+          <label class="rec-edit-label">Rationale</label>
+          <textarea class="rec-edit-textarea" v-model="draftRec.rationale" rows="3" placeholder="2–3 sentences of strategic reasoning…"></textarea>
+        </div>
+        <div class="rec-edit-row">
+          <label class="rec-edit-label">Key Conditions / Actions</label>
+          <textarea class="rec-edit-textarea" v-model="draftRec.keyConditions" rows="4" placeholder="One condition per line…"></textarea>
         </div>
       </div>
 
@@ -388,6 +448,8 @@ const props = defineProps<{
   editMode: boolean
   dealId: string
 }>()
+
+const emit = defineEmits<{ (e: 'meta-updated'): void }>()
 
 const ndpClass = computed(() => (props.fin?.ndpMargin ?? 0) >= (props.deal?.hurdleRate ?? 15) ? 'ndp-green' : 'ndp-red')
 
@@ -599,6 +661,70 @@ const verdictClass = computed(() => {
 function formatSwotDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
+
+// ── SWOT MANUAL EDIT ─────────────────────────────────────────────
+const editingSwot = ref(false)
+const swotSaving  = ref(false)
+const draftSwot = ref({ strengths: '', weaknesses: '', opportunities: '', threats: '' })
+const draftRec  = ref({ verdict: '', headline: '', rationale: '', keyConditions: '' })
+
+function arrToText(arr: string[] = []) { return arr.join('\n') }
+function textToArr(text: string)       { return text.split('\n').map(s => s.trim()).filter(Boolean) }
+
+function startEditSwot() {
+  const s = swot.value?.swot ?? {}
+  draftSwot.value = {
+    strengths:    arrToText(s.strengths),
+    weaknesses:   arrToText(s.weaknesses),
+    opportunities: arrToText(s.opportunities),
+    threats:      arrToText(s.threats),
+  }
+  const r = swot.value?.recommendation ?? {}
+  draftRec.value = {
+    verdict:       r.verdict ?? 'Proceed with Caution',
+    headline:      r.headline ?? r.summary ?? '',
+    rationale:     r.rationale ?? '',
+    keyConditions: arrToText(r.keyConditions),
+  }
+  editingSwot.value = true
+}
+
+function cancelEditSwot() {
+  editingSwot.value = false
+}
+
+async function saveSwot() {
+  swotSaving.value = true
+  try {
+    const updated = {
+      ...swot.value,
+      swot: {
+        strengths:    textToArr(draftSwot.value.strengths),
+        weaknesses:   textToArr(draftSwot.value.weaknesses),
+        opportunities: textToArr(draftSwot.value.opportunities),
+        threats:      textToArr(draftSwot.value.threats),
+      },
+      recommendation: {
+        verdict:       draftRec.value.verdict,
+        headline:      draftRec.value.headline,
+        rationale:     draftRec.value.rationale,
+        keyConditions: textToArr(draftRec.value.keyConditions),
+      },
+      isDemo: false,
+    }
+    await $fetch(`/api/${props.dealId}/meta`, {
+      method: 'PUT',
+      body: { ...props.meta, swot: updated },
+    })
+    swot.value = updated
+    editingSwot.value = false
+    emit('meta-updated')
+  } catch (err: any) {
+    alert('Save failed: ' + (err?.data?.message ?? err.message))
+  } finally {
+    swotSaving.value = false
+  }
+}
 </script>
 
 <style>
@@ -802,6 +928,41 @@ function formatSwotDate(iso: string) {
 .btn-delete-row:hover { background: var(--red-bg); color: var(--red); }
 
 /* ── SWOT SECTION ── */
+/* ── SWOT EDIT CONTROLS ── */
+.swot-actions { display: flex; align-items: center; gap: 8px; }
+.btn-swot-action {
+  font-size: 11px; font-weight: 600; padding: 5px 14px; border-radius: 6px;
+  border: 1px solid var(--border); cursor: pointer; transition: background 0.15s;
+}
+.btn-edit   { background: var(--surface); color: var(--text); }
+.btn-edit:hover { background: var(--border); }
+.btn-save   { background: var(--accent, #2563eb); color: #fff; border-color: transparent; }
+.btn-save:hover { opacity: 0.88; }
+.btn-save:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-cancel { background: var(--surface); color: var(--muted); }
+.btn-cancel:hover { background: var(--border); }
+
+.swot-edit-area {
+  width: 100%; box-sizing: border-box;
+  font-size: 12px; line-height: 1.55; color: var(--text);
+  background: var(--bg, #f9fafb); border: 1px solid var(--border);
+  border-radius: 6px; padding: 8px 10px; resize: vertical;
+  font-family: inherit; outline: none;
+}
+.swot-edit-area:focus { border-color: var(--accent, #2563eb); }
+
+/* ── RECOMMENDATION EDIT ── */
+.rec-edit-body { display: flex; flex-direction: column; gap: 12px; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.rec-edit-row  { display: flex; flex-direction: column; gap: 4px; }
+.rec-edit-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.rec-edit-select, .rec-edit-input, .rec-edit-textarea {
+  font-size: 12.5px; color: var(--text); font-family: inherit;
+  background: var(--bg, #f9fafb); border: 1px solid var(--border);
+  border-radius: 6px; padding: 7px 10px; outline: none; width: 100%; box-sizing: border-box;
+}
+.rec-edit-select:focus, .rec-edit-input:focus, .rec-edit-textarea:focus { border-color: var(--accent, #2563eb); }
+.rec-edit-textarea { resize: vertical; line-height: 1.55; }
+
 .swot-section {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: var(--radius); padding: 20px 22px;

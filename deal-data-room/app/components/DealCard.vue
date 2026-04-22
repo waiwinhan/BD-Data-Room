@@ -124,6 +124,7 @@ function formatDate(dateStr: string): string {
 .deal-card-wrap {
   position: relative;
   animation: fadeUp 0.3s ease both;
+  display: flex; flex-direction: column;
 }
 .deal-card-wrap:hover .trash-btn { opacity: 1; }
 
@@ -148,6 +149,7 @@ function formatDate(dateStr: string): string {
   overflow: hidden;
   display: flex; flex-direction: column;
   text-decoration: none; color: inherit;
+  flex: 1;
 }
 .deal-card:hover {
   box-shadow: var(--shadow-md);
@@ -181,7 +183,7 @@ function formatDate(dateStr: string): string {
 .card-kpi:not(:last-child) { border-right: 1px solid var(--border); }
 .ck-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 3px; font-weight: 500; }
 .ck-value { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
-.ck-sub { font-size: 10px; color: var(--faint); margin-top: 1px; font-family: 'DM Mono', monospace; }
+.ck-sub { font-size: 10px; color: var(--faint); margin-top: 1px; font-family: 'DM Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ck-sub.positive { color: var(--green); }
 .ck-sub.negative { color: var(--red); }
 

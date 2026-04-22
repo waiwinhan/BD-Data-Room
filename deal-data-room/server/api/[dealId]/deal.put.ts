@@ -5,6 +5,7 @@ export default defineEventHandler(async (event) => {
 
   // Map camelCase body fields → snake_case columns
   const update: Record<string, any> = {}
+  if (body.ref         !== undefined) update.ref         = body.ref
   if (body.name        !== undefined) update.name        = body.name
   if (body.location    !== undefined) update.location    = body.location
   if (body.stage       !== undefined) update.stage       = body.stage

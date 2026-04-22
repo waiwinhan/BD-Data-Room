@@ -22,6 +22,7 @@
             <template v-else>
               <input v-model="draftMeta.name" class="edit-input edit-name" placeholder="Deal name" />
               <div class="edit-meta-row">
+                <input v-model="draftDeal.ref" class="edit-input edit-meta-field" placeholder="Index e.g. KL-2026-03" style="width:140px;flex:none" />
                 <input v-model="draftDeal.location" class="edit-input edit-meta-field" placeholder="Location" style="flex:2" />
                 <select v-model="draftMeta.tenure" class="edit-select edit-meta-field">
                   <option>Freehold</option>
@@ -99,6 +100,7 @@
           :fin="fin"
           :edit-mode="editMode"
           :deal-id="dealId"
+          @meta-updated="refreshMeta"
         />
         <DocumentsTab  v-else-if="activeTab === 'documents'"  key="documents"  :deal-id="dealId" />
         <FinancialsTab v-else-if="activeTab === 'financials'" key="financials" :deal="deal" :meta="meta" :fin="fin" :deal-id="dealId" @uploaded="refreshFin" />
@@ -210,8 +212,9 @@ function cancelEdit() {
 async function saveChanges() {
   saving.value = true
   try {
-    // Keep name in sync — it lives in both meta.json and deals.json
+    // Keep name + ref in sync across both tables
     if (draftMeta.name) draftDeal.name = draftMeta.name
+    if (draftDeal.ref)  draftMeta.ref  = draftDeal.ref
     await Promise.all([
       $fetch(`/api/${dealId}/meta`, { method: 'PUT', body: draftMeta }),
       $fetch(`/api/${dealId}/deal`, { method: 'PUT', body: draftDeal }),

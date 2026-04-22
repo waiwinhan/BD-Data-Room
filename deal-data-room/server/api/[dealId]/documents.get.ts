@@ -15,7 +15,8 @@ export default defineEventHandler(async (event) => {
     const ext = d.filename.split('.').pop()?.toLowerCase() ?? ''
     const typeMap: Record<string, string> = {
       pdf: 'PDF', xlsx: 'XLS', xls: 'XLS',
-      doc: 'DOC', docx: 'DOC', jpg: 'IMG', jpeg: 'IMG', png: 'IMG',
+      doc: 'DOC', docx: 'DOC', ppt: 'PPT', pptx: 'PPT',
+      jpg: 'IMG', jpeg: 'IMG', png: 'IMG',
     }
     return {
       filename: d.filename,
