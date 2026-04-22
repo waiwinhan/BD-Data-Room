@@ -494,10 +494,16 @@ function removeAssumption(i: number) {
 const siteMapEl = ref<HTMLElement | null>(null)
 let siteMap: any = null
 
+function destroyMap() {
+  if (siteMap) { siteMap.remove(); siteMap = null }
+}
+
 async function initSiteMap() {
   if (!siteMapEl.value) return
   const coords = props.meta?.coordinates
   if (!coords?.lat || !coords?.lng) return
+
+  destroyMap()
 
   const L = await import('leaflet')
 
@@ -509,22 +515,16 @@ async function initSiteMap() {
     scrollWheelZoom: true,
   })
 
-  // Esri World Imagery — satellite base, free, no API key
   L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    {
-      attribution: 'Tiles &copy; Esri',
-      maxZoom: 19,
-    }
+    { attribution: 'Tiles &copy; Esri', maxZoom: 19 }
   ).addTo(siteMap)
 
-  // Street label overlay on top of satellite
   L.tileLayer(
     'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
     { maxZoom: 19, opacity: 0.8 }
   ).addTo(siteMap)
 
-  // Site marker
   L.circleMarker([coords.lat, coords.lng], {
     radius: 7,
     fillColor: '#5DCAA5',
@@ -546,29 +546,27 @@ onMounted(async () => {
   if (!props.editMode) await initSiteMap()
 })
 
-onBeforeUnmount(() => {
-  if (siteMap) { siteMap.remove(); siteMap = null }
-})
+onBeforeUnmount(destroyMap)
 
-// Re-init map when coordinates arrive (Supabase data loads after mount)
-watch(
-  () => props.meta?.coordinates,
-  async (coords) => {
-    if (!coords?.lat || !coords?.lng || props.editMode) return
-    if (siteMap) { siteMap.remove(); siteMap = null }
-    await nextTick()
-    await initSiteMap()
-  },
-  { deep: true }
-)
-
+// Re-draw map when leaving edit mode OR when coordinates change
 watch(() => props.editMode, async (isEditing) => {
   if (!isEditing) {
-    siteMap = null
     await nextTick()
     await initSiteMap()
+  } else {
+    destroyMap()
   }
 })
+
+watch(
+  () => [props.meta?.coordinates?.lat, props.meta?.coordinates?.lng],
+  async ([lat, lng]) => {
+    if (!props.editMode && lat && lng) {
+      await nextTick()
+      await initSiteMap()
+    }
+  }
+)
 
 // ── SWOT AI ──────────────────────────────────────────────────────
 const generating = ref(false)
