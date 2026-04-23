@@ -46,6 +46,7 @@
 | M25 | Documents Trash Permanent Delete + Rename Fix | 3 | ✅ | Apr 21 |
 | M26 | Welcome Popup (admin-configurable GIF + message) | 4 | ✅ | Apr 21 |
 | M27 | Manual SWOT & Recommendation Editing | 4 | ✅ | Apr 23 |
+| M28 | Supabase RLS + Service Role Key | 5 | ✅ | Apr 23 |
 
 **Prototype files (visual spec — open in browser before coding each module)**
 - `deal-data-room-list.html` → M02 DealCard, FilterBar, PortfolioSummary
@@ -819,6 +820,25 @@ Goal: Replace flat JSON files + local filesystem with Supabase (PostgreSQL + Sto
 - [x] Fix: pass lat/lng in POST body to `/api/[dealId]/proximities/suggest` so auto-suggest works before coordinates are saved
 - [x] Fix: add `User-Agent` header to Overpass API requests (was returning 406 without it)
 - [x] Fix: add `overpass.kumi.systems` as fallback mirror if primary Overpass endpoint fails
+
+---
+
+### M28 — Supabase RLS + Service Role Key ✅
+
+**Milestone:** Row Level Security enabled on all public Supabase tables. Server uses service role key to bypass RLS safely.
+
+> **Apr 23 2026:** Enabled RLS on all 6 public tables (`access_log`, `deal_activity_log`, `deal_documents`, `deals`, `settings`, `deal_risks`, `deal_meta`). Log tables (access_log, deal_activity_log) allow service role insert only — no direct client read. Data tables allow authenticated read + service role write. Switched `server/utils/supabase.ts` from anon key to service role key so all server-side API routes continue to work. Added `SUPABASE_SERVICE_ROLE_KEY` to `.env` and `nuxt.config.ts` runtimeConfig.
+
+- [x] Enable RLS on `public.access_log` — service role insert only
+- [x] Enable RLS on `public.deal_activity_log` — service role insert only
+- [x] Enable RLS on `public.deal_documents` — authenticated read, service role write
+- [x] Enable RLS on `public.deals` — authenticated read, service role write
+- [x] Enable RLS on `public.settings` — authenticated read, service role write
+- [x] Enable RLS on `public.deal_risks` — authenticated read, service role write
+- [x] Enable RLS on `public.deal_meta` — authenticated read, service role write
+- [x] Add `SUPABASE_SERVICE_ROLE_KEY` to `nuxt.config.ts` runtimeConfig (private)
+- [x] Update `server/utils/supabase.ts` — prefer service role key over anon key
+- [x] Add `SUPABASE_SERVICE_ROLE_KEY` to `.env`
 
 ---
 
