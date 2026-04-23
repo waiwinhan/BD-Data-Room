@@ -99,7 +99,10 @@ out center 40;
     try {
       const res = await fetch(endpoint, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'BRDB-DataRoom/1.0 (property deal due diligence tool)',
+        },
         body: overpassBody,
         signal: AbortSignal.timeout(20000),
       })
