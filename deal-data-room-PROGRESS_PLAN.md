@@ -47,6 +47,7 @@
 | M26 | Welcome Popup (admin-configurable GIF + message) | 4 | ✅ | Apr 21 |
 | M27 | Manual SWOT & Recommendation Editing | 4 | ✅ | Apr 23 |
 | M28 | Supabase RLS + Service Role Key | 5 | ✅ | Apr 23 |
+| M29 | Excel Parser — Label-Based Row Detection | 5 | ✅ | Apr 23 |
 
 **Prototype files (visual spec — open in browser before coding each module)**
 - `deal-data-room-list.html` → M02 DealCard, FilterBar, PortfolioSummary
@@ -839,6 +840,27 @@ Goal: Replace flat JSON files + local filesystem with Supabase (PostgreSQL + Sto
 - [x] Add `SUPABASE_SERVICE_ROLE_KEY` to `nuxt.config.ts` runtimeConfig (private)
 - [x] Update `server/utils/supabase.ts` — prefer service role key over anon key
 - [x] Add `SUPABASE_SERVICE_ROLE_KEY` to `.env`
+
+---
+
+### M29 — Excel Parser — Label-Based Row Detection ✅
+
+**Milestone:** Excel parser correctly reads all BRDB feasibility study template versions, regardless of row layout differences.
+
+> **Apr 23 2026:** Rewrote `server/utils/parseFinancials.ts` to replace all hardcoded row numbers with label-based scanning. Root cause: newer BRDB feasibility templates (KL-2026-03, KL-2026-04) have the same data but at different row positions — e.g. NDV at row 69 instead of 61, GDV at row 47 instead of 38, NDP at row 170 instead of 159. The old parser was reading completely wrong cells, producing garbage like NDV=19.5M (Repeat Buyers/BGB value) and NDP margin of 12,933,800,208%.
+>
+> Fix: `parseFinancials.ts` now scans the sheet for known label strings ("NET DEVELOPMENT VALUE (NDV)", "GROSS DEVELOPMENT VALUE (GDV)", "NET DEVELOPMENT COST (GDC) BEFORE FINANCE CHARGES", etc.) to locate the correct rows. Section totals (Land=section 2, Construction=section 3, Finance=section 11) are found by matching section numbers. blendedPSF uses the consistent ndvRow+3 offset. NDP picks the first money-valued row (>1) containing "NDP" and "AFTER FINANCIAL CHARGES".
+>
+> **Verified API output for KL-2026-04 (Jalan Ampang):** NDV 649.3M · GDV 834.2M · Construction 306.2M · NDP 102.8M · Dev margin 15.8% · Land 159.5M · Finance 26.5M · PSF 1374
+> **Verified API output for KL-2026-03 (Jalan Desa Sentosa):** NDV 161.7M · GDV 229.3M · Construction 102.6M · NDP 23.8M · Dev margin 14.7% · Land 15M · Finance 5.4M · PSF 550
+
+- [x] Replace all hardcoded row offsets with `findRowByLabel()` label scanner
+- [x] `findSection()` helper finds section totals (2=Land, 3=GCC, 11=Finance) by numeric section prefix
+- [x] NDV row detection drives phaseCol scan (first non-zero col ≥ 9 on NDV row)
+- [x] NDP: scan forward from NDV row for "(NDP) AFTER FINANCIAL CHARGES" with money value; fallback to pre-NDV scan for old template style
+- [x] Finance charges: GDC after - GDC before diff, fallback to section 11 search
+- [x] blendedPSF: ndvRow+3 offset (consistent across all observed template versions)
+- [x] Remove isNew flag — no longer needed (label search is template-agnostic)
 
 ---
 
