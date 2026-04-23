@@ -94,13 +94,13 @@ out center 40;
   ]
 
   let data: any
-  const body = 'data=' + encodeURIComponent(query)
+  const overpassBody = 'data=' + encodeURIComponent(query)
   for (const endpoint of OVERPASS_MIRRORS) {
     try {
       const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body,
+        body: overpassBody,
         signal: AbortSignal.timeout(20000),
       })
       if (!res.ok) throw new Error(`Overpass HTTP ${res.status}`)
