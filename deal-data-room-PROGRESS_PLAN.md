@@ -44,6 +44,8 @@
 | M23 | Editable Deal Team + Activity Log | 4 | ✅ | Apr 21 |
 | M24 | Excel Parser Multi-Template + KPI Auto-Sync | 5 | ✅ | Apr 21 |
 | M25 | Documents Trash Permanent Delete + Rename Fix | 3 | ✅ | Apr 21 |
+| M26 | Welcome Popup (admin-configurable GIF + message) | 4 | ✅ | Apr 21 |
+| M27 | Manual SWOT & Recommendation Editing | 4 | ✅ | Apr 23 |
 
 **Prototype files (visual spec — open in browser before coding each module)**
 - `deal-data-room-list.html` → M02 DealCard, FilterBar, PortfolioSummary
@@ -784,6 +786,39 @@ Goal: Replace flat JSON files + local filesystem with Supabase (PostgreSQL + Sto
 - [x] Trash section always visible in DocumentsTab (not conditional on item count)
 - [x] "Delete forever" button per trashed file → red warning dialog → permanent removal
 - [x] Fix `documents/[filename].put.ts` — rewritten to update `deal_documents` in Supabase (was writing to dead local `.meta.json`)
+
+---
+
+### M26 — Welcome Popup (admin-configurable GIF + message) ✅
+
+**Milestone:** A welcome popup appears on first login with a custom GIF and message, configurable by Admin from Settings.
+
+> **Apr 21 2026:** Added a welcome popup modal that displays on first page load after login. Admin can upload a GIF and write a custom welcome message in Settings → Branding tab. Popup is dismissible and remembers dismissal per session.
+
+- [x] Admin-configurable welcome GIF + message stored in Supabase settings table
+- [x] Settings → Branding tab: GIF upload field + welcome message textarea
+- [x] Popup shown on first load after login (session-scoped dismissal)
+- [x] Dismiss button closes popup and suppresses for the rest of the session
+
+---
+
+### M27 — Manual SWOT & Recommendation Editing ✅
+
+**Milestone:** Users can manually create or edit the SWOT analysis and AI Recommendation from the Overview tab — no AI generation required.
+
+> **Apr 23 2026:** Added Edit / Add Manually buttons to the SWOT Analysis and AI Recommendation sections. In edit mode, each SWOT quadrant becomes a textarea (one bullet per line). The Recommendation section shows a verdict dropdown, headline input, rationale textarea, and key conditions textarea. Saves to Supabase `deal_meta` via `PUT /api/[dealId]/meta` and triggers a parent `refreshMeta()` so data persists across tab switches without page reload.
+>
+> **Bug fixed (Apr 23):** Auto-suggest proximities was failing with "Could not reach map service" due to: (1) Overpass API returning 406 when no `User-Agent` header is present, (2) coordinates not yet saved to Supabase when button is clicked. Fixed by adding `User-Agent` header, adding fallback mirror (`overpass.kumi.systems`), and passing current lat/lng from client in the POST body so unsaved coordinates work.
+
+- [x] SWOT section: **Edit** button (when SWOT exists) / **Add Manually** button (when empty)
+- [x] Edit mode: 4 textareas — Strengths, Weaknesses, Opportunities, Threats (one point per line)
+- [x] Recommendation edit: verdict dropdown, headline input, rationale textarea, key conditions textarea
+- [x] Save / Cancel buttons replace Edit button while in edit mode
+- [x] `saveSwot()` calls `PUT /api/[dealId]/meta` with full updated meta + swot blob
+- [x] Emits `meta-updated` event → parent calls `refreshMeta()` so data survives tab switches
+- [x] Fix: pass lat/lng in POST body to `/api/[dealId]/proximities/suggest` so auto-suggest works before coordinates are saved
+- [x] Fix: add `User-Agent` header to Overpass API requests (was returning 406 without it)
+- [x] Fix: add `overpass.kumi.systems` as fallback mirror if primary Overpass endpoint fails
 
 ---
 
