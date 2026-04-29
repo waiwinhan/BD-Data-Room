@@ -31,7 +31,7 @@
       <!-- Cost Breakdown Doughnut -->
       <div class="chart-card">
         <div class="card-title">Cost Breakdown</div>
-        <div class="chart-wrap">
+        <div class="chart-wrap chart-wrap-3d">
           <ClientOnly>
             <Doughnut :data="doughnutData" :options="doughnutOpts" :plugins="[DataLabelsPlugin]" />
           </ClientOnly>
@@ -40,7 +40,7 @@
           <div v-for="(item, i) in costItems" :key="i" class="legend-item">
             <div class="legend-dot" :style="{ background: item.color }"></div>
             {{ item.label }} RM {{ item.value }}M
-            <span class="legend-pct">({{ ((item.value / fin.totalDevCost) * 100).toFixed(0) }}%)</span>
+            <span class="legend-pct">({{ ((item.value / displayedTotal) * 100).toFixed(0) }}%)</span>
           </div>
         </div>
       </div>
@@ -211,15 +211,17 @@ const ndpClass = computed(() => {
   return m >= hurdle ? 'val-green' : 'val-red'
 })
 
-// ── Cost items (6 categories) ───────────────────────────────────────────────
+// ── Cost items (5 categories — marketing excluded) ──────────────────────────
 const costItems = computed(() => [
   { label: 'Land',         value: fin.value.landCost,   color: '#5DCAA5' },
   { label: 'Construction', value: fin.value.constr,     color: '#85B7EB' },
   { label: 'Authority',    value: fin.value.authority,  color: '#FAC775' },
   { label: 'Site Staff',   value: fin.value.siteStaff,  color: '#B4B2A9' },
   { label: 'Finance',      value: fin.value.finance,    color: '#F0997B' },
-  { label: 'Marketing',    value: fin.value.marketing,  color: '#C4A0E8' },
 ])
+
+// Sum of displayed items — used as denominator so percentages always add to 100%
+const displayedTotal = computed(() => costItems.value.reduce((s, c) => s + (c.value ?? 0), 0))
 
 // ── Doughnut ────────────────────────────────────────────────────────────────
 const doughnutData = computed(() => ({
@@ -233,7 +235,7 @@ const doughnutData = computed(() => ({
 }))
 
 const doughnutOpts = computed(() => {
-  const total = fin.value.totalDevCost
+  const total = displayedTotal.value
   return {
     responsive: true,
     maintainAspectRatio: false,
@@ -375,6 +377,16 @@ function cellClass(abs: number, asp: number): string {
 }
 .card-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 14px; letter-spacing: 0.01em; }
 .chart-wrap { height: 200px; position: relative; }
+.chart-wrap-3d {
+  background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(93,202,165,0.09) 0%, transparent 72%);
+  border-radius: 50%;
+}
+.chart-wrap-3d canvas {
+  filter:
+    drop-shadow(0 0 18px rgba(93,202,165,0.28))
+    drop-shadow(0 8px 20px rgba(0,0,0,0.13))
+    drop-shadow(0 2px 4px rgba(0,0,0,0.08));
+}
 .legend { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-top: 14px; }
 .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--muted); }
 .legend-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }

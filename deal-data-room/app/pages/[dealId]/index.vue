@@ -71,6 +71,9 @@
         <Transition name="toast">
           <div v-if="savedToast" class="saved-toast">✓ Changes saved</div>
         </Transition>
+        <Transition name="toast">
+          <div v-if="autoSaved && !savedToast" class="auto-saved-indicator">↑ Auto-saved</div>
+        </Transition>
 
         <!-- TAB BAR -->
         <div class="tab-bar" role="tablist">
@@ -104,6 +107,7 @@
         />
         <DocumentsTab  v-else-if="activeTab === 'documents'"  key="documents"  :deal-id="dealId" />
         <FinancialsTab v-else-if="activeTab === 'financials'" key="financials" :deal="deal" :meta="meta" :fin="fin" :deal-id="dealId" @uploaded="refreshFin" />
+        <MarketResearchTab v-else-if="activeTab === 'market-research'" key="market-research" :deal-id="dealId" :fin="fin" :meta="meta" />
         <RiskTab       v-else-if="activeTab === 'risk'"       key="risk"       :deal-id="dealId" :meta="meta" :deal="deal" @meta-updated="refreshMeta" />
         <TeamTab       v-else-if="activeTab === 'team'"       key="team"       :deal-id="dealId" />
       </Transition>
@@ -179,18 +183,20 @@ const stageBadgeMap: Record<string, string> = {
 const stageBadge = computed(() => stageBadgeMap[deal.value?.stage] ?? 'badge-grey')
 
 const tabs = [
-  { key: 'overview',   label: 'Overview' },
-  { key: 'documents',  label: 'Documents' },
-  { key: 'financials', label: 'Financials' },
-  { key: 'risk',       label: 'Risk & Legal' },
-  { key: 'team',       label: 'Deal Team' },
+  { key: 'overview',        label: 'Overview' },
+  { key: 'market-research', label: 'Market Research' },
+  { key: 'documents',       label: 'Documents' },
+  { key: 'financials',      label: 'Financials' },
+  { key: 'risk',            label: 'Risk & Legal' },
+  { key: 'team',            label: 'Deal Team' },
 ]
 const activeTab = ref('overview')
 
 // ── EDIT MODE ──────────────────────────────────────────────────────
-const editMode  = ref(false)
-const saving    = ref(false)
+const editMode   = ref(false)
+const saving     = ref(false)
 const savedToast = ref(false)
+const autoSaved  = ref(false)
 
 // Draft objects — reactive copies of the fetched data
 const draftMeta = reactive<any>({})
@@ -230,6 +236,30 @@ async function saveChanges() {
     saving.value = false
   }
 }
+
+// ── Auto-save while editing ─────────────────────────────────────────
+// Any change to draftMeta or draftDeal auto-syncs to Supabase after 1.5s
+let _autoSaveTimer: ReturnType<typeof setTimeout> | null = null
+
+async function flushAutoSave() {
+  if (!editMode.value) return
+  if (draftMeta.name) draftDeal.name = draftMeta.name
+  if (draftDeal.ref)  draftMeta.ref  = draftDeal.ref
+  try {
+    await Promise.all([
+      $fetch(`/api/${dealId}/meta`, { method: 'PUT', body: draftMeta }),
+      $fetch(`/api/${dealId}/deal`, { method: 'PUT', body: draftDeal }),
+    ])
+    autoSaved.value = true
+    setTimeout(() => { autoSaved.value = false }, 2000)
+  } catch { /* silent — user can still click Save */ }
+}
+
+watch([() => ({ ...draftMeta }), () => ({ ...draftDeal })], () => {
+  if (!editMode.value) return
+  if (_autoSaveTimer) clearTimeout(_autoSaveTimer)
+  _autoSaveTimer = setTimeout(flushAutoSave, 1500)
+}, { deep: true })
 
 // Keyboard shortcuts
 onMounted(() => {
@@ -355,6 +385,12 @@ onMounted(() => {
   background: var(--green); color: #fff;
   font-size: 12px; font-weight: 500; padding: 5px 14px;
   border-radius: 20px; pointer-events: none;
+}
+.auto-saved-indicator {
+  position: absolute; right: 28px; top: 12px;
+  background: transparent; color: var(--muted);
+  font-size: 11px; font-weight: 400; padding: 5px 0;
+  pointer-events: none;
 }
 .toast-enter-active, .toast-leave-active { transition: opacity 0.3s, transform 0.3s; }
 .toast-enter-from  { opacity: 0; transform: translateY(-6px); }

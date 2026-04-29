@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRDB Deal Data Room — Market Research Tab (Prototype)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F4F2EE;--surface:#FFF;--surface2:#F9F7F4;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --text:#1A1916;--muted:#7A7770;--faint:#B0ADA8;
+  --green:#1D9E75;--green-bg:#E1F5EE;--green-txt:#0F6E56;
+  --blue:#185FA5;--blue-bg:#E6F1FB;
+  --amber:#854F0B;--amber-bg:#FEF3E2;
+  --red:#A32D2D;--red-bg:#FCEBEB;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --r:10px;--rs:6px;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shm:0 4px 16px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.05);
+}
+html{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.tl{display:flex;align-items:center;gap:12px}
+.logo{width:30px;height:30px;background:var(--text);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;letter-spacing:.04em}
+.t-title{font-size:13px;font-weight:600}
+.t-div{width:1px;height:16px;background:var(--border2)}
+.t-sub{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.btn{height:30px;padding:0 12px;border:1px solid var(--border2);border-radius:var(--rs);background:transparent;font-family:var(--font);font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:5px}
+.btn:hover{background:var(--surface2);color:var(--text)}
+.btn-p{height:30px;padding:0 14px;border:none;border-radius:var(--rs);background:var(--text);color:#fff;font-family:var(--font);font-size:12px;font-weight:500;cursor:pointer;transition:opacity .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-p:hover{opacity:.82}
+.btn-sm{height:26px;padding:0 10px;font-size:11px}
+
+/* NDA */
+.nda{background:var(--amber-bg);border-bottom:1px solid rgba(133,79,11,.15);padding:8px 24px;display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--amber);font-weight:500}
+
+/* DEAL HEADER */
+.dh{background:var(--surface);border-bottom:1px solid var(--border);padding:16px 24px 0}
+.dh-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.d-name{font-size:18px;font-weight:600;letter-spacing:-.3px;margin-bottom:3px}
+.d-meta{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.sep-dot{color:var(--faint)}
+.bdgs{display:flex;gap:6px;align-items:center}
+.b{font-size:10.5px;font-weight:500;padding:2px 9px;border-radius:20px;letter-spacing:.02em}
+.b-grn{background:var(--green-bg);color:var(--green-txt)}
+.b-grey{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.b-blue{background:var(--blue-bg);color:var(--blue)}
+.b-amb{background:var(--amber-bg);color:var(--amber)}
+.b-red{background:var(--red-bg);color:var(--red)}
+.b-ong{background:#E6F1FB;color:#185FA5}
+.b-done{background:var(--green-bg);color:var(--green-txt)}
+
+/* TABS */
+.tabs{display:flex}
+.tab{font-size:13px;font-weight:400;color:var(--muted);padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:color .15s;white-space:nowrap;user-select:none}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--text);font-weight:500;border-bottom-color:var(--text)}
+
+/* MAIN */
+.main{padding:24px;max-width:1280px;width:100%;margin:0 auto}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── OPTION F: SUBJECT PROPERTY CARD ── */
+.deal-ctx{background:var(--text);border-radius:var(--r);padding:14px 20px;margin-bottom:18px;display:flex;align-items:center;gap:0}
+.deal-ctx-label{font-size:10px;font-weight:600;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px}
+.deal-ctx-val{font-size:15px;font-weight:600;color:#fff;letter-spacing:-.3px}
+.deal-ctx-sub{font-size:11px;color:rgba(255,255,255,.55);margin-top:1px}
+.deal-ctx-div{width:1px;background:rgba(255,255,255,.15);align-self:stretch;margin:0 22px}
+.deal-ctx-tag{font-size:10.5px;font-weight:500;padding:2px 9px;border-radius:20px;background:rgba(255,255,255,.15);color:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.2)}
+
+/* KPI ROW */
+.kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:20px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);transition:box-shadow .2s,transform .2s}
+.kpi:hover{box-shadow:var(--shm);transform:translateY(-1px)}
+.kpi-l{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;font-weight:500}
+.kpi-v{font-size:22px;font-weight:600;line-height:1;letter-spacing:-.5px}
+.kpi-s{font-size:11px;margin-top:5px;color:var(--muted)}
+.kpi-s.up{color:var(--green)}
+.kpi-s.warn{color:var(--amber)}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh)}
+.cl{font-size:10.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+
+/* CHARTS + MAP 3-COL */
+.g3-charts{display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:14px;margin-bottom:20px}
+.cw{position:relative;height:210px}
+.map-container{height:242px;border-radius:8px;overflow:hidden;border:1px solid var(--border);position:relative;z-index:1}
+.ref-legend{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);margin-top:8px}
+.ref-line-sample{width:22px;height:2px;border-top:2px dashed #854F0B;display:inline-block;margin-bottom:-1px}
+.map-legend{position:absolute;bottom:8px;left:8px;background:rgba(255,255,255,.92);border-radius:6px;padding:6px 10px;font-size:10.5px;z-index:10;line-height:1.9;box-shadow:var(--sh)}
+.ml-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:middle}
+
+/* ── OPTION D: INSIGHTS PANEL ── */
+.insights-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);margin-bottom:20px}
+.insights-body{font-size:12.5px;color:var(--text);line-height:1.7;white-space:pre-wrap;min-height:60px}
+.insights-textarea{width:100%;min-height:90px;padding:10px 12px;border:1px solid var(--border2);border-radius:var(--rs);font-family:var(--font);font-size:12.5px;color:var(--text);background:var(--surface);resize:vertical;outline:none;line-height:1.6}
+.insights-textarea:focus{border-color:var(--blue)}
+
+/* FILTER PILLS */
+.filter-row{display:flex;align-items:center;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.pill{height:27px;padding:0 11px;border:1px solid var(--border2);border-radius:20px;background:transparent;font-family:var(--font);font-size:11.5px;font-weight:500;color:var(--muted);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.pill:hover{background:var(--surface2);color:var(--text)}
+.pill.on{background:var(--text);color:#fff;border-color:var(--text)}
+.filter-sep{width:1px;height:16px;background:var(--border2);margin:0 1px}
+.filter-lbl{font-size:10.5px;color:var(--muted);font-weight:500;white-space:nowrap}
+
+/* COMPS TABLE */
+.tbl-wrap{overflow-x:auto;border-radius:0;box-shadow:none}
+.ct{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1150px}
+.ct th{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:9px 11px;text-align:left;border-bottom:1px solid var(--border2);white-space:nowrap;background:var(--surface2);cursor:pointer;user-select:none}
+.ct th:hover{color:var(--text)}
+.ct td{padding:9px 11px;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap}
+.ct tbody tr{transition:background .1s;cursor:pointer}
+.ct tbody tr:hover{background:var(--surface2)}
+.ct tbody tr.expanded{background:#FAFAF8}
+.ct tr:last-child td{border-bottom:none}
+.sort-ico{font-size:9px;opacity:.35;margin-left:2px}
+
+/* PSF COLORS */
+.psf-hi{color:var(--green-txt);font-weight:600}
+.psf-ok{color:var(--amber);font-weight:600}
+.psf-lo{color:var(--red);font-weight:600}
+
+/* CHECK / CROSS */
+.chk{color:var(--green)}
+.crs{color:var(--faint)}
+
+/* PHOTO THUMBNAIL */
+.proj-thumb{width:60px;height:42px;border-radius:6px;object-fit:cover;border:1px solid var(--border);flex-shrink:0}
+.proj-thumb-ph{width:60px;height:42px;border-radius:6px;border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;color:var(--faint)}
+.proj-cell{display:flex;align-items:center;gap:9px}
+
+/* EXPANDED ROW */
+.expand-row td{padding:0!important;border-bottom:1px solid var(--border2)!important}
+.expand-inner{padding:14px 16px 16px;background:#FAFAF8;display:grid;grid-template-columns:240px 1fr 1fr;gap:16px;border-top:1px dashed var(--border2)}
+.expand-photo{width:100%;height:150px;object-fit:cover;border-radius:8px;border:1px solid var(--border);display:block}
+.expand-photo-ph{width:100%;height:150px;border-radius:8px;border:1px dashed var(--border2);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;color:var(--faint);font-size:11.5px}
+.expand-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;font-weight:500}
+.expand-val{font-size:12.5px;color:var(--text);line-height:1.5}
+.fac-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.fac-pill{font-size:10.5px;padding:2px 8px;border-radius:20px;background:var(--blue-bg);color:var(--blue)}
+
+/* HIGHLIGHTED ROW (from map click) */
+.ct tbody tr.map-highlight td{background:#FEF9EE!important;box-shadow:inset 3px 0 0 #854F0B}
+
+/* ADD FORM */
+.add-form-wrap{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:20px;box-shadow:var(--shm);margin:0 0 0;display:none}
+.add-form-wrap.open{display:block;animation:fu .18s ease}
+.form-title{font-size:13px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+.form-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:10px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.fg input,.fg select,.fg textarea{width:100%;height:32px;padding:0 10px;border:1px solid var(--border2);border-radius:var(--rs);font-family:var(--font);font-size:12.5px;color:var(--text);background:var(--surface);outline:none;transition:border-color .15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--blue)}
+.fg textarea{height:64px;padding:8px 10px;resize:none;line-height:1.4}
+.form-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding-top:12px;border-top:1px solid var(--border)}
+.cb-row{display:flex;align-items:center;gap:6px;font-size:12.5px;cursor:pointer}
+.cb-row input[type=checkbox]{width:14px;height:14px;accent-color:var(--green);cursor:pointer}
+
+/* EMPTY */
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;color:var(--muted);text-align:center}
+.empty-ico{font-size:30px;margin-bottom:10px;opacity:.5}
+.empty-t{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px}
+.empty-s{font-size:12px}
+
+/* ── OPTION C: BUYER PROFILES ── */
+.buyer-section{margin-top:24px}
+.buyer-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px}
+.buyer-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--sh)}
+.buyer-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:10px}
+.buyer-name{font-size:13px;font-weight:600;margin-bottom:8px}
+.buyer-attr-lbl{font-size:9.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px}
+.buyer-attr-list{list-style:none;display:flex;flex-direction:column;gap:4px}
+.buyer-attr-list li{font-size:11.5px;color:var(--muted);display:flex;align-items:flex-start;gap:6px;line-height:1.4}
+.buyer-attr-list li::before{content:'·';color:var(--faint);flex-shrink:0;margin-top:1px}
+.buyer-edit-area{width:100%;min-height:80px;padding:8px 10px;border:1px solid var(--border2);border-radius:var(--rs);font-family:var(--font);font-size:12px;color:var(--text);background:var(--surface);resize:none;outline:none;line-height:1.5;display:none}
+.buyer-edit-area:focus{border-color:var(--blue)}
+
+.mb20{margin-bottom:20px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="tl">
+    <div class="logo">BD</div>
+    <span class="t-title">BRDB Deal Data Room</span>
+    <div class="t-div"></div>
+    <span class="t-sub">KL-2026-03</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button class="btn">← All Deals</button>
+    <button class="btn">⤓ Export</button>
+    <button class="btn-p">✎ Edit Mode</button>
+  </div>
+</header>
+
+<div class="nda">🔒 Confidential — For Authorised Recipients Only. Do not distribute.</div>
+
+<div class="dh">
+  <div class="dh-top">
+    <div>
+      <div class="d-name">U-Thant (Langgak Golf) Residences</div>
+      <div class="d-meta">
+        <span>Jalan U-Thant, Kuala Lumpur</span>
+        <span class="sep-dot">·</span>
+        <span>1.54 acres · Freehold Residential</span>
+        <span class="sep-dot">·</span>
+        <span>Updated 27 Apr 2026</span>
+      </div>
+    </div>
+    <div class="bdgs">
+      <span class="b b-grn">Active DD</span>
+      <span class="b b-grey">DD Progress 62%</span>
+      <span class="b b-blue">IRR 18.4%</span>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab" onclick="switchTab(this)">Overview</div>
+    <div class="tab active" onclick="switchTab(this)">Market Research</div>
+    <div class="tab" onclick="switchTab(this)">Documents</div>
+    <div class="tab" onclick="switchTab(this)">Financials</div>
+    <div class="tab" onclick="switchTab(this)">Risk &amp; Legal</div>
+    <div class="tab" onclick="switchTab(this)">Deal Team</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- RESEARCH META BAR -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:10.5px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.07em">Market Research Conducted</span>
+      <span id="research-date-display" style="font-size:13px;font-weight:600;font-family:var(--mono)">25 Apr 2026</span>
+      <span id="research-date-edit-wrap" style="display:none;align-items:center;gap:6px">
+        <input type="date" id="research-date-input" value="2026-04-25" style="height:28px;padding:0 8px;border:1px solid var(--border2);border-radius:var(--rs);font-family:var(--mono);font-size:12px;outline:none">
+        <button class="btn btn-sm" onclick="saveResearchDate()">Save</button>
+      </span>
+      <button id="research-date-edit-btn" class="btn btn-sm" onclick="editResearchDate()">✎ Edit</button>
+    </div>
+    <div style="font-size:11.5px;color:var(--muted)">Prepared by <strong style="color:var(--text);font-weight:500">Marketing Team</strong></div>
+  </div>
+
+  <!-- KPI STRIP -->
+  <div class="kpi-row">
+    <div class="kpi">
+      <div class="kpi-l">Comps Tracked</div>
+      <div class="kpi-v" id="kpi-count">7</div>
+      <div class="kpi-s">Comparable projects nearby</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-l">Market PSF Range</div>
+      <div class="kpi-v" id="kpi-psf-range">RM 680–1,450</div>
+      <div class="kpi-s">across all comps</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-l">Avg Take-Up Rate</div>
+      <div class="kpi-v" id="kpi-takeup">84%</div>
+      <div class="kpi-s up" id="kpi-takeup-sub">↑ Market absorption healthy</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-l">Deal Target vs Median PSF</div>
+      <div class="kpi-v">RM 1,500</div>
+      <div class="kpi-s warn" id="kpi-bench-sub">↑ Above market median</div>
+    </div>
+  </div>
+
+  <!-- CHARTS + MAP (3-column) -->
+  <div class="g3-charts">
+    <div class="card">
+      <div class="cl">PSF Comparison vs Deal Target</div>
+      <div class="cw"><canvas id="psfChart"></canvas></div>
+      <div class="ref-legend"><span class="ref-line-sample"></span><span>Deal target: RM 1,500 psf</span></div>
+    </div>
+    <div class="card">
+      <div class="cl">Take-Up Rate by Project</div>
+      <div class="cw"><canvas id="takeupChart"></canvas></div>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:12px 14px 10px;border-bottom:1px solid var(--border)">
+        <div class="cl" style="margin-bottom:0">Location Map</div>
+      </div>
+      <div id="compMap" class="map-container" style="border-radius:0;border:none;height:232px"></div>
+      <div class="map-legend">
+        <div><span class="ml-dot" style="background:#1D9E75"></span>PSF ≥ target</div>
+        <div><span class="ml-dot" style="background:#EF9F27"></span>PSF within 10%</div>
+        <div><span class="ml-dot" style="background:#E24B4A"></span>PSF below</div>
+        <div><span class="ml-dot" style="background:#1A1916"></span>Our site</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION D: KEY MARKET INSIGHTS -->
+  <div class="insights-card mb20">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div class="cl" style="margin-bottom:0">Key Market Insights</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-sm" id="insights-edit-btn" onclick="toggleInsightsEdit()">✎ Edit</button>
+        <button class="btn-p btn-sm" id="insights-save-btn" onclick="saveInsights()" style="display:none">Save</button>
+      </div>
+    </div>
+    <div id="insights-display" class="insights-body">The Ashwood (1,400–3,000 sf) achieved 100% take-up, demonstrating strong demand for larger premium units. Impression U-Thant (931–1,632 sf) recorded 95% take-up since its 2018 launch — remaining stock primarily smaller units, confirming buyers favour larger layouts. Skyline Embassy targets the mass-market segment (521–976 sf) and is differentiated from the upscale, low-density segment we are targeting. Within a 2km radius, three major under-construction projects signal sustained supply pressure through 2027.</div>
+    <textarea id="insights-input" class="insights-textarea"></textarea>
+  </div>
+
+  <!-- COMPS TABLE -->
+  <div class="card mb20" style="padding:0">
+    <div style="padding:14px 16px 0">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="cl" style="margin-bottom:0">Comparable Projects</div>
+        <button class="btn" onclick="toggleForm()">+ Add Project</button>
+      </div>
+
+      <!-- FILTERS -->
+      <div class="filter-row">
+        <span class="filter-lbl">Status:</span>
+        <button class="pill on" onclick="filterPS(this,'all')">All</button>
+        <button class="pill" onclick="filterPS(this,'Ongoing')">Ongoing</button>
+        <button class="pill" onclick="filterPS(this,'Completed')">Completed</button>
+        <div class="filter-sep"></div>
+        <span class="filter-lbl">Tenure:</span>
+        <button class="pill on" onclick="filterTenure(this,'all')">All</button>
+        <button class="pill" onclick="filterTenure(this,'Freehold')">Freehold</button>
+        <button class="pill" onclick="filterTenure(this,'Leasehold')">Leasehold</button>
+        <div class="filter-sep"></div>
+        <span class="filter-lbl">Market:</span>
+        <button class="pill on" onclick="filterMkt(this,'all')">All</button>
+        <button class="pill" onclick="filterMkt(this,'primary')">Primary</button>
+        <button class="pill" onclick="filterMkt(this,'secondary')">Secondary</button>
+      </div>
+    </div>
+
+    <div class="tbl-wrap">
+      <table class="ct">
+        <thead>
+          <tr>
+            <th onclick="sortTable('name')">Project <span class="sort-ico">↕</span></th>
+            <th onclick="sortTable('developer')">Developer <span class="sort-ico">↕</span></th>
+            <th>Status</th>
+            <th onclick="sortTable('completion')">Compl. <span class="sort-ico">↕</span></th>
+            <th onclick="sortTable('units')" style="text-align:right">Units <span class="sort-ico">↕</span></th>
+            <th onclick="sortTable('storeys')" style="text-align:right">Storeys <span class="sort-ico">↕</span></th>
+            <th onclick="sortTable('sizeMin')">Size (sf) <span class="sort-ico">↕</span></th>
+            <th onclick="sortTable('avgPSF')" style="text-align:right">Avg PSF <span class="sort-ico">↕</span></th>
+            <th>Tenure</th>
+            <th>A/C</th>
+            <th style="text-align:center">Bathtub</th>
+            <th style="text-align:center">Green Bldg</th>
+            <th onclick="sortTable('takeUpRate')" style="text-align:right">Take-Up <span class="sort-ico">↕</span></th>
+            <th>Sales Status</th>
+            <th style="text-align:center">Secure</th>
+            <th style="width:32px"></th>
+          </tr>
+        </thead>
+        <tbody id="compsBody"></tbody>
+      </table>
+    </div>
+
+    <!-- ADD / EDIT FORM -->
+    <div id="addForm" class="add-form-wrap" style="margin:14px 16px 16px">
+      <div class="form-title">
+        <span id="formTitle">Add Comparable Project</span>
+        <button class="btn" onclick="toggleForm()">✕ Close</button>
+      </div>
+
+      <div class="form-grid">
+        <div class="fg" style="grid-column:span 2">
+          <label>Project Name *</label>
+          <input type="text" id="f-name" placeholder="e.g. The Ashwood">
+        </div>
+        <div class="fg">
+          <label>Developer *</label>
+          <input type="text" id="f-developer" placeholder="e.g. Paramount">
+        </div>
+        <div class="fg">
+          <label>Architect</label>
+          <input type="text" id="f-architect" placeholder="e.g. GDP Architects">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="fg" style="grid-column:span 2">
+          <label>Location / Address</label>
+          <input type="text" id="f-location" placeholder="e.g. Jalan Ampang Hilir">
+        </div>
+        <div class="fg">
+          <label>Lat</label>
+          <input type="number" id="f-lat" placeholder="3.1582" step="0.0001">
+        </div>
+        <div class="fg">
+          <label>Lng</label>
+          <input type="number" id="f-lng" placeholder="101.7195" step="0.0001">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="fg">
+          <label>Project Status</label>
+          <select id="f-projectStatus">
+            <option value="Ongoing">Ongoing</option>
+            <option value="Completed">Completed</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Completion Year</label>
+          <input type="number" id="f-completion" placeholder="2025" min="2000" max="2035">
+        </div>
+        <div class="fg">
+          <label>No. of Units</label>
+          <input type="number" id="f-units" placeholder="500">
+        </div>
+        <div class="fg">
+          <label>Storeys</label>
+          <input type="number" id="f-storeys" placeholder="40">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="fg">
+          <label>Min Size (sf)</label>
+          <input type="number" id="f-sizeMin" placeholder="700">
+        </div>
+        <div class="fg">
+          <label>Max Size (sf)</label>
+          <input type="number" id="f-sizeMax" placeholder="1200">
+        </div>
+        <div class="fg">
+          <label>Avg PSF (RM) *</label>
+          <input type="number" id="f-avgPSF" placeholder="850">
+        </div>
+        <div class="fg">
+          <label>Take-Up Rate (%)</label>
+          <input type="number" id="f-takeUpRate" placeholder="80" min="0" max="100">
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="fg">
+          <label>Tenure</label>
+          <select id="f-tenure">
+            <option value="Freehold">Freehold</option>
+            <option value="Leasehold 99yr">Leasehold 99yr</option>
+            <option value="Leasehold 60yr">Leasehold 60yr</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Sales Status</label>
+          <select id="f-salesStatus">
+            <option value="Primary Market">Primary Market</option>
+            <option value="Secondary Market">Secondary Market</option>
+            <option value="Upcoming">Upcoming</option>
+            <option value="Sold Out">Sold Out</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Maintenance Fee</label>
+          <input type="text" id="f-maintenanceFee" placeholder="RM 0.35 psf">
+        </div>
+        <div class="fg">
+          <label>Furnishing</label>
+          <select id="f-furnishing">
+            <option value="Bare">Bare</option>
+            <option value="Semi-Furnished">Semi-Furnished</option>
+            <option value="Fully Furnished">Fully Furnished</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-grid-3">
+        <div class="fg">
+          <label>A/C System</label>
+          <select id="f-acSystem">
+            <option value="Split Unit">Split Unit</option>
+            <option value="Ducted A/C">Ducted A/C</option>
+            <option value="VRV/VRF">VRV/VRF</option>
+            <option value="Wall Mount">Wall Mount</option>
+            <option value="None">None (bare)</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Facilities (comma-separated)</label>
+          <input type="text" id="f-facilities" placeholder="Infinity pool, Sky gym, Co-work">
+        </div>
+        <div class="fg" style="justify-content:flex-end;gap:10px">
+          <label style="opacity:0">·</label>
+          <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+            <label class="cb-row"><input type="checkbox" id="f-hasBathtub"> Bathtub</label>
+            <label class="cb-row"><input type="checkbox" id="f-secureBuilding"> Secure Building</label>
+            <label class="cb-row"><input type="checkbox" id="f-greenBuilding"> Green Building</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="fg" style="margin-bottom:12px">
+        <label>Photo URL</label>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <input type="url" id="f-imageUrl" placeholder="https://..." style="flex:1">
+          <div id="f-imgPreview" style="width:76px;height:50px;border-radius:6px;border:1px solid var(--border);overflow:hidden;flex-shrink:0;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--faint)">🏢</div>
+        </div>
+      </div>
+
+      <div class="fg" style="margin-bottom:14px">
+        <label>Notes / USP Analysis</label>
+        <textarea id="f-notes" placeholder="Key selling points, market positioning, absorption drivers..."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn" onclick="toggleForm()">Cancel</button>
+        <button class="btn-p" onclick="saveComp()">Save Project</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPTION C: TARGET BUYER PROFILES -->
+  <div class="buyer-section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+      <div>
+        <div class="cl" style="margin-bottom:2px">Target Buyer Profiles</div>
+        <div style="font-size:11.5px;color:var(--muted);margin-bottom:0">Based on BRDB Marketing Brief — U-Thant appeals to buyers seeking calm, ordered living shaped by landscape and design clarity</div>
+      </div>
+      <button class="btn btn-sm" id="buyer-edit-btn" onclick="toggleBuyerEdit()">✎ Edit Profiles</button>
+    </div>
+    <div class="buyer-grid" id="buyerGrid"></div>
+  </div>
+
+</div><!-- end main -->
+
+<script>
+// ─── CONSTANTS ────────────────────────────────────────────────────────────
+const DEAL_PSF = 1500;
+const DEAL_LAT = 3.1555, DEAL_LNG = 101.7190;
+
+// ─── SAMPLE DATA ─────────────────────────────────────────────────────────
+const compsData = [
+  {
+    id:1, name:"Skyline Embassy", developer:"TS Law Land", architect:"A61",
+    location:"Off Jalan Ampang", lat:3.1612, lng:101.7245,
+    projectStatus:"Ongoing", completion:2027, units:1296, blocks:3, storeys:65,
+    sizeMin:521, sizeMax:976, avgPSF:1350, tenure:"Freehold",
+    salesStatus:"Primary Market", maintenanceFee:"RM 0.50 psf", furnishing:"Semi-Furnished",
+    acSystem:"Ducted A/C", hasBathtub:false, secureBuilding:false, greenBuilding:false, takeUpRate:95,
+    facilities:["2 infinity pools","Sky bridge","Spin room","Swing room","Podium facilities"],
+    imageUrl:"https://picsum.photos/seed/skylineembassy/600/400",
+    notes:"Prominent site off Jalan Ampang beside the previous British High Comm land. Leverages proximity to LRT, retail of Linc & Intermark, and matured commercial sector of Vista, Integra, Binjai. Smaller sizes targeting mass market. Early preview just started."
+  },
+  {
+    id:2, name:"The Ashwood", developer:"Paramount", architect:"UIG",
+    location:"Jalan Ampang Hilir", lat:3.1580, lng:101.7220,
+    projectStatus:"Ongoing", completion:2029, units:354, blocks:2, storeys:49,
+    sizeMin:1400, sizeMax:3000, avgPSF:1250, tenure:"Freehold",
+    salesStatus:"Primary Market", maintenanceFee:"RM 0.39 psf", furnishing:"Semi-Furnished",
+    acSystem:"Wall Mount", hasBathtub:true, secureBuilding:true, greenBuilding:true, takeUpRate:100,
+    facilities:["50m Infinity pool","Basketball/Badminton","Co-working space","Urban farming","Sky terrace","Pet saloon"],
+    imageUrl:"https://picsum.photos/seed/theashwood/600/400",
+    notes:"Following successful completion of Atrium (smaller sizes), Paramount fills the gap for larger units within their ecosystem. Prime location at Jalan Ampang Hilir roundabout, synonymous with U-Thant. 100% take-up confirms strong demand for spacious premium units. Q2 launch."
+  },
+  {
+    id:3, name:"Impression U-Thant", developer:"Yong Tai", architect:"TBC",
+    location:"Jalan U-Thant", lat:3.1560, lng:101.7195,
+    projectStatus:"Completed", completion:2025, units:108, blocks:1, storeys:10,
+    sizeMin:931, sizeMax:1632, avgPSF:1400, tenure:"Freehold",
+    salesStatus:"Secondary Market", maintenanceFee:"RM 0.77 psf", furnishing:"Semi-Furnished",
+    acSystem:"Ducted A/C", hasBathtub:false, secureBuilding:true, greenBuilding:false, takeUpRate:95,
+    facilities:["Infinity pool","Sky infinity pool","Ground floor restaurant"],
+    imageUrl:"https://picsum.photos/seed/impressionutthant/600/400",
+    notes:"95% take-up since 2018 launch. Remaining stock primarily smaller units — confirming buyers favour larger layouts. Proximity to our land is very close. Timing consideration needed so its construction trajectory does not affect our future sales."
+  },
+  {
+    id:4, name:"Pavilion Embassy", developer:"Pavilion REIT / Urusharta JM", architect:"BEP Akitek",
+    location:"Jalan Ampang, Embassy Row", lat:3.1625, lng:101.7235,
+    projectStatus:"Completed", completion:2025, units:450, blocks:1, storeys:54,
+    sizeMin:800, sizeMax:2100, avgPSF:1200, tenure:"Leasehold 99yr",
+    salesStatus:"Primary Market", maintenanceFee:"RM 0.45 psf", furnishing:"Semi-Furnished",
+    acSystem:"Ducted A/C", hasBathtub:true, secureBuilding:true, greenBuilding:false, takeUpRate:76,
+    facilities:["Sky pool & wading pool","Mountain and skyline views"],
+    imageUrl:"https://picsum.photos/seed/pavilionembassy/600/400",
+    notes:"Backed by Pavilion brand — strong lifestyle positioning. Integrated with mall ecosystem. Leasehold tenure limits some buyer segments but brand premium partly compensates. Take-up constrained by thin foreign buyer market post-2023."
+  },
+  {
+    id:5, name:"Star Residences (T1)", developer:"UEM Sunrise", architect:"Farrells",
+    location:"Jalan Yap Kwan Seng, KLCC", lat:3.1572, lng:101.7148,
+    projectStatus:"Completed", completion:2022, units:810, blocks:1, storeys:57,
+    sizeMin:700, sizeMax:4300, avgPSF:820, tenure:"Freehold",
+    salesStatus:"Secondary Market", maintenanceFee:"RM 0.38 psf", furnishing:"Semi-Furnished",
+    acSystem:"Ducted A/C", hasBathtub:false, secureBuilding:true, greenBuilding:false, takeUpRate:91,
+    facilities:["50m Infinity / Lap Pool","VIP Platinum Club","Cigar & Wine Lounge"],
+    imageUrl:"https://picsum.photos/seed/starresidences/600/400",
+    notes:"Large GDV project driven by UEM brand and aggressive launch pricing. Secondary market active; trading at 5–8% premium over launch price. Strong buy-to-let demand from expats."
+  },
+  {
+    id:6, name:"Sastra U-Thant", developer:"CapitaLand", architect:"VERITAS",
+    location:"Jalan U-Thant, KL", lat:3.1548, lng:101.7182,
+    projectStatus:"Completed", completion:2019, units:360, blocks:2, storeys:38,
+    sizeMin:950, sizeMax:2200, avgPSF:780, tenure:"Freehold",
+    salesStatus:"Secondary Market", maintenanceFee:"RM 0.33 psf", furnishing:"Semi-Furnished",
+    acSystem:"Ducted A/C", hasBathtub:true, secureBuilding:true, greenBuilding:true, takeUpRate:88,
+    facilities:["Infinity pool","Tennis court","Gym","Resident lounge"],
+    imageUrl:"https://picsum.photos/seed/sastrautthant/600/400",
+    notes:"Completed CapitaLand project in the same corridor. Strong secondary market liquidity. Serves as a pricing floor benchmark. GreenRE certified. Units with golf views command 8–12% premium over non-golf facing units."
+  },
+  {
+    id:7, name:"Madge Mansions", developer:"Gamuda", architect:"GDP Architects",
+    location:"Jalan Madge, U-Thant", lat:3.1538, lng:101.7170,
+    projectStatus:"Ongoing", completion:2027, units:168, blocks:2, storeys:28,
+    sizeMin:2100, sizeMax:5200, avgPSF:1450, tenure:"Freehold",
+    salesStatus:"Primary Market", maintenanceFee:"RM 0.42 psf", furnishing:"Semi-Furnished",
+    acSystem:"VRV/VRF", hasBathtub:true, secureBuilding:true, greenBuilding:true, takeUpRate:72,
+    facilities:["Lap pool","Sky lounge","Concierge","Private lift lobby","EV charging"],
+    imageUrl:"https://picsum.photos/seed/madgemansions/600/400",
+    notes:"Gamuda's ultra-luxury boutique play targeting the same landed-downsizer and expat segments as our project. Low density (168 units) and large format units are most comparable. Take-up at 72% reflects high ASP selectivity. Most direct competitor — monitor closely."
+  }
+];
+
+// ─── BUYER PROFILES ───────────────────────────────────────────────────────
+let buyerProfiles = [
+  {
+    icon:"🏡", color:"#E1F5EE", name:"Owner Occupiers",
+    attrs:["Low-rise, private enclave living","Golf views as everyday backdrop","Intuitive layouts, human-scaled design","Architecture that feels timeless, not trendy"]
+  },
+  {
+    icon:"🌍", color:"#E6F1FB", name:"Expats",
+    attrs:["Embassy-area location & security","Global design language (Mid-Century Modern)","Indoor–outdoor living & wellness spaces","Calm, ordered environments that feel right"]
+  },
+  {
+    icon:"🏗️", color:"#FEF3E2", name:"Landed Home Upgraders",
+    attrs:["Prestigious embassy district address","Larger unit formats (2,000–5,000 sf)","Private lift lobby & concierge arrival","Premium fit-out without maintenance burden"]
+  },
+  {
+    icon:"✦", color:"#EEEDFE", name:"Design Conscious Minimalists",
+    attrs:["Mid-Century Modern architectural language","Honest structure and horizontality","Passive sustainability embedded in design","Architecture that 'makes sense' — no excess"]
+  }
+];
+let buyerEditMode = false;
+
+// ─── STATE ────────────────────────────────────────────────────────────────
+let data = [...compsData];
+let sortKey = 'avgPSF', sortDir = -1;
+let psFilter = 'all', tenureFilter = 'all', mktFilter = 'all';
+let expandedId = null, editingId = null;
+let highlightedId = null;
+let compMap = null, markers = {};
+
+// ─── FILTER HELPERS ───────────────────────────────────────────────────────
+function setPillGroup(clicked, groupSelector) {
+  document.querySelectorAll(groupSelector).forEach(p => {
+    p.classList.toggle('on', p === clicked);
+  });
+}
+function filterPS(el, val) {
+  psFilter = val;
+  setPillGroup(el, '.ps-pill');
+  renderTable(); renderCharts(); renderMap();
+}
+function filterTenure(el, val) {
+  tenureFilter = val;
+  setPillGroup(el, '.tn-pill');
+  renderTable(); renderCharts(); renderMap();
+}
+function filterMkt(el, val) {
+  mktFilter = val;
+  setPillGroup(el, '.mk-pill');
+  renderTable(); renderCharts(); renderMap();
+}
+
+// Tag pills by group after DOM ready
+function tagPills() {
+  const allPills = [...document.querySelectorAll('.filter-row .pill')];
+  let g = 0, prev = null;
+  const groups = [[], [], []];
+  document.querySelectorAll('.filter-row').forEach(row => {
+    row.querySelectorAll('.filter-sep').forEach((sep, i) => {});
+  });
+  // manually tag by index in filter row
+  const row = document.querySelector('.filter-row');
+  let cur = 0;
+  [...row.children].forEach(el => {
+    if (el.classList.contains('filter-sep')) { cur++; return; }
+    if (el.classList.contains('pill')) {
+      if (cur === 0) el.classList.add('ps-pill');
+      else if (cur === 1) el.classList.add('tn-pill');
+      else el.classList.add('mk-pill');
+    }
+  });
+}
+
+function getFiltered() {
+  return data.filter(c => {
+    if (psFilter !== 'all' && c.projectStatus !== psFilter) return false;
+    if (tenureFilter === 'Freehold' && c.tenure !== 'Freehold') return false;
+    if (tenureFilter === 'Leasehold' && !c.tenure.startsWith('Leasehold')) return false;
+    if (mktFilter === 'primary' && c.salesStatus !== 'Primary Market') return false;
+    if (mktFilter === 'secondary' && c.salesStatus !== 'Secondary Market') return false;
+    return true;
+  }).sort((a, b) => {
+    let av = a[sortKey], bv = b[sortKey];
+    if (typeof av === 'string') av = av.toLowerCase(), bv = bv.toLowerCase();
+    return av < bv ? sortDir : av > bv ? -sortDir : 0;
+  });
+}
+
+// ─── BADGES ───────────────────────────────────────────────────────────────
+function tenureBadge(t) {
+  return t === 'Freehold' ? `<span class="b b-grn">${t}</span>` : `<span class="b b-grey">${t}</span>`;
+}
+function statusBadge(s) {
+  if (s === 'Primary Market') return `<span class="b b-blue">${s}</span>`;
+  if (s === 'Secondary Market') return `<span class="b b-grey">${s}</span>`;
+  if (s === 'Upcoming') return `<span class="b b-amb">${s}</span>`;
+  return `<span class="b b-grey">${s}</span>`;
+}
+function psBadge(ps) {
+  return ps === 'Ongoing'
+    ? `<span class="b b-ong">Ongoing</span>`
+    : `<span class="b b-done">Completed</span>`;
+}
+function psfClass(psf) {
+  if (psf >= DEAL_PSF) return 'psf-hi';
+  if (psf >= DEAL_PSF * 0.88) return 'psf-ok';
+  return 'psf-lo';
+}
+function markerColor(psf) {
+  if (psf >= DEAL_PSF) return '#1D9E75';
+  if (psf >= DEAL_PSF * 0.88) return '#EF9F27';
+  return '#E24B4A';
+}
+
+// ─── RENDER TABLE ─────────────────────────────────────────────────────────
+function renderTable() {
+  const rows = getFiltered();
+  const tbody = document.getElementById('compsBody');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="16"><div class="empty"><div class="empty-ico">🔍</div><div class="empty-t">No comps match your filters</div><div class="empty-s">Adjust filters above</div></div></td></tr>`;
+    updateKPIs([]);
+    return;
+  }
+  tbody.innerHTML = rows.flatMap(c => {
+    const isExp = expandedId === c.id;
+    const isHl = highlightedId === c.id;
+    const sizeRange = (c.sizeMin && c.sizeMax) ? `${c.sizeMin.toLocaleString()}–${c.sizeMax.toLocaleString()}` : '—';
+    const thumb = c.imageUrl
+      ? `<img src="${c.imageUrl}" class="proj-thumb" alt="${c.name}" onerror="this.style.display='none'">`
+      : `<div class="proj-thumb-ph">🏢</div>`;
+    const trClass = [isExp ? 'expanded' : '', isHl ? 'map-highlight' : ''].filter(Boolean).join(' ');
+    const greenIcon = c.greenBuilding ? `<span class="chk" title="Green Building certified">✓</span>` : `<span class="crs">—</span>`;
+    const main = `
+      <tr id="row-${c.id}" class="${trClass}" onclick="toggleExpand(${c.id})">
+        <td><div class="proj-cell">${thumb}<div><strong style="font-size:12.5px">${c.name}</strong><br><span style="font-size:11px;color:var(--muted)">${c.location}</span></div></div></td>
+        <td style="font-size:12px">${c.developer}</td>
+        <td>${psBadge(c.projectStatus)}</td>
+        <td style="font-family:var(--mono);font-size:12px">${c.completion}</td>
+        <td style="text-align:right;font-family:var(--mono)">${c.units.toLocaleString()}</td>
+        <td style="text-align:right;font-family:var(--mono)">${c.storeys}</td>
+        <td style="font-family:var(--mono);font-size:11.5px">${sizeRange}</td>
+        <td style="text-align:right" class="${psfClass(c.avgPSF)}">RM ${c.avgPSF.toLocaleString()}</td>
+        <td>${tenureBadge(c.tenure)}</td>
+        <td style="font-size:11.5px;color:var(--muted)">${c.acSystem}</td>
+        <td style="text-align:center">${c.hasBathtub ? '<span class="chk">✓</span>' : '<span class="crs">—</span>'}</td>
+        <td style="text-align:center">${greenIcon}</td>
+        <td style="text-align:right;font-family:var(--mono);font-size:12.5px;color:${c.takeUpRate >= 85 ? 'var(--green-txt)' : c.takeUpRate >= 70 ? 'var(--amber)' : 'var(--red)'};font-weight:600">${c.takeUpRate}%</td>
+        <td>${statusBadge(c.salesStatus)}</td>
+        <td style="text-align:center">${c.secureBuilding ? '<span class="chk">✓</span>' : '<span class="crs">—</span>'}</td>
+        <td style="text-align:center;color:var(--muted);font-size:11px">${isExp ? '▲' : '▾'}</td>
+      </tr>`;
+    const photoHtml = c.imageUrl
+      ? `<img src="${c.imageUrl}" class="expand-photo" alt="${c.name}" onerror="this.outerHTML='<div class=expand-photo-ph><span style=font-size:28px>🏢</span>No photo</div>'">`
+      : `<div class="expand-photo-ph"><span style="font-size:28px">🏢</span><span>No photo — paste URL in edit</span></div>`;
+    const detail = isExp ? `
+      <tr class="expand-row">
+        <td colspan="16">
+          <div class="expand-inner">
+            <div>
+              ${photoHtml}
+              <div style="margin-top:10px">
+                <div class="expand-lbl">Architect</div>
+                <div class="expand-val">${c.architect || '—'}</div>
+              </div>
+              <div style="margin-top:8px">
+                <div class="expand-lbl">Maintenance Fee</div>
+                <div class="expand-val">${c.maintenanceFee || '—'}</div>
+              </div>
+              <div style="margin-top:8px">
+                <div class="expand-lbl">Furnishing</div>
+                <div class="expand-val">${c.furnishing}</div>
+              </div>
+              ${c.lat ? `<div style="margin-top:8px"><div class="expand-lbl">Coordinates</div><div class="expand-val" style="font-family:var(--mono);font-size:11.5px">${c.lat}, ${c.lng}</div></div>` : ''}
+            </div>
+            <div>
+              <div class="expand-lbl">Facilities</div>
+              <div class="fac-pills">${(c.facilities||[]).map(f=>`<span class="fac-pill">${f}</span>`).join('')}</div>
+              <div style="margin-top:12px">
+                <div class="expand-lbl">Green Building</div>
+                <div class="expand-val">${c.greenBuilding ? '✓ Certified' : 'Not certified'}</div>
+              </div>
+            </div>
+            <div>
+              <div class="expand-lbl">Notes / USP Analysis</div>
+              <div class="expand-val" style="font-size:12px;line-height:1.6;white-space:normal">${c.notes || '—'}</div>
+              <div style="margin-top:12px;display:flex;gap:6px">
+                <button class="btn btn-sm" onclick="editComp(${c.id},event)">✎ Edit</button>
+                <button class="btn btn-sm" style="color:var(--red)" onclick="deleteComp(${c.id},event)">✕ Remove</button>
+              </div>
+            </div>
+          </div>
+        </td>
+      </tr>` : '';
+    return [main, detail];
+  }).join('');
+  updateKPIs(rows);
+}
+
+// ─── KPI UPDATE ───────────────────────────────────────────────────────────
+function updateKPIs(rows) {
+  if (!rows.length) { document.getElementById('kpi-count').textContent = 0; return; }
+  const psfs = rows.map(r => r.avgPSF);
+  const takeUps = rows.map(r => r.takeUpRate).filter(v => v > 0);
+  const minPSF = Math.min(...psfs), maxPSF = Math.max(...psfs);
+  const avgTU = Math.round(takeUps.reduce((a,b)=>a+b,0)/takeUps.length);
+  const medPSF = [...psfs].sort((a,b)=>a-b)[Math.floor(psfs.length/2)];
+  document.getElementById('kpi-count').textContent = rows.length;
+  document.getElementById('kpi-psf-range').textContent = `RM ${minPSF.toLocaleString()}–${maxPSF.toLocaleString()}`;
+  document.getElementById('kpi-takeup').textContent = avgTU + '%';
+  const sub = document.getElementById('kpi-bench-sub');
+  sub.textContent = DEAL_PSF > medPSF
+    ? `↑ Above market median (RM ${medPSF.toLocaleString()})`
+    : `↓ Below market median (RM ${medPSF.toLocaleString()})`;
+  sub.className = 'kpi-s ' + (DEAL_PSF > medPSF ? 'warn' : 'up');
+}
+
+// ─── SORT ─────────────────────────────────────────────────────────────────
+function sortTable(key) {
+  sortDir = (sortKey === key) ? sortDir * -1 : -1;
+  sortKey = key;
+  renderTable();
+}
+
+// ─── EXPAND ───────────────────────────────────────────────────────────────
+function toggleExpand(id) {
+  expandedId = expandedId === id ? null : id;
+  highlightedId = null;
+  renderTable();
+}
+
+// ─── CHARTS ───────────────────────────────────────────────────────────────
+let psfChart, takeupChart;
+
+function renderCharts() {
+  const rows = getFiltered().sort((a,b) => a.avgPSF - b.avgPSF);
+  const labels = rows.map(r => r.name);
+  const psfs = rows.map(r => r.avgPSF);
+  const bg = psfs.map(p => p >= DEAL_PSF ? 'rgba(29,158,117,.75)' : p >= DEAL_PSF*.88 ? 'rgba(239,159,39,.75)' : 'rgba(176,173,168,.55)');
+
+  if (psfChart) psfChart.destroy();
+  psfChart = new Chart(document.getElementById('psfChart').getContext('2d'), {
+    type:'bar',
+    data:{ labels, datasets:[{ label:'Avg PSF', data:psfs, backgroundColor:bg, borderRadius:4, borderWidth:0 }] },
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label:c=>`RM ${c.raw.toLocaleString()} psf` }}},
+      scales:{
+        x:{ grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:10,family:"'DM Mono'"},color:'#7A7770',callback:v=>'RM '+v.toLocaleString()}, min:400 },
+        y:{ grid:{display:false}, ticks:{font:{size:10.5,family:"'DM Sans'"},color:'#1A1916'} }
+      },
+      animation:{duration:300}
+    },
+    plugins:[{ id:'dealLine', afterDraw(chart){
+      const {ctx, chartArea:{top,bottom}, scales:{x}} = chart;
+      const xp = x.getPixelForValue(DEAL_PSF);
+      ctx.save(); ctx.beginPath(); ctx.setLineDash([5,4]);
+      ctx.strokeStyle='#854F0B'; ctx.lineWidth=1.5;
+      ctx.moveTo(xp,top); ctx.lineTo(xp,bottom); ctx.stroke(); ctx.restore();
+    }}]
+  });
+
+  const tuRows = getFiltered().sort((a,b)=>b.takeUpRate-a.takeUpRate);
+  if (takeupChart) takeupChart.destroy();
+  takeupChart = new Chart(document.getElementById('takeupChart').getContext('2d'), {
+    type:'bar',
+    data:{
+      labels:tuRows.map(r=>r.name),
+      datasets:[{ label:'Take-Up %', data:tuRows.map(r=>r.takeUpRate),
+        backgroundColor:tuRows.map(r=> r.takeUpRate>=85?'rgba(29,158,117,.75)':r.takeUpRate>=70?'rgba(239,159,39,.75)':'rgba(162,45,45,.65)'),
+        borderRadius:4, borderWidth:0 }]
+    },
+    options:{
+      indexAxis:'y', responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>c.raw+'%'}} },
+      scales:{
+        x:{ min:0,max:100, grid:{color:'rgba(0,0,0,.05)'}, ticks:{font:{size:10,family:"'DM Mono'"},color:'#7A7770',callback:v=>v+'%'} },
+        y:{ grid:{display:false}, ticks:{font:{size:10.5,family:"'DM Sans'"},color:'#1A1916'} }
+      },
+      animation:{duration:300}
+    }
+  });
+}
+
+// ─── OPTION E: MAP ────────────────────────────────────────────────────────
+function initMap() {
+  compMap = L.map('compMap', { zoomControl:true, scrollWheelZoom:true }).setView([DEAL_LAT, DEAL_LNG], 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution:'© OpenStreetMap', maxZoom:19
+  }).addTo(compMap);
+
+  // Deal site marker
+  const siteIcon = L.divIcon({
+    className:'', iconSize:[16,16], iconAnchor:[8,8],
+    html:`<div style="width:16px;height:16px;background:#1A1916;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)"></div>`
+  });
+  L.marker([DEAL_LAT, DEAL_LNG], {icon:siteIcon}).addTo(compMap)
+    .bindPopup(`<strong>Our Site</strong><br>U-Thant (Langgak Golf)<br>Target: RM ${DEAL_PSF.toLocaleString()} psf`);
+}
+
+function renderMap() {
+  if (!compMap) return;
+  Object.values(markers).forEach(m => compMap.removeLayer(m));
+  markers = {};
+  const rows = getFiltered();
+  rows.forEach(c => {
+    if (!c.lat || !c.lng) return;
+    const col = markerColor(c.avgPSF);
+    const icon = L.divIcon({
+      className:'', iconSize:[12,12], iconAnchor:[6,6],
+      html:`<div style="width:12px;height:12px;background:${col};border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);cursor:pointer"></div>`
+    });
+    const m = L.marker([c.lat, c.lng], {icon}).addTo(compMap);
+    m.bindPopup(`<strong>${c.name}</strong><br>${c.developer}<br>RM ${c.avgPSF.toLocaleString()} psf · ${c.takeUpRate}% take-up`);
+    m.on('click', () => highlightFromMap(c.id));
+    markers[c.id] = m;
+  });
+}
+
+function highlightFromMap(id) {
+  highlightedId = id;
+  expandedId = id;
+  renderTable();
+  const row = document.getElementById(`row-${id}`);
+  if (row) row.scrollIntoView({ behavior:'smooth', block:'center' });
+}
+
+// ─── OPTION D: INSIGHTS ───────────────────────────────────────────────────
+let insightsEditing = false;
+function toggleInsightsEdit() {
+  insightsEditing = !insightsEditing;
+  const display = document.getElementById('insights-display');
+  const input = document.getElementById('insights-input');
+  const editBtn = document.getElementById('insights-edit-btn');
+  const saveBtn = document.getElementById('insights-save-btn');
+  if (insightsEditing) {
+    input.value = display.textContent;
+    display.style.display = 'none';
+    input.style.display = 'block';
+    editBtn.style.display = 'none';
+    saveBtn.style.display = '';
+    input.focus();
+  } else {
+    saveInsights();
+  }
+}
+function saveInsights() {
+  const display = document.getElementById('insights-display');
+  const input = document.getElementById('insights-input');
+  display.textContent = input.value;
+  display.style.display = '';
+  input.style.display = 'none';
+  document.getElementById('insights-edit-btn').style.display = '';
+  document.getElementById('insights-save-btn').style.display = 'none';
+  insightsEditing = false;
+}
+
+// ─── OPTION C: BUYER PROFILES ─────────────────────────────────────────────
+function renderBuyerProfiles() {
+  const grid = document.getElementById('buyerGrid');
+  grid.innerHTML = buyerProfiles.map((p, i) => `
+    <div class="buyer-card">
+      <div class="buyer-icon" style="background:${p.color}">${p.icon}</div>
+      <div class="buyer-name">${p.name}</div>
+      <div class="buyer-attr-lbl">What Attracts Them</div>
+      <ul class="buyer-attr-list" id="buyer-list-${i}">
+        ${p.attrs.map(a=>`<li>${a}</li>`).join('')}
+      </ul>
+      <textarea class="buyer-edit-area" id="buyer-ta-${i}">${p.attrs.join('\n')}</textarea>
+    </div>`).join('');
+}
+
+function toggleBuyerEdit() {
+  buyerEditMode = !buyerEditMode;
+  const btn = document.getElementById('buyer-edit-btn');
+  if (buyerEditMode) {
+    btn.textContent = '✓ Done';
+    btn.classList.add('btn-p');
+    buyerProfiles.forEach((_, i) => {
+      document.getElementById(`buyer-list-${i}`).style.display = 'none';
+      const ta = document.getElementById(`buyer-ta-${i}`);
+      ta.style.display = 'block';
+      ta.focus();
+    });
+  } else {
+    buyerProfiles.forEach((p, i) => {
+      const ta = document.getElementById(`buyer-ta-${i}`);
+      p.attrs = ta.value.split('\n').map(s=>s.trim()).filter(Boolean);
+    });
+    btn.textContent = '✎ Edit Profiles';
+    btn.classList.remove('btn-p');
+    renderBuyerProfiles();
+  }
+}
+
+// ─── ADD / EDIT FORM ──────────────────────────────────────────────────────
+function toggleForm() {
+  const form = document.getElementById('addForm');
+  const open = form.classList.contains('open');
+  form.classList.toggle('open', !open);
+  if (open) { editingId = null; clearForm(); document.getElementById('formTitle').textContent = 'Add Comparable Project'; }
+  else form.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+function clearForm() {
+  ['f-name','f-developer','f-architect','f-location','f-facilities','f-notes','f-maintenanceFee','f-imageUrl'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  ['f-completion','f-units','f-storeys','f-sizeMin','f-sizeMax','f-avgPSF','f-takeUpRate','f-lat','f-lng'].forEach(id => { const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('f-tenure').value = 'Freehold';
+  document.getElementById('f-salesStatus').value = 'Primary Market';
+  document.getElementById('f-furnishing').value = 'Bare';
+  document.getElementById('f-acSystem').value = 'Split Unit';
+  document.getElementById('f-projectStatus').value = 'Ongoing';
+  document.getElementById('f-hasBathtub').checked = false;
+  document.getElementById('f-secureBuilding').checked = false;
+  document.getElementById('f-greenBuilding').checked = false;
+  updateImgPreview('');
+}
+function updateImgPreview(url) {
+  const box = document.getElementById('f-imgPreview');
+  if (!box) return;
+  box.innerHTML = url ? `<img src="${url}" style="width:100%;height:100%;object-fit:cover" onerror="this.parentElement.innerHTML='🏢'">` : '🏢';
+}
+function editComp(id, e) {
+  e.stopPropagation();
+  const c = data.find(x=>x.id===id); if(!c) return;
+  editingId = id;
+  document.getElementById('f-name').value = c.name;
+  document.getElementById('f-developer').value = c.developer;
+  document.getElementById('f-architect').value = c.architect||'';
+  document.getElementById('f-location').value = c.location||'';
+  document.getElementById('f-lat').value = c.lat||'';
+  document.getElementById('f-lng').value = c.lng||'';
+  document.getElementById('f-projectStatus').value = c.projectStatus||'Ongoing';
+  document.getElementById('f-completion').value = c.completion||'';
+  document.getElementById('f-units').value = c.units||'';
+  document.getElementById('f-storeys').value = c.storeys||'';
+  document.getElementById('f-sizeMin').value = c.sizeMin||'';
+  document.getElementById('f-sizeMax').value = c.sizeMax||'';
+  document.getElementById('f-avgPSF').value = c.avgPSF||'';
+  document.getElementById('f-takeUpRate').value = c.takeUpRate||'';
+  document.getElementById('f-tenure').value = c.tenure;
+  document.getElementById('f-salesStatus').value = c.salesStatus;
+  document.getElementById('f-maintenanceFee').value = c.maintenanceFee||'';
+  document.getElementById('f-furnishing').value = c.furnishing;
+  document.getElementById('f-acSystem').value = c.acSystem;
+  document.getElementById('f-hasBathtub').checked = c.hasBathtub;
+  document.getElementById('f-secureBuilding').checked = c.secureBuilding;
+  document.getElementById('f-greenBuilding').checked = c.greenBuilding||false;
+  document.getElementById('f-facilities').value = (c.facilities||[]).join(', ');
+  document.getElementById('f-imageUrl').value = c.imageUrl||'';
+  document.getElementById('f-notes').value = c.notes||'';
+  updateImgPreview(c.imageUrl||'');
+  document.getElementById('formTitle').textContent = `Edit: ${c.name}`;
+  document.getElementById('addForm').classList.add('open');
+  document.getElementById('addForm').scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+function deleteComp(id, e) {
+  e.stopPropagation();
+  const c = data.find(x=>x.id===id);
+  if (!c || !confirm(`Remove "${c.name}"?`)) return;
+  data = data.filter(x=>x.id!==id);
+  expandedId = null;
+  renderTable(); renderCharts(); renderMap();
+}
+function saveComp() {
+  const name = document.getElementById('f-name').value.trim();
+  const developer = document.getElementById('f-developer').value.trim();
+  const avgPSF = parseInt(document.getElementById('f-avgPSF').value);
+  if (!name || !developer || !avgPSF) { alert('Please fill in Project Name, Developer, and Avg PSF.'); return; }
+  const comp = {
+    id: editingId || Date.now(),
+    name, developer,
+    architect: document.getElementById('f-architect').value.trim(),
+    location: document.getElementById('f-location').value.trim(),
+    lat: parseFloat(document.getElementById('f-lat').value)||null,
+    lng: parseFloat(document.getElementById('f-lng').value)||null,
+    projectStatus: document.getElementById('f-projectStatus').value,
+    completion: parseInt(document.getElementById('f-completion').value)||null,
+    units: parseInt(document.getElementById('f-units').value)||0,
+    storeys: parseInt(document.getElementById('f-storeys').value)||0,
+    sizeMin: parseInt(document.getElementById('f-sizeMin').value)||null,
+    sizeMax: parseInt(document.getElementById('f-sizeMax').value)||null,
+    avgPSF,
+    tenure: document.getElementById('f-tenure').value,
+    salesStatus: document.getElementById('f-salesStatus').value,
+    maintenanceFee: document.getElementById('f-maintenanceFee').value.trim(),
+    furnishing: document.getElementById('f-furnishing').value,
+    acSystem: document.getElementById('f-acSystem').value,
+    hasBathtub: document.getElementById('f-hasBathtub').checked,
+    secureBuilding: document.getElementById('f-secureBuilding').checked,
+    greenBuilding: document.getElementById('f-greenBuilding').checked,
+    takeUpRate: parseInt(document.getElementById('f-takeUpRate').value)||0,
+    facilities: document.getElementById('f-facilities').value.split(',').map(s=>s.trim()).filter(Boolean),
+    imageUrl: document.getElementById('f-imageUrl').value.trim(),
+    notes: document.getElementById('f-notes').value.trim()
+  };
+  if (editingId) data = data.map(c=>c.id===editingId ? comp : c);
+  else data.push(comp);
+  toggleForm();
+  renderTable(); renderCharts(); renderMap();
+}
+
+// ─── TAB SWITCHER ─────────────────────────────────────────────────────────
+function switchTab(el) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ─── RESEARCH DATE ────────────────────────────────────────────────────────
+function editResearchDate() {
+  document.getElementById('research-date-display').style.display = 'none';
+  document.getElementById('research-date-edit-btn').style.display = 'none';
+  document.getElementById('research-date-edit-wrap').style.display = 'inline-flex';
+}
+function saveResearchDate() {
+  const val = document.getElementById('research-date-input').value;
+  if (!val) return;
+  const d = new Date(val);
+  document.getElementById('research-date-display').textContent = d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+  document.getElementById('research-date-display').style.display = '';
+  document.getElementById('research-date-edit-btn').style.display = '';
+  document.getElementById('research-date-edit-wrap').style.display = 'none';
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────
+document.getElementById('f-imageUrl').addEventListener('input', e => updateImgPreview(e.target.value.trim()));
+tagPills();
+renderTable();
+renderCharts();
+renderBuyerProfiles();
+setTimeout(() => { initMap(); renderMap(); }, 100);
+</script>
+</body>
+</html>

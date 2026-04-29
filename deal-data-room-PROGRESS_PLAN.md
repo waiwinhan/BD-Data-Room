@@ -48,10 +48,12 @@
 | M27 | Manual SWOT & Recommendation Editing | 4 | ✅ | Apr 23 |
 | M28 | Supabase RLS + Service Role Key | 5 | ✅ | Apr 23 |
 | M29 | Excel Parser — Label-Based Row Detection | 5 | ✅ | Apr 23 |
+| M30 | Market Research Tab (Comparable Projects) | 6 | ✅ | Apr 28 |
 
 **Prototype files (visual spec — open in browser before coding each module)**
 - `deal-data-room-list.html` → M02 DealCard, FilterBar, PortfolioSummary
 - `deal-data-room-prototype.html` → M03–M10 (all 5 dashboard tabs)
+- `deal-data-room-market-research-prototype.html` → M30 Market Research tab (comparable projects)
 
 ---
 
@@ -861,6 +863,103 @@ Goal: Replace flat JSON files + local filesystem with Supabase (PostgreSQL + Sto
 - [x] Finance charges: GDC after - GDC before diff, fallback to section 11 search
 - [x] blendedPSF: ndvRow+3 offset (consistent across all observed template versions)
 - [x] Remove isNew flag — no longer needed (label search is template-agnostic)
+
+---
+
+## Phase 6 — Market Research Tab
+
+---
+
+### M30 — Market Research Tab (Comparable Projects) 🔄
+
+**Milestone:** A new "Market Research" tab (positioned after Overview) lets the Marketing Team log and compare nearby competing projects — developer, PSF, take-up rate, facilities, and USP notes — with live charts benchmarked against the deal's own target PSF.
+
+> **Apr 27 2026:** HTML prototype (`deal-data-room-market-research-prototype.html`) completed and approved. Shows 4 KPI cards, horizontal PSF bar chart with deal target reference line, take-up rate chart, filterable/sortable comps table with inline row expand, and a full Add/Edit project form. Tab positioned as tab 2 (after Overview). "Research Conducted" date + "Prepared by Marketing Team" meta shown at top of tab.
+
+**Reference:** `deal-data-room-market-research-prototype.html`
+
+**Data structure** — `data/[dealId]/comps.json` (array):
+```json
+{
+  "conductedDate": "2026-04-25",
+  "preparedBy": "Marketing Team",
+  "comps": [
+    {
+      "id": "uuid",
+      "projectName": "8 Conlay",
+      "developer": "KSK Land",
+      "architect": "Zaha Hadid / GDP",
+      "location": "Jalan Conlay, KLCC",
+      "completion": 2024,
+      "units": 900,
+      "blocks": 2,
+      "storeys": 60,
+      "sizeMin": 710,
+      "sizeMax": 4300,
+      "avgPSF": 1450,
+      "tenure": "Freehold",
+      "salesStatus": "Secondary Market",
+      "maintenanceFee": "RM 0.48 psf",
+      "furnishing": "Fully Furnished",
+      "acSystem": "VRV/VRF",
+      "hasBathtub": true,
+      "secureBuilding": true,
+      "takeUpRate": 88,
+      "facilities": ["Sky pool", "Infinity pool", "Concierge"],
+      "notes": "Iconic twin towers..."
+    }
+  ]
+}
+```
+
+**Step 1 — HTML Prototype ✅ (Apr 27 2026)**
+- [x] `deal-data-room-market-research-prototype.html` — fully interactive standalone prototype
+- [x] Tab repositioned to slot 2 (Overview → **Market Research** → Documents → …)
+- [x] "Research Conducted" date field with inline edit (pencil → date picker → save)
+- [x] "Prepared by Marketing Team" attribution
+- [x] 4 KPI cards: Comps Tracked, Market PSF Range, Avg Take-Up Rate, Deal Target PSF
+- [x] PSF horizontal bar chart — green/amber/grey bars, dashed deal-target reference line
+- [x] Take-up rate horizontal bar chart — green/amber/red by health
+- [x] Comps table: sortable columns, filter pills (Freehold/Leasehold, Primary/Secondary/Upcoming)
+- [x] Row expand: shows architect, maintenance fee, furnishing, facilities pills, USP notes, Edit/Remove buttons
+- [x] Add Project / Edit Project inline form with all schema fields
+- [x] PSF cells color-coded: green ≥ deal target, amber within 10% below, red further below
+
+**Step 2 — Vue Implementation ⏳**
+
+*Data store*
+- [ ] Create `data/KL-2026-03/comps.json` with 7 sample KL comps (same as prototype)
+- [ ] Create `server/api/[dealId]/comps.get.ts` — reads `comps.json`, returns `{ conductedDate, preparedBy, comps }`
+- [ ] Create `server/api/[dealId]/comps.put.ts` — writes full updated payload back to `comps.json`
+
+*Component*
+- [ ] Create `app/components/MarketResearchTab.vue`:
+  - [ ] Props: `:deal`, `:meta`, `:deal-id`
+  - [ ] Fetch `/api/[dealId]/comps` on mount via `useFetch`
+  - [ ] Research meta bar: conductedDate (inline editable) + "Prepared by Marketing Team"
+  - [ ] 4 KPI cards (same as prototype, reactive to filtered set)
+  - [ ] PSF chart (Chart.js horizontal bar, `indexAxis: 'y'`, dashed reference line plugin)
+  - [ ] Take-up chart (Chart.js horizontal bar)
+  - [ ] Filter pills: Tenure × Sales Status
+  - [ ] Sortable comps table with expand/collapse rows
+  - [ ] Add/Edit form (slide-down panel)
+  - [ ] Save → `PUT /api/[dealId]/comps` with full comps array
+  - [ ] Scoped styles matching existing tab CSS variables
+
+*Tab registration*
+- [ ] `app/pages/[dealId]/index.vue`:
+  - [ ] Add `{ key: 'market-research', label: 'Market Research' }` at index 1 in `tabs` array (after Overview)
+  - [ ] Add `<MarketResearchTab v-else-if="activeTab === 'market-research'" key="market-research" :deal="deal" :meta="meta" :deal-id="dealId" />`
+  - [ ] Import `MarketResearchTab` component
+
+**Verification**
+- [ ] `npm run dev` → navigate to any deal → "Market Research" tab appears at position 2
+- [ ] Add a new comp via form → row appears in table, charts update, PSF KPI recalculates
+- [ ] Edit an existing comp → changes persist after tab switch and page reload
+- [ ] Filter pills (Freehold / Primary Market) correctly filter table and chart
+- [ ] Sort by PSF descending → rows reorder, chart updates
+- [ ] conductedDate edit → save → persists after page reload
+- [ ] Verify `comps.json` updated on disk after each save
 
 ---
 
