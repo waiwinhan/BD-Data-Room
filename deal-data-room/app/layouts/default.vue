@@ -48,6 +48,9 @@
 
     <!-- Welcome Popup (shown once per session after login) -->
     <WelcomePopup />
+
+    <!-- Floating AI co-pilot — visible on every page -->
+    <AiChatbot />
   </div>
 </template>
 
