@@ -16,7 +16,7 @@ import Anthropic from '@anthropic-ai/sdk'
 // ── Demo responses (streamed when ANTHROPIC_API_KEY is missing/invalid) ──────
 const DEMO_RESPONSES: Array<{ keywords: string[]; answer: string }> = [
   {
-    keywords: ['mont kiara', 'mk', 'luxury', 'psf', '1800', '1,800'],
+    keywords: ['mont kiara', 'luxury condo', '1800 psf', '1,800 psf', 'mk comp', 'kiara comp'],
     answer: `**Mont Kiara Luxury Comps — RM 1,800 PSF Analysis**
 
 Your RM 1,800 PSF positioning sits at the **upper mid-range of the MK luxury corridor** — credible but tight against recent launches. Here's how it benchmarks:
@@ -59,7 +59,7 @@ Gamuda developments command a **5–8% PSF premium** over non-branded township d
 *KB references: \`entities/developers/gamuda-land\`, \`concepts/construction-quality-benchmarks\`, \`areas/kl-south-corridor\`*`,
   },
   {
-    keywords: ['irr', 'return', 'hurdle', 'margin', 'feasibility'],
+    keywords: ['irr', 'hurdle rate', 'dev margin', 'development margin', 'feasibility', 'equity return'],
     answer: `**IRR & Development Margin — Quick Diagnostic**
 
 For a KL residential development at this deal's profile, here are the benchmarks to measure against:
@@ -79,6 +79,65 @@ For a KL residential development at this deal's profile, here are the benchmarks
 **Rule of thumb:** If your ungeared IRR is below 12%, the deal is not creating value above the cost of capital — reconsider land price or GDV assumptions.
 
 *KB references: \`concepts/development-economics\`, \`concepts/irr-benchmarks-malaysia\`, \`costs/construction-kl-2025\`*`,
+  },
+  {
+    keywords: ['land cost', 'land price', 'acquisition', 'land value', 'per acre', 'per sf'],
+    answer: `**Land Cost Benchmarks — KL & Selangor**
+
+Land pricing varies sharply by location tier, tenure, and zoning. Here's the current KB benchmark grid:
+
+| Area | Tenure | Zoning | Land Cost (RM PSF) | RM per acre (approx) |
+|---|---|---|---|---|
+| KLCC / Bukit Bintang | FH | Commercial | 1,800–3,500 | 78M–152M |
+| Mont Kiara / Damansara Heights | FH | Residential | 600–1,100 | 26M–48M |
+| Bangsar / Damansara | FH/LH | Mixed | 450–800 | 20M–35M |
+| Petaling Jaya (SS/PJ Utama) | FH | Residential | 280–480 | 12M–21M |
+| Subang / Shah Alam | FH | Industrial/Resi | 120–260 | 5M–11M |
+| Cheras / Sg Besi | LH | Residential | 180–320 | 8M–14M |
+| Setapak / Wangsa Maju | LH | Residential | 150–250 | 6.5M–11M |
+
+**Acquisition sanity check (rule of thumb):**
+- Land cost should not exceed **15–20% of GDV** for the deal to pencil at a 25%+ dev margin
+- At RM 1,250 PSF ASP and 2.0 plot ratio, land cost ceiling is ~RM 375–500 PSF (gross) before margin compresses
+- Leasehold land should price at a **15–20% discount** to freehold equivalent — otherwise you're overpaying for tenure risk
+
+**Red flags:**
+- Vendor quoting FH prices for LH land → walk away or reprice hard
+- Irregular lot shape reducing buildable area below 75% of gross → recalculate net-to-gross before accepting any PSF price
+- Existing tenants / squatters → add RM 2–5M buffer per acre for vacant possession costs
+
+*KB references: \`concepts/land-cost-benchmarks\`, \`areas/kl-central\`, \`concepts/plot-ratio-optimisation\`*`,
+  },
+  {
+    keywords: ['construction cost', 'build cost', 'psf build', 'hard cost', 'contractor', 'building cost'],
+    answer: `**Construction Cost Benchmarks — KL High-Rise (2025–2026)**
+
+Current hard cost landscape post-material inflation cycle:
+
+| Building Type | Spec | Cost PSF (RM) | Notes |
+|---|---|---|---|
+| High-rise condo (20–40 floors) | Mid-range | 360–420 | Most common residential typology |
+| High-rise condo | Premium | 450–550 | Branded fittings, higher M&E spec |
+| High-rise condo | Luxury | 580–750 | Custom facades, smart home, concierge |
+| Serviced apartment | Mid | 320–380 | Smaller units, simpler M&E |
+| SOHO / SOFO | Budget | 280–340 | Lower floor-to-floor, simplified finishes |
+| Retail podium (GF–4F) | Standard | 380–480 | Higher structural load, MEP complexity |
+| Car park (basement) | Per bay | 35,000–55,000 | Per parking bay, inclusive of structure |
+
+**Key cost drivers in 2025–2026:**
+- **Steel:** RM 3,200–3,600/tonne (up 15% from 2023) — still volatile, lock in price early
+- **Cement:** RM 22–26/bag (stabilised after 2023 spike)
+- **Labour:** Up 18% YoY due to foreign worker permit tightening (Madani policy impact)
+- **M&E:** 22–28% of hard cost for high-rise; don't underbudget this
+
+**Soft costs to add on top (% of hard cost):**
+- Professional fees (arch/struct/M&E): 8–12%
+- CIDB levy: 0.125% of contract value
+- Contingency: 5–8% minimum (10% if schedule is tight)
+
+**Contractor market:** Currently a buyer's market for Tier-2 contractors. Good time to lock in fixed-price contracts, but ensure performance bond of ≥5% contract value.
+
+*KB references: \`costs/construction-kl-2025\`, \`costs/material-benchmarks\`, \`concepts/development-economics\`*`,
   },
   {
     keywords: ['swot', 'strength', 'weakness', 'risk', 'opportunity'],
