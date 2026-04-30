@@ -23,7 +23,7 @@
           </svg>
         </div>
         <div>
-          <div class="chat-header-title">Strategic Co-Pilot</div>
+          <div class="chat-header-title">Malaysia Property Chatgpt</div>
           <div class="chat-header-sub">
             KB · {{ threads.length }} chats
             <span v-if="dealLabel" class="chat-deal-chip">📌 {{ dealLabel }}</span>
